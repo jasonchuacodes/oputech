@@ -1,0 +1,15 @@
+{
+  "name": "oputech",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter client dev & pnpm --filter server start:dev",
+    "dev:client": "pnpm --filter client dev",
+    "dev:server": "pnpm --filter server start:dev"
+  },
+  "dependencies": {
+    "lucide-react": "^1.17.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@nestjs/core"]
+  }
+}
