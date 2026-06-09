@@ -18,4 +18,10 @@ export class AuthController {
   login(@Body() input: LoginDto, @Res({ passthrough: true }) res: Response) {
     return this.auth.login(input, res);
   }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) res: Response) {
+    this.auth.logout(res);
+  }
 }

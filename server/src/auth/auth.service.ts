@@ -48,6 +48,14 @@ export class AuthService {
     };
   }
 
+  logout(res: Response) {
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+  }
+
   async register(input: RegisterDto) {
     const existing = await this.users.findByEmail(input.email);
     if (existing) throw new ConflictException('Email already in use');
