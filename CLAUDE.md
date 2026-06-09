@@ -81,3 +81,15 @@ Global API prefix: `/api`. All routes are therefore `/api/<path>`.
 CORS is handled by a whitelist middleware at `src/common/middleware/cors.middleware.ts` — add allowed origins to `CLIENT_URL` env var (single value today; extend the whitelist array as needed). The middleware is applied in `main.ts` before route registration.
 
 Feature modules go under `src/<feature>/` following NestJS conventions (`module`, `controller`, `service`).
+
+**Dependency injection naming** — injected services are named after their domain, not the full class name:
+```ts
+constructor(private readonly auth: AuthService) {}
+constructor(private readonly users: UsersService) {}
+```
+
+**DTO parameter naming** — when a method accepts a DTO, always name the parameter `input`:
+```ts
+register(input: RegisterDto) {}
+create(input: CreateUserDto) {}
+```
