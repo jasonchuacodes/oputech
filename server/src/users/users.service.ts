@@ -8,6 +8,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersService {
   constructor(@InjectModel(User.name) private user: Model<UserDocument>) {}
 
+  findById(id: string): Promise<UserDocument | null> {
+    return this.user.findById(id).exec();
+  }
+
   findByEmail(email: string): Promise<UserDocument | null> {
     return this.user.findOne({ email }).exec();
   }

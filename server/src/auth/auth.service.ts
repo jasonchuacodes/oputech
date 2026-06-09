@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -46,6 +46,24 @@ export class AuthService {
         role: user.role,
       },
     };
+  }
+
+  async refresh(req: Request) {
+    const token = req.cookies?.refresh_token;
+    if (!token) throw new UnauthorizedException('No refresh token');
+
+    let payload: { sub: string };
+    try {
+      payload = this.jwt.verify(token, { secret: process.env.JWT_REFRESH_SECRET });
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const user = await this.users.findById(payload.sub);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const accessToken = this.jwt.sign({ sub: user._id, role: user.role });
+    return { accessToken };
   }
 
   logout(res: Response) {
