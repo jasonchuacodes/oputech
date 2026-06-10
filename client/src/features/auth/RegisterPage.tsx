@@ -1,20 +1,24 @@
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { Button, Input, Label } from '../../shared/components'
 import { LoginLayout } from './components/LoginLayout'
-import { register } from '../../shared/api/auth'
+import { register as registerUser } from '../../shared/api/auth'
 import { PublicRoutes } from '../../shared/routes'
+import { registerSchema, RegisterFormValues } from './schemas/register.schema'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({ resolver: zodResolver(registerSchema) })
 
   const { mutate, isPending, error } = useMutation({
-    mutationFn: register,
+    mutationFn: registerUser,
     onSuccess: () => {
       navigate(PublicRoutes.Login)
     },
@@ -34,10 +38,7 @@ export default function RegisterPage() {
           <div className="rounded-sm px-8 py-8 shadow-sm">
             <form
               className="flex flex-col gap-5"
-              onSubmit={(e) => {
-                e.preventDefault()
-                mutate({ username, email, password })
-              }}
+              onSubmit={handleSubmit((data) => mutate(data))}
             >
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="username">Username</Label>
@@ -46,20 +47,13 @@ export default function RegisterPage() {
                   type="text"
                   placeholder="Choose a username"
                   autoComplete="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  {...register('username')}
                 />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                {errors.username && (
+                  <p className="text-sm text-red-500">
+                    {errors.username.message}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="password">Password</Label>
@@ -68,9 +62,13 @@ export default function RegisterPage() {
                   type="password"
                   placeholder="Create a password"
                   autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register('password')}
                 />
+                {errors.password && (
+                  <p className="text-sm text-red-500">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
               {error && (
                 <p className="text-sm text-red-500">
@@ -93,7 +91,7 @@ export default function RegisterPage() {
                   to={PublicRoutes.Login}
                   className="font-medium text-gray-900 hover:underline"
                 >
-                  Sign up here
+                  Login
                 </Link>
               </p>
             </form>

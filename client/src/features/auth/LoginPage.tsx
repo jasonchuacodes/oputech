@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate, Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
@@ -7,12 +8,16 @@ import { Footer } from './components/Footer'
 import { LoginLayout } from './components/LoginLayout'
 import { login } from '../../shared/api/auth'
 import { UserRoutes, PublicRoutes } from '../../shared/routes'
+import { loginSchema, LoginFormValues } from './schemas/login.schema'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) })
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: login,
@@ -36,34 +41,37 @@ export default function LoginPage() {
             </div>
             <form
               className="flex flex-col gap-5"
-              onSubmit={(e) => {
-                e.preventDefault()
-                mutate({ email, password })
-              }}
+              onSubmit={handleSubmit((data) => mutate(data))}
             >
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="username"
+                  type="text"
+                  placeholder="Enter your username"
+                  autoComplete="username"
+                  {...register('username')}
                 />
+                {errors.username && (
+                  <p className="text-sm text-red-500">
+                    {errors.username.message}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   placeholder="Enter your password"
                   autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register('password')}
                 />
+                {errors.password && (
+                  <p className="text-sm text-red-500">
+                    {errors.password.message}
+                  </p>
+                )}
                 <div className="mt-1 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <input
@@ -107,7 +115,7 @@ export default function LoginPage() {
                   to={PublicRoutes.Register}
                   className="font-medium text-gray-900 hover:underline"
                 >
-                  Sign up here
+                  Register
                 </Link>
               </p>
             </form>

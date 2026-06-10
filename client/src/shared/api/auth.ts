@@ -1,13 +1,12 @@
 import apiClient from './client'
 
 export interface LoginInput {
-  email: string
+  username: string
   password: string
 }
 
 export interface RegisterInput {
   username: string
-  email: string
   password: string
 }
 
