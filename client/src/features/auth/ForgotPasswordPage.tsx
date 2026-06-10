@@ -1,5 +1,5 @@
-import { Button, Input, Label } from '../../shared/components';
-import { LoginLayout } from './components/LoginLayout';
+import { Button, Input, Label } from '../../components'
+import { LoginLayout } from './components/LoginLayout'
 
 export default function ForgotPasswordPage() {
   return (
@@ -32,5 +32,5 @@ export default function ForgotPasswordPage() {
         </div>
       </main>
     </LoginLayout>
-  );
+  )
 }

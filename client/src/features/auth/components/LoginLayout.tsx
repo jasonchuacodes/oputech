@@ -1,7 +1,7 @@
-import { cn } from '../../../shared/lib/utils';
+import { cn } from '../../../utils/cn'
 
 interface LoginLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export function LoginLayout({
@@ -10,13 +10,13 @@ export function LoginLayout({
   ...props
 }: LoginLayoutProps) {
   return (
-    <div className='flex h-dvh flex-col'>
+    <div className="flex h-dvh flex-col">
       <div
-        className={cn('flex-1 min-h-0 overflow-auto bg-background', className)}
+        className={cn('bg-background min-h-0 flex-1 overflow-auto', className)}
         {...props}
       >
         {children}
       </div>
     </div>
-  );
+  )
 }

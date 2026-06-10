@@ -1,32 +1,63 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate, Link } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { Button, Input, Label } from '../../shared/components'
+import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { Button, Input, Label } from '../../components'
 import { Footer } from './components/Footer'
 import { LoginLayout } from './components/LoginLayout'
-import { login } from '../../shared/api/auth'
-import { UserRoutes, PublicRoutes } from '../../shared/routes'
-import { loginSchema, LoginFormValues } from './schemas/login.schema'
+import { PublicRoutes } from '../../routes'
+import { useLoginMutation } from '../../services/auth/auth.queries'
+import { useAuthContext } from '../../context/auth/useAuthContext'
+import { LoginInput } from '../../services/auth/auth.types'
+import { loginSchema } from './schemas/login.schema'
 
 export default function LoginPage() {
+  const { auth, loading } = useAuthContext()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) })
 
-  const { mutate, isPending, error } = useMutation({
-    mutationFn: login,
-    onSuccess: (data) => {
-      localStorage.setItem('token', data.accessToken)
-      queryClient.invalidateQueries({ queryKey: ['me'] })
-      navigate(UserRoutes.Home)
-    },
+  const [error, setError] = useState<string | null>(null)
+
+  const {
+    handleSubmit,
+    reset,
+    register,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
   })
+
+  const { mutate: login, isPending } = useLoginMutation()
+
+  const onSubmit = (data: LoginInput) => {
+    login(data, {
+      onSuccess: (res) => {
+        localStorage.setItem('auth', res.accessToken)
+
+        queryClient.setQueryData(['auth'], res.user)
+        setError(null)
+        navigate('/')
+      },
+      onError: (err) => {
+        setError(
+          isAxiosError(err)
+            ? (err.response?.data?.message ?? 'Invalid credentials')
+            : 'Invalid credentials'
+        )
+      },
+      onSettled: () => {
+        reset()
+      },
+    })
+  }
+
+  useEffect(() => {
+    if (!loading && auth) {
+      navigate('/', { replace: true })
+    }
+  }, [auth, loading, navigate])
 
   return (
     <LoginLayout>
@@ -41,7 +72,7 @@ export default function LoginPage() {
             </div>
             <form
               className="flex flex-col gap-5"
-              onSubmit={handleSubmit((data) => mutate(data))}
+              onSubmit={handleSubmit((data) => onSubmit(data))}
             >
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="username">Username</Label>
@@ -94,13 +125,7 @@ export default function LoginPage() {
                   </Link>
                 </div>
               </div>
-              {error && (
-                <p className="text-sm text-red-500">
-                  {isAxiosError(error)
-                    ? (error.response?.data?.message ?? 'Invalid credentials')
-                    : 'Invalid credentials'}
-                </p>
-              )}
+              {error && <p className="text-sm text-red-500">{error}</p>}
               <Button
                 type="submit"
                 size="lg"

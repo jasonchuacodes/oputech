@@ -1,44 +1,73 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { Button, Input, Label } from '../../shared/components'
+import { useEffect, useState } from 'react'
+import { Button, Input, Label } from '../../components'
 import { LoginLayout } from './components/LoginLayout'
-import { register as registerUser } from '../../shared/api/auth'
-import { PublicRoutes } from '../../shared/routes'
-import { registerSchema, RegisterFormValues } from './schemas/register.schema'
+import { PublicRoutes } from '../../routes'
+import { registerSchema } from './schemas/register.schema'
+import { Footer } from './components/Footer'
+import { useRegisterMutation } from '../../services/auth/auth.queries'
+import { useAuthContext } from '../../context/auth/useAuthContext'
+import { RegisterInput } from '../../services/auth/auth.types'
 
 export default function RegisterPage() {
+  const { auth, loading } = useAuthContext()
   const navigate = useNavigate()
+
+  const [error, setError] = useState<string | null>(null)
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm<RegisterFormValues>({ resolver: zodResolver(registerSchema) })
+  } = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) })
 
-  const { mutate, isPending, error } = useMutation({
-    mutationFn: registerUser,
-    onSuccess: () => {
-      navigate(PublicRoutes.Login)
-    },
-  })
+  const { mutate: registerUser, isPending } = useRegisterMutation()
+
+  const onSubmit = (data: RegisterInput) => {
+    registerUser(data, {
+      onSuccess: () => {
+        setError(null)
+        navigate(PublicRoutes.Login)
+      },
+      onError: (err) => {
+        setError(
+          isAxiosError(err)
+            ? (err.response?.data?.message ?? 'Registration failed')
+            : 'Registration failed'
+        )
+      },
+      onSettled: () => {
+        reset()
+      },
+    })
+  }
+
+  useEffect(() => {
+    if (!loading && auth) {
+      navigate('/', { replace: true })
+    }
+  }, [auth, loading, navigate])
 
   return (
     <LoginLayout>
-      <main className="flex h-full items-center justify-center px-4 py-12">
+      <main className="flex h-full flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-bold text-gray-900">Create account</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Get started with Oputech
-            </p>
-          </div>
-
           <div className="rounded-sm px-8 py-8 shadow-sm">
+            <div className="mb-8 text-center">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Create account
+              </h1>
+              <p className="mt-1 text-sm text-gray-500">
+                Get started with Oputech
+              </p>
+            </div>
             <form
               className="flex flex-col gap-5"
-              onSubmit={handleSubmit((data) => mutate(data))}
+              onSubmit={handleSubmit(onSubmit)}
             >
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="username">Username</Label>
@@ -70,13 +99,7 @@ export default function RegisterPage() {
                   </p>
                 )}
               </div>
-              {error && (
-                <p className="text-sm text-red-500">
-                  {isAxiosError(error)
-                    ? (error.response?.data?.message ?? 'Registration failed')
-                    : 'Registration failed'}
-                </p>
-              )}
+              {error && <p className="text-sm text-red-500">{error}</p>}
               <Button
                 type="submit"
                 size="lg"
@@ -97,6 +120,7 @@ export default function RegisterPage() {
             </form>
           </div>
         </div>
+        <Footer />
       </main>
     </LoginLayout>
   )
