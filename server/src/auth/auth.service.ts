@@ -66,6 +66,10 @@ export class AuthService {
     return { accessToken };
   }
 
+  async me(payload: { userId: string }) {
+    return this.users.findById(payload.userId);
+  }
+
   logout(res: Response) {
     res.clearCookie('refresh_token', {
       httpOnly: true,

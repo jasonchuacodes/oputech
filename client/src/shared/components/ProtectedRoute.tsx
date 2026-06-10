@@ -1,17 +1,18 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { UserRole } from '../types';
-import { PublicRoutes } from '../routes';
+import { Navigate, Outlet } from 'react-router-dom'
+import { UserRole } from '../types'
+import { PublicRoutes } from '../routes'
+import { useMe } from '../hooks/useMe'
 
 interface ProtectedRouteProps {
-  allowedRoles: UserRole[];
+  allowedRoles: UserRole[]
 }
 
-export function ProtectedRoute({ allowedRoles: _allowedRoles }: ProtectedRouteProps) {
-  const token = localStorage.getItem('token');
+export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
+  const { data, isLoading, isError } = useMe()
 
-  if (!token) {
-    return <Navigate to={PublicRoutes.Login} replace />;
-  }
+  if (isLoading) return null
+  if (isError || !data) return <Navigate to={PublicRoutes.Login} replace />
+  if (!allowedRoles.includes(data.role as UserRole)) return <Navigate to={PublicRoutes.Login} replace />
 
-  return <Outlet />;
+  return <Outlet />
 }
