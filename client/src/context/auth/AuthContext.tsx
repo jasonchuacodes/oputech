@@ -23,7 +23,7 @@ const initialState: AuthContextType = {
 const AuthContext = createContext<AuthContextType>(initialState)
 
 function AuthProvider({ children }: { children?: ReactNode }) {
-  const { data: auth, isPending, refetch } = useGetMe()
+  const { data: auth, isLoading, isFetching, refetch } = useGetMe()
 
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -33,16 +33,15 @@ function AuthProvider({ children }: { children?: ReactNode }) {
   const logout = useCallback(() => {
     mutate(undefined, {
       onSuccess: () => {
-        localStorage.removeItem('auth')
         queryClient.setQueryData(['auth'], null)
         queryClient.cancelQueries()
+
         navigate(PublicRoutes.Login)
       },
     })
   }, [mutate, queryClient, navigate])
 
-  const hasToken = !!localStorage.getItem('auth')
-  const loading = (hasToken && isPending) || isLoggingOut
+  const loading = isLoading || isFetching || isLoggingOut
 
   return (
     <AuthContext.Provider value={{ auth, loading, refetch, logout }}>

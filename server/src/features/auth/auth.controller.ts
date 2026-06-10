@@ -1,9 +1,19 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common'
+import { Request, Response } from 'express'
+import { AuthService } from './auth.service'
+import { LoginDto } from './dto/login.dto'
+import { RegisterDto } from './dto/register.dto'
+import { JwtAuthGuard } from './guards/jwt-auth.guard'
 
 @Controller('auth')
 export class AuthController {
@@ -11,30 +21,30 @@ export class AuthController {
 
   @Post('register')
   register(@Body() input: RegisterDto) {
-    return this.auth.register(input);
+    return this.auth.register(input)
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   login(@Body() input: LoginDto, @Res({ passthrough: true }) res: Response) {
-    return this.auth.login(input, res);
+    return this.auth.login(input, res)
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  refresh(@Req() req: Request) {
-    return this.auth.refresh(req);
+  refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    return this.auth.refresh(req, res)
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@Res({ passthrough: true }) res: Response) {
-    this.auth.logout(res);
+    return this.auth.logout(res)
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
   me(@Req() req: Request) {
-    return this.auth.me(req.user as { userId: string });
+    return this.auth.me(req.user as { userId: string })
   }
 }

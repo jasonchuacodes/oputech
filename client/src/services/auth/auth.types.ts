@@ -21,6 +21,5 @@ export interface AuthUser {
 }
 
 export interface LoginResponse {
-  accessToken: string
   user: AuthUser
 }

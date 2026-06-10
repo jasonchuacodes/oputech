@@ -3,7 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate, Link } from 'react-router-dom'
 import { isAxiosError } from 'axios'
 import { useEffect, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { Button, Input, Label } from '../../components'
 import { Footer } from './components/Footer'
 import { LoginLayout } from './components/LoginLayout'
@@ -14,9 +13,8 @@ import { LoginInput } from '../../services/auth/auth.types'
 import { loginSchema } from './schemas/login.schema'
 
 export default function LoginPage() {
-  const { auth, loading } = useAuthContext()
+  const { auth, loading, refetch: refetchAuth } = useAuthContext()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
   const [error, setError] = useState<string | null>(null)
 
@@ -24,7 +22,7 @@ export default function LoginPage() {
     handleSubmit,
     reset,
     register,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(loginSchema),
   })
@@ -33,10 +31,8 @@ export default function LoginPage() {
 
   const onSubmit = (data: LoginInput) => {
     login(data, {
-      onSuccess: (res) => {
-        localStorage.setItem('auth', res.accessToken)
-
-        queryClient.setQueryData(['auth'], res.user)
+      onSuccess: () => {
+        refetchAuth()
         setError(null)
         navigate('/')
       },
@@ -130,7 +126,7 @@ export default function LoginPage() {
                 type="submit"
                 size="lg"
                 className="mt-1 w-full"
-                disabled={isPending}
+                disabled={!isValid}
               >
                 {isPending ? 'Signing in…' : 'Sign in'}
               </Button>

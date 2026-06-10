@@ -3,11 +3,7 @@ import { UserRole } from '../types'
 import { PublicRoutes } from '../routes'
 import { useAuthContext } from '../context/auth/useAuthContext'
 
-interface ProtectedRouteProps {
-  allowedRoles: UserRole[]
-}
-
-export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
+export function ProtectedRoute({ allowedRoles }: { allowedRoles: UserRole[] }) {
   const { auth, loading } = useAuthContext()
 
   if (loading) return null

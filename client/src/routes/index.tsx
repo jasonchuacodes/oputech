@@ -4,7 +4,6 @@ import {
   Route,
 } from 'react-router-dom'
 import { App } from '../App'
-import { UserRole } from '../types'
 import { ProtectedRoute } from '../components/ProtectedRoute'
 import LoginPage from '../features/auth/LoginPage'
 import AdminLoginPage from '../features/auth/AdminLoginPage'
@@ -12,6 +11,7 @@ import RegisterPage from '../features/auth/RegisterPage'
 import ForgotPasswordPage from '../features/auth/ForgotPasswordPage'
 import { UserMainLayout } from '../features/user/UserMainLayout'
 import UserHomePage from '../features/user/UserHomePage'
+import { UserRole } from '../types'
 
 export const PublicRoutes = {
   Login: '/login',
