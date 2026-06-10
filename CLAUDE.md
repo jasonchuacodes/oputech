@@ -93,3 +93,11 @@ constructor(private readonly users: UsersService) {}
 register(input: RegisterDto) {}
 create(input: CreateUserDto) {}
 ```
+
+## Client code style
+
+**Functions** — prefer arrow functions over `function` declarations in client code:
+```ts
+const handleSubmit = () => { ... }
+const MyComponent = () => { ... }
+```

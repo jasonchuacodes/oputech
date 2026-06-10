@@ -11,6 +11,7 @@ import RegisterPage from '../features/auth/RegisterPage'
 import ForgotPasswordPage from '../features/auth/ForgotPasswordPage'
 import { UserMainLayout } from '../features/user/UserMainLayout'
 import UserHomePage from '../features/user/UserHomePage'
+import UsersPage from '../features/user/UsersPage'
 import { UserRole } from '../types'
 
 export const PublicRoutes = {
@@ -22,6 +23,7 @@ export const PublicRoutes = {
 
 export const UserRoutes = {
   Home: '/',
+  Users: '/users',
 }
 
 export const router = createBrowserRouter(
@@ -43,6 +45,7 @@ export const router = createBrowserRouter(
       >
         <Route element={<UserMainLayout />}>
           <Route index element={<UserHomePage />} />
+          <Route path={UserRoutes.Users} element={<UsersPage />} />
         </Route>
       </Route>
     </Route>
