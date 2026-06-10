@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   async login(input: LoginDto, res: Response) {
-    const user = await this.users.findByEmail(input.email);
+    const user = await this.users.findByUsername(input.username);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const match = await bcrypt.compare(input.password, user.password);
@@ -79,8 +79,8 @@ export class AuthService {
   }
 
   async register(input: RegisterDto) {
-    const existing = await this.users.findByEmail(input.email);
-    if (existing) throw new ConflictException('Email already in use');
+    const existing = await this.users.findByUsername(input.username);
+    if (existing) throw new ConflictException('Username already in use');
 
     const password = await bcrypt.hash(input.password, 10);
     const user = await this.users.create({ ...input, password });

@@ -16,6 +16,10 @@ export class UsersService {
     return this.user.findOne({ email }).exec();
   }
 
+  findByUsername(username: string): Promise<UserDocument | null> {
+    return this.user.findOne({ username }).exec();
+  }
+
   create(input: CreateUserDto): Promise<UserDocument> {
     return this.user.create(input);
   }
