@@ -12,6 +12,7 @@ import ForgotPassword from '../features/auth/ForgotPassword'
 import { UserMainLayout } from '../features/user/MainLayout'
 import UserHome from '../features/dashboard'
 import Users from '../features/user'
+import Inventory from '../features/inventory'
 import { UserRole } from '../types'
 
 export const PublicRoutes = {
@@ -24,6 +25,7 @@ export const PublicRoutes = {
 export const UserRoutes = {
   Home: '/',
   Users: '/users',
+  Inventory: '/inventory',
 }
 
 export const router = createBrowserRouter(
@@ -43,6 +45,7 @@ export const router = createBrowserRouter(
         <Route element={<UserMainLayout />}>
           <Route index element={<UserHome />} />
           <Route path={UserRoutes.Users} element={<Users />} />
+          <Route path={UserRoutes.Inventory} element={<Inventory />} />
         </Route>
       </Route>
     </Route>

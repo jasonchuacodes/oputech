@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
+  Package,
 } from 'lucide-react'
 import { useAuthContext } from '../../../context/auth/useAuthContext'
 import { cn } from '../../../utils/cn'
@@ -19,6 +20,7 @@ const navGroups = [
       { label: 'Dashboard', icon: LayoutDashboard, to: '/' },
       { label: 'Report', icon: FileBarChart, to: '/report' },
       { label: 'POS', icon: ShoppingCart, to: '/pos' },
+      { label: 'Inventory', icon: Package, to: '/inventory' },
       { label: 'Users', icon: Users, to: '/users' },
     ],
   },

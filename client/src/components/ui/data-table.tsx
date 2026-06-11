@@ -81,7 +81,7 @@ function DataTableComponent<T>({
   const empty = !loading && collection.items.length === 0
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
+    <div className="overflow-x-auto rounded-sm border">
       <table id={id} className="w-full min-w-162.5 text-sm">
         <thead>
           <tr className="border-b border-gray-200 bg-slate-50">
@@ -90,7 +90,7 @@ function DataTableComponent<T>({
                 key={column.id}
                 style={{ width: column.width }}
                 className={cn(
-                  'h-12 px-4 text-sm font-medium whitespace-nowrap text-slate-600',
+                  'bg-surface h-12 px-4 text-sm font-medium whitespace-nowrap text-slate-600',
                   alignClass[column.align ?? 'left'],
                   column.orderable && 'cursor-pointer select-none'
                 )}
@@ -157,7 +157,8 @@ function DataTableComponent<T>({
                   onClick={onRowClick ? () => onRowClick(item) : undefined}
                   className={cn(
                     !isLast && 'border-b',
-                    onRowClick && 'hover:bg-muted/50 cursor-pointer'
+                    'hover:bg-white',
+                    onRowClick && 'cursor-pointer'
                   )}
                 >
                   {columns.map((column, colIdx) => {
