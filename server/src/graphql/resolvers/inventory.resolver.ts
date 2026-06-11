@@ -11,6 +11,12 @@ interface CreateInventoryItemInput {
   imageUrl?: string
 }
 
+interface UpdateInventoryItemInput {
+  name?: string
+  price?: number
+  addQuantity?: number
+}
+
 @UseGuards(JwtAuthGuard)
 @Resolver('InventoryItem')
 export class InventoryResolver {
@@ -26,8 +32,26 @@ export class InventoryResolver {
     return this.inventory.create(input)
   }
 
+  @Mutation()
+  updateInventoryItem(@Args('id') id: string, @Args('input') input: UpdateInventoryItemInput) {
+    return this.inventory.update(id, input)
+  }
+
+  @Mutation()
+  async deleteInventoryItem(@Args('id') id: string): Promise<boolean> {
+    const result = await this.inventory.remove(id)
+    return result !== null
+  }
+
   @ResolveField('id')
   id(@Parent() item: InventoryItemDocument): string {
     return item._id.toString()
+  }
+
+  @ResolveField('status')
+  status(@Parent() item: InventoryItemDocument): string {
+    if (item.quantity === 0) return 'OUT_OF_STOCK'
+    if (item.quantity <= 10) return 'LOW'
+    return 'IN_STOCK'
   }
 }

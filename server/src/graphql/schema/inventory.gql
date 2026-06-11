@@ -1,9 +1,16 @@
+enum InventoryStatus {
+  IN_STOCK
+  LOW
+  OUT_OF_STOCK
+}
+
 type InventoryItem {
   id: ID!
   name: String!
   quantity: Int!
   price: Float!
   imageUrl: String
+  status: InventoryStatus!
 }
 
 extend type Query {
@@ -17,6 +24,14 @@ input CreateInventoryItemInput {
   imageUrl: String
 }
 
+input UpdateInventoryItemInput {
+  name: String
+  price: Float
+  addQuantity: Int
+}
+
 extend type Mutation {
   createInventoryItem(input: CreateInventoryItemInput!): InventoryItem!
+  updateInventoryItem(id: ID!, input: UpdateInventoryItemInput!): InventoryItem!
+  deleteInventoryItem(id: ID!): Boolean!
 }
