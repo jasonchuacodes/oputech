@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { Button } from '../../components'
+import { Button, PageHeader } from '../../components'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
 import { useUsers } from '../../services/users/users.queries'
 import { User } from '../../services/users/users.types'
@@ -39,13 +39,16 @@ const UsersPage = () => {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Users</h1>
-        <Button className="gap-2" onClick={() => setModalOpen(true)}>
-          <Plus size={16} />
-          Add User
-        </Button>
-      </div>
+      <PageHeader
+        title="Users"
+        description="Manage system users and their roles"
+        action={
+          <Button className="gap-2" onClick={() => setModalOpen(true)}>
+            <Plus size={16} />
+            Add User
+          </Button>
+        }
+      />
 
       <DataTable
         collection={collection}

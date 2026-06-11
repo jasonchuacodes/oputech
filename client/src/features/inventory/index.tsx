@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { Button, Input } from '../../components'
+import { Button, Input, PageHeader } from '../../components'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
 import { useInventoryItems } from '../../services/inventory/inventory.queries'
 import { InventoryItem } from '../../services/inventory/inventory.types'
@@ -42,13 +42,16 @@ const InventoryPage = () => {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Inventory</h1>
-        <Button className="gap-2" onClick={() => setModalOpen(true)}>
-          <Plus size={16} />
-          Add Item
-        </Button>
-      </div>
+      <PageHeader
+        title="Inventory"
+        description="Track and manage your product stock"
+        action={
+          <Button className="gap-2" onClick={() => setModalOpen(true)}>
+            <Plus size={16} />
+            Add Item
+          </Button>
+        }
+      />
 
       <Input
         placeholder="Search by name…"
