@@ -5,13 +5,13 @@ import {
 } from 'react-router-dom'
 import { App } from '../App'
 import { ProtectedRoute } from '../components/ProtectedRoute'
-import LoginPage from '../features/auth/LoginPage'
-import AdminLoginPage from '../features/auth/AdminLoginPage'
-import RegisterPage from '../features/auth/RegisterPage'
-import ForgotPasswordPage from '../features/auth/ForgotPasswordPage'
-import { UserMainLayout } from '../features/user/UserMainLayout'
-import UserHomePage from '../features/user/UserHomePage'
-import UsersPage from '../features/user/UsersPage'
+import Login from '../features/auth/Login'
+import AdminLogin from '../features/auth/AdminLogin'
+import Register from '../features/auth/Register'
+import ForgotPassword from '../features/auth/ForgotPassword'
+import { UserMainLayout } from '../features/user/MainLayout'
+import UserHome from '../features/dashboard'
+import Users from '../features/user'
 import { UserRole } from '../types'
 
 export const PublicRoutes = {
@@ -30,13 +30,10 @@ export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<App />}>
       {/* Public Routes */}
-      <Route path={PublicRoutes.Login} element={<LoginPage />} />
-      <Route path={PublicRoutes.LoginAdmin} element={<AdminLoginPage />} />
-      <Route path={PublicRoutes.Register} element={<RegisterPage />} />
-      <Route
-        path={PublicRoutes.ForgotPassword}
-        element={<ForgotPasswordPage />}
-      />
+      <Route path={PublicRoutes.Login} element={<Login />} />
+      <Route path={PublicRoutes.LoginAdmin} element={<AdminLogin />} />
+      <Route path={PublicRoutes.Register} element={<Register />} />
+      <Route path={PublicRoutes.ForgotPassword} element={<ForgotPassword />} />
 
       {/* User Routes */}
       <Route
@@ -44,8 +41,8 @@ export const router = createBrowserRouter(
         element={<ProtectedRoute allowedRoles={[UserRole.USER]} />}
       >
         <Route element={<UserMainLayout />}>
-          <Route index element={<UserHomePage />} />
-          <Route path={UserRoutes.Users} element={<UsersPage />} />
+          <Route index element={<UserHome />} />
+          <Route path={UserRoutes.Users} element={<Users />} />
         </Route>
       </Route>
     </Route>
