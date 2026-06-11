@@ -59,7 +59,7 @@ export default function LoginPage() {
     <LoginLayout>
       <main className="flex h-full flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
-          <div className="rounded-sm px-8 py-8 shadow-sm">
+          <div className="rounded-sm bg-white p-8 shadow-sm">
             <div className="mb-8 text-center">
               <h1 className="text-2xl font-bold text-gray-900">Sign in</h1>
               <p className="mt-1 text-sm text-gray-500">

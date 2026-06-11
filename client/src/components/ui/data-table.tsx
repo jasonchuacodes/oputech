@@ -36,7 +36,7 @@ const alignClass = {
 }
 
 function getSortableValue<T>(item: T, key: string): string | number {
-  return (item as Record<string, unknown>)[key] as string | number ?? ''
+  return ((item as Record<string, unknown>)[key] as string | number) ?? ''
 }
 
 function compareValues(a: string | number, b: string | number): number {
@@ -57,7 +57,10 @@ function DataTableComponent<T>({
   const handleSort = (columnId: string) => {
     setSortConfig((prev) => {
       if (prev?.key === columnId) {
-        return { key: columnId, direction: prev.direction === 'asc' ? 'desc' : 'asc' }
+        return {
+          key: columnId,
+          direction: prev.direction === 'asc' ? 'desc' : 'asc',
+        }
       }
       return { key: columnId, direction: 'asc' }
     })
@@ -78,29 +81,32 @@ function DataTableComponent<T>({
   const empty = !loading && collection.items.length === 0
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
+    <div className="overflow-x-auto rounded-sm border bg-white">
       <table id={id} className="w-full min-w-[650px] text-sm">
         <thead>
-          <tr className="bg-muted/50 border-b">
+          <tr className="border-b border-gray-200 bg-slate-50">
             {columns.map((column) => (
               <th
                 key={column.id}
                 style={{ width: column.width }}
                 className={cn(
-                  'text-muted-foreground h-10 px-4 font-medium whitespace-nowrap',
+                  'h-12 px-4 text-sm font-medium whitespace-nowrap text-slate-600',
                   alignClass[column.align ?? 'left'],
                   column.orderable && 'cursor-pointer select-none'
                 )}
-                onClick={column.orderable ? () => handleSort(column.id) : undefined}
+                onClick={
+                  column.orderable ? () => handleSort(column.id) : undefined
+                }
               >
                 <span className="inline-flex items-center gap-1">
                   {column.heading}
                   {column.orderable && (
-                    <span className="inline-flex flex-col -gap-1">
+                    <span className="-gap-1 inline-flex flex-col">
                       <ChevronUp
                         size={12}
                         className={cn(
-                          sortConfig?.key === column.id && sortConfig.direction === 'asc'
+                          sortConfig?.key === column.id &&
+                            sortConfig.direction === 'asc'
                             ? 'text-foreground'
                             : 'text-muted-foreground/40'
                         )}
@@ -108,7 +114,8 @@ function DataTableComponent<T>({
                       <ChevronDown
                         size={12}
                         className={cn(
-                          sortConfig?.key === column.id && sortConfig.direction === 'desc'
+                          sortConfig?.key === column.id &&
+                            sortConfig.direction === 'desc'
                             ? 'text-foreground'
                             : 'text-muted-foreground/40'
                         )}
@@ -131,7 +138,10 @@ function DataTableComponent<T>({
             </tr>
           ) : empty ? (
             <tr>
-              <td colSpan={columns.length} className="text-muted-foreground py-8 text-center">
+              <td
+                colSpan={columns.length}
+                className="text-muted-foreground py-8 text-center"
+              >
                 {emptyMessage}
               </td>
             </tr>
@@ -157,7 +167,7 @@ function DataTableComponent<T>({
                         key={column.id}
                         scope={colIdx === 0 ? 'row' : undefined}
                         className={cn(
-                          'px-4 py-3 whitespace-nowrap font-normal',
+                          'px-4 py-3 font-normal whitespace-nowrap',
                           alignClass[column.align ?? 'left']
                         )}
                       >

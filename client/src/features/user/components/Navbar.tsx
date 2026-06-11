@@ -6,7 +6,7 @@ interface NavbarProps {
 
 export function Navbar({ onMenuClick }: NavbarProps) {
   return (
-    <header className="bg-background flex h-14 items-center justify-between border-b px-4 lg:hidden">
+    <header className="bg-white flex h-16 items-center justify-between border-b border-gray-200 px-6 lg:hidden">
       <button
         onClick={onMenuClick}
         className="hover:bg-muted flex gap-2 rounded p-1"

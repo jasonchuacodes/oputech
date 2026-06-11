@@ -13,7 +13,7 @@ export default function ForgotPasswordPage() {
             </p>
           </div>
 
-          <div className="rounded-sm px-8 py-8 shadow-sm">
+          <div className="rounded-sm bg-white px-8 py-8 shadow-sm">
             <form className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="email">Email</Label>

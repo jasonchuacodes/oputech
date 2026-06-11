@@ -49,13 +49,13 @@ export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
 
       <aside
         className={cn(
-          'bg-background z-[1200] flex h-full flex-col border-r transition-all duration-200',
-          open ? 'w-60' : 'w-16',
+          'bg-white z-[1200] flex h-full flex-col border-r border-gray-200 transition-all duration-200',
+          open ? 'w-60' : 'w-18',
           isMobile ? 'fixed inset-y-0 left-0' : 'relative',
           isMobile && !open && '-translate-x-full'
         )}
       >
-        <div className="flex h-14 items-center border-b px-3 py-4">
+        <div className="flex h-16 items-center border-b border-gray-200 px-3">
           {open && <span className="text-md font-semibold">Oputech</span>}
           <button
             onClick={() => onOpenChange(!open)}
@@ -84,10 +84,10 @@ export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
                     to={to}
                     title={!open ? label : undefined}
                     className={cn(
-                      'flex items-center gap-3 rounded-md px-2 py-2 text-sm transition-colors',
+                      'flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors',
                       active
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                        ? 'bg-surface-selected text-brand font-medium'
+                        : 'text-slate-600 hover:bg-surface-hover hover:text-foreground',
                       !open && 'justify-center'
                     )}
                   >
@@ -105,7 +105,7 @@ export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
             onClick={logout}
             title={!open ? 'Logout' : undefined}
             className={cn(
-              'text-muted-foreground hover:bg-muted hover:text-foreground flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm transition-colors',
+              'text-slate-600 hover:bg-surface-hover hover:text-foreground flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors',
               !open && 'justify-center'
             )}
           >

@@ -56,7 +56,7 @@ export function CustomModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" />
       <div
-        className="border-border bg-background relative mx-auto flex w-[95%] flex-col overflow-hidden rounded-xl border shadow-xl sm:w-[95%]"
+        className="border-border bg-white relative mx-auto flex w-[95%] flex-col overflow-hidden rounded-lg border shadow-lg sm:w-[95%]"
         style={{ maxWidth, maxHeight: '90vh' }}
       >
         {/* Header */}
@@ -64,7 +64,7 @@ export function CustomModal({
           {Icon && (
             <div
               className={cn(
-                'relative flex size-10 shrink-0 items-center justify-center rounded-lg',
+                'relative flex size-10 shrink-0 items-center justify-center rounded-md',
                 type === 'danger' ? 'bg-destructive' : 'bg-primary'
               )}
             >
