@@ -1,29 +1,35 @@
 import { useState } from 'react'
 import { ShoppingCart } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Input } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
 import { PaymentMode, Product, SaleItem } from '../../services/pos/pos.types'
-import { mockProducts } from './data/mock-products'
+import { useInventoryItems } from '../../services/inventory/inventory.queries'
+import { useCreateSale } from '../../services/pos/pos.queries'
+import { useDisclosure } from '../../hooks/useDisclosure'
 import { ProductCard } from './components/ProductCard'
 import { CurrentSale } from './components/CurrentSale'
 import { CartSheet } from './components/CartSheet'
 
 const POSPage = () => {
-  const [products, setProducts] = useState<Product[]>(mockProducts)
   const [saleItems, setSaleItems] = useState<SaleItem[]>([])
   const [paymentMode, setPaymentMode] = useState<PaymentMode>(PaymentMode.Cash)
   const [search, setSearch] = useState('')
-  const [cartOpen, setCartOpen] = useState(false)
+  const cart = useDisclosure()
 
-  const filtered = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  )
+  const queryClient = useQueryClient()
+  const { data: inventoryItems = [], isLoading } = useInventoryItems(search)
+  const { mutate: createSale } = useCreateSale()
+
+  const products: Product[] = inventoryItems.map((item) => ({
+    id: item.id,
+    name: item.name,
+    price: item.price,
+    stock: item.quantity - (saleItems.find((s) => s.product.id === item.id)?.quantity ?? 0),
+    image: item.imageUrl,
+  }))
 
   const handleProductClick = (product: Product) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === product.id ? { ...p, stock: p.stock - 1 } : p))
-    )
-
     setSaleItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id)
       if (existing) {
@@ -36,36 +42,33 @@ const POSPage = () => {
   }
 
   const handleRemoveItem = (productId: string) => {
-    const item = saleItems.find((i) => i.product.id === productId)
-    if (!item) return
-
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === productId ? { ...p, stock: p.stock + item.quantity } : p
-      )
-    )
     setSaleItems((prev) => prev.filter((i) => i.product.id !== productId))
   }
 
-  const handleClear = () => {
-    setProducts((prev) =>
-      prev.map((p) => {
-        const item = saleItems.find((i) => i.product.id === p.id)
-        return item ? { ...p, stock: p.stock + item.quantity } : p
-      })
-    )
-    setSaleItems([])
-  }
+  const handleClear = () => setSaleItems([])
 
   const handleCancel = () => {
     handleClear()
-    setCartOpen(false)
+    cart.onClose()
   }
 
   const handleSubmit = () => {
-    // TODO: integrate with backend
-    handleClear()
-    setCartOpen(false)
+    createSale(
+      {
+        items: saleItems.map((i) => ({
+          inventoryItemId: i.product.id,
+          quantity: i.quantity,
+        })),
+        paymentMode,
+      },
+      {
+        onSuccess: () => {
+          handleClear()
+          cart.onClose()
+          queryClient.invalidateQueries({ queryKey: ['inventory'] })
+        },
+      },
+    )
   }
 
   return (
@@ -82,23 +85,28 @@ const POSPage = () => {
           />
 
           <div className="grid grid-cols-2 gap-3 overflow-y-auto lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((product) => (
+            {isLoading && (
+              <p className="col-span-full py-12 text-center text-sm text-slate-400">
+                Loading products…
+              </p>
+            )}
+            {!isLoading && products.length === 0 && (
+              <p className="col-span-full py-12 text-center text-sm text-slate-400">
+                No products found.
+              </p>
+            )}
+            {products.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
                 onClick={handleProductClick}
               />
             ))}
-            {filtered.length === 0 && (
-              <p className="col-span-full py-12 text-center text-sm text-slate-400">
-                No products found.
-              </p>
-            )}
           </div>
 
           <div className="fixed right-0 bottom-0 -translate-x-4 -translate-y-4 md:hidden">
             <button
-              onClick={() => setCartOpen(true)}
+              onClick={cart.onOpen}
               className="relative flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg"
             >
               <ShoppingCart size={18} />
@@ -126,8 +134,8 @@ const POSPage = () => {
       </div>
 
       <CartSheet
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
+        open={cart.open}
+        onClose={cart.onClose}
         items={saleItems}
         paymentMode={paymentMode}
         onPaymentModeChange={setPaymentMode}

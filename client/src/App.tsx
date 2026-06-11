@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ApolloProvider } from '@apollo/client/react'
+import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/auth/AuthContext'
 import { apolloClient } from './lib/apollo'
 
@@ -17,6 +18,7 @@ export const App = () => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <AppLayout />
+          <Toaster position="top-right" />
           <ReactQueryDevtools initialIsOpen={false} />
         </AuthProvider>
       </QueryClientProvider>
