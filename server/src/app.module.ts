@@ -7,17 +7,19 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { UsersModule } from './features/users/users.module'
 import { AuthModule } from './features/auth/auth.module'
+import { InventoryModule } from './features/inventory/inventory.module'
 
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.MONGO_URI as string),
-    UsersModule,
-    AuthModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       typePaths: [path.resolve(__dirname, './graphql/schema/*.gql')],
       playground: true,
     }),
+    UsersModule,
+    AuthModule,
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

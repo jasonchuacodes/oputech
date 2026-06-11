@@ -1,0 +1,22 @@
+type InventoryItem {
+  id: ID!
+  name: String!
+  quantity: Int!
+  price: Float!
+  imageUrl: String
+}
+
+extend type Query {
+  inventoryItems(search: String): [InventoryItem!]!
+}
+
+input CreateInventoryItemInput {
+  name: String!
+  quantity: Int!
+  price: Float!
+  imageUrl: String
+}
+
+extend type Mutation {
+  createInventoryItem(input: CreateInventoryItemInput!): InventoryItem!
+}
