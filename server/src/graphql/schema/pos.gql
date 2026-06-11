@@ -1,0 +1,33 @@
+enum PaymentMode {
+  CASH
+  GCASH
+}
+
+type SaleItem {
+  inventoryItemId: ID!
+  name: String!
+  price: Float!
+  quantity: Int!
+}
+
+type Sale {
+  id: ID!
+  items: [SaleItem!]!
+  paymentMode: PaymentMode!
+  total: Float!
+  createdAt: String!
+}
+
+input SaleItemInput {
+  inventoryItemId: ID!
+  quantity: Int!
+}
+
+input CreateSaleInput {
+  items: [SaleItemInput!]!
+  paymentMode: PaymentMode!
+}
+
+extend type Mutation {
+  createSale(input: CreateSaleInput!): Sale!
+}

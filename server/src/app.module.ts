@@ -8,6 +8,7 @@ import { AppService } from './app.service'
 import { UsersModule } from './features/users/users.module'
 import { AuthModule } from './features/auth/auth.module'
 import { InventoryModule } from './features/inventory/inventory.module'
+import { PosModule } from './features/pos/pos.module'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { InventoryModule } from './features/inventory/inventory.module'
     UsersModule,
     AuthModule,
     InventoryModule,
+    PosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
