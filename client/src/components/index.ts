@@ -10,4 +10,11 @@ export {
   SelectTrigger,
   SelectContent,
   SelectItem,
-} from './ui/select'
+} from '../shared/components/ui/select'
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '../shared/components/ui/dropdown-menu'

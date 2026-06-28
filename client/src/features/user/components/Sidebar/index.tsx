@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
 import {
   LayoutDashboard,
   FileBarChart,
@@ -10,8 +11,10 @@ import {
   Users,
   Package,
 } from 'lucide-react'
-import { useAuthContext } from '../../../context/auth/useAuthContext'
-import { cn } from '../../../utils/cn'
+import { useAuthContext } from '../../../../context/auth/useAuthContext'
+import { Button } from '../../../../components'
+import { cn } from '../../../../utils/cn'
+import { StatusToggler } from './StatusToggler'
 
 const navGroups = [
   {
@@ -38,20 +41,21 @@ interface SidebarProps {
 
 export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
   const location = useLocation()
-  const { logout } = useAuthContext()
+  const { auth, logout } = useAuthContext()
+  const [status, setStatus] = useState<string>('active')
 
   return (
     <>
       {isMobile && open && (
         <div
-          className="fixed inset-0 z-[1199] bg-black/40"
+          className="fixed inset-0 w-[1200] bg-black/40"
           onClick={() => onOpenChange(false)}
         />
       )}
 
       <aside
         className={cn(
-          'bg-white z-[1200] flex h-full flex-col border-r border-gray-200 transition-all duration-200',
+          'flex h-full w-[1200] flex-col border-r border-gray-200 bg-white transition-all duration-200',
           open ? 'w-60' : 'w-18',
           isMobile ? 'fixed inset-y-0 left-0' : 'relative',
           isMobile && !open && '-translate-x-full'
@@ -89,7 +93,7 @@ export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
                       'flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors',
                       active
                         ? 'bg-surface-selected text-brand font-medium'
-                        : 'text-slate-600 hover:bg-surface-hover hover:text-foreground',
+                        : 'hover:bg-surface-hover hover:text-foreground text-slate-600',
                       !open && 'justify-center'
                     )}
                   >
@@ -103,17 +107,24 @@ export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
         </nav>
 
         <div className="border-t px-2 py-3">
-          <button
-            onClick={logout}
-            title={!open ? 'Logout' : undefined}
-            className={cn(
-              'text-slate-600 hover:bg-surface-hover hover:text-foreground flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors',
-              !open && 'justify-center'
-            )}
-          >
-            <LogOut size={18} />
-            {open && <span>Logout</span>}
-          </button>
+          <div className={cn('flex items-center gap-2', !open && 'flex-col')}>
+            <StatusToggler
+              open={open}
+              status={status}
+              setStatus={setStatus}
+              auth={auth}
+            />
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={logout}
+              title="Logout"
+              className="shrink-0"
+            >
+              <LogOut size={18} />
+            </Button>
+          </div>
         </div>
       </aside>
     </>
