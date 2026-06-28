@@ -3,8 +3,9 @@ import { Plus } from 'lucide-react'
 import { Button, PageHeader } from '../../components'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
 import { useUsers } from '../../services/users/users.queries'
-import { User } from '../../services/users/users.types'
+import { User, UserStatus } from '../../services/users/users.types'
 import { AddUserModal } from './components/AddUserModal'
+import { cn } from '../../utils/cn'
 
 const columns: DataTableColumn<User>[] = [
   {
@@ -24,6 +25,24 @@ const columns: DataTableColumn<User>[] = [
     heading: 'Role',
     cell: (u) => u.role,
     orderable: true,
+  },
+  {
+    id: 'status',
+    heading: 'Status',
+    cell: (u) => (
+      <div className="flex items-center gap-2">
+        <span
+          className={cn(
+            'h-2 w-2 shrink-0 rounded-full',
+            u.activityStatus.status === UserStatus.Active ? 'bg-green-500' : 'bg-gray-400'
+          )}
+        />
+        <span className="text-sm">
+          {u.activityStatus.message ??
+            (u.activityStatus.status === UserStatus.Active ? 'Active' : 'Inactive')}
+        </span>
+      </div>
+    ),
   },
 ]
 

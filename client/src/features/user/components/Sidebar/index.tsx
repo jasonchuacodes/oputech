@@ -1,5 +1,4 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useState } from 'react'
 import {
   LayoutDashboard,
   FileBarChart,
@@ -41,8 +40,7 @@ interface SidebarProps {
 
 export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
   const location = useLocation()
-  const { auth, logout } = useAuthContext()
-  const [status, setStatus] = useState<string>('active')
+  const { logout } = useAuthContext()
 
   return (
     <>
@@ -108,12 +106,7 @@ export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
 
         <div className="border-t px-2 py-3">
           <div className={cn('flex items-center gap-2', !open && 'flex-col')}>
-            <StatusToggler
-              open={open}
-              status={status}
-              setStatus={setStatus}
-              auth={auth}
-            />
+            <StatusToggler open={open} />
 
             <Button
               variant="ghost"

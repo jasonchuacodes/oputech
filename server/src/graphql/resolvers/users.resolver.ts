@@ -13,6 +13,7 @@ import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
 import {
   UserDocument,
   UserRole,
+  UserStatus,
 } from '../../features/users/schemas/user.schema'
 
 interface CreateUserInput {
@@ -20,6 +21,11 @@ interface CreateUserInput {
   email?: string
   password: string
   role?: string
+}
+
+interface ActivityStatusInput {
+  status: string
+  message?: string
 }
 
 @UseGuards(JwtAuthGuard)
@@ -40,6 +46,16 @@ export class UsersResolver {
       email: input.email,
       password: hashed,
       role: (input.role as UserRole) ?? UserRole.User,
+    })
+  }
+
+  @Mutation()
+  updateActivityStatus(
+    @Args('id') id: string,
+    @Args('input') input: ActivityStatusInput,
+  ) {
+    return this.usersService.updateStatus(id, {
+      activityStatus: { status: input.status as UserStatus, message: input.message },
     })
   }
 

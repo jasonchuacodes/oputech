@@ -8,31 +8,50 @@ import {
   DropdownMenuSeparator,
 } from '../../../../components'
 import { cn } from '../../../../utils/cn'
-import type { AuthUser } from '../../../../services/auth/auth.types'
+import { UserStatus } from '../../../../services/users/users.types'
+import {
+  useUsers,
+  useUpdateActivityStatus,
+} from '../../../../services/users/users.queries'
+import { useAuthContext } from '../../../../context/auth/useAuthContext'
 
 interface StatusTogglerProps {
   open: boolean
-  status: string
-  setStatus: (status: string) => void
-  auth?: AuthUser | null
 }
 
-export const StatusToggler = ({
-  open,
-  status,
-  setStatus,
-  auth,
-}: StatusTogglerProps) => {
+export const StatusToggler = ({ open }: StatusTogglerProps) => {
+  const { auth } = useAuthContext()
+
   const [manualInput, setManualInput] = useState('')
   const [showManualInput, setShowManualInput] = useState(false)
 
+  const { data: users } = useUsers()
+  const updateActivityStatus = useUpdateActivityStatus()
+
+  const currentUser = users?.find((u) => u.id === auth?.id)
+  const activityStatus = currentUser?.activityStatus ?? {
+    status: UserStatus.Active,
+  }
+  const { status, message } = activityStatus
+
+  const handleStatusChange = (newStatus: UserStatus, newMessage?: string) => {
+    if (!auth?.id) return
+    updateActivityStatus.mutate({
+      id: auth.id,
+      input: { status: newStatus, message: newMessage },
+    })
+  }
+
   const handleSetManualStatus = () => {
     if (manualInput.trim()) {
-      setStatus(manualInput)
+      handleStatusChange(UserStatus.Inactive, manualInput)
       setManualInput('')
       setShowManualInput(false)
     }
   }
+
+  const displayLabel =
+    message ?? (status === UserStatus.Active ? 'Active' : 'Inactive')
 
   return (
     <DropdownMenu>
@@ -48,7 +67,7 @@ export const StatusToggler = ({
             <span
               className={cn(
                 'absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full border-2 border-white',
-                status === 'active' ? 'bg-green-500' : 'bg-yellow-400'
+                status === UserStatus.Active ? 'bg-success' : 'bg-gray-400'
               )}
             />
           </div>
@@ -58,12 +77,8 @@ export const StatusToggler = ({
               <span className="text-foreground truncate text-sm font-medium">
                 {auth?.username}
               </span>
-              <span className="text-muted-foreground text-xs">
-                {status === 'on-break'
-                  ? 'On Break'
-                  : status === 'active'
-                    ? 'Active'
-                    : status}
+              <span className="text-muted-foreground truncate text-xs">
+                {displayLabel}
               </span>
             </div>
           )}
@@ -76,15 +91,17 @@ export const StatusToggler = ({
             Status
           </div>
           <DropdownMenuItem
-            onClick={() => setStatus('active')}
-            className={cn(status === 'active' && 'bg-accent')}
+            onClick={() => handleStatusChange(UserStatus.Active)}
+            className={cn(
+              status === UserStatus.Active && !message && 'bg-accent'
+            )}
           >
             <div className="h-2 w-2 shrink-0 rounded-full bg-green-500" />
             Active
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => setStatus('on-break')}
-            className={cn(status === 'on-break' && 'bg-accent')}
+            onClick={() => handleStatusChange(UserStatus.Inactive, 'On Break')}
+            className={cn(status === UserStatus.Inactive && 'bg-accent')}
           >
             <Coffee size={16} />
             On Break
@@ -97,7 +114,7 @@ export const StatusToggler = ({
           {!showManualInput ? (
             <button
               onClick={() => setShowManualInput(true)}
-              className="w-full rounded-md px-2 py-1.5 text-sm text-left hover:bg-accent transition-colors"
+              className="hover:bg-accent w-full rounded-md px-2 py-1.5 text-left text-sm transition-colors"
             >
               Set custom status
             </button>
@@ -113,13 +130,13 @@ export const StatusToggler = ({
                     handleSetManualStatus()
                   }
                 }}
-                className="rounded-md border border-border bg-white px-2 py-1.5 text-sm placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
+                className="border-border placeholder-muted-foreground focus:ring-ring/50 rounded-md border bg-white px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
                 autoFocus
               />
               <div className="flex gap-1">
                 <button
                   onClick={handleSetManualStatus}
-                  className="flex-1 rounded-md bg-brand px-2 py-1 text-xs font-medium text-white hover:bg-brand-hover transition-colors"
+                  className="bg-brand hover:bg-brand-hover flex-1 rounded-md px-2 py-1 text-xs font-medium text-white transition-colors"
                 >
                   Set
                 </button>
@@ -128,7 +145,7 @@ export const StatusToggler = ({
                     setShowManualInput(false)
                     setManualInput('')
                   }}
-                  className="flex-1 rounded-md border border-border px-2 py-1 text-xs font-medium hover:bg-surface-hover transition-colors"
+                  className="border-border hover:bg-surface-hover flex-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors"
                 >
                   Cancel
                 </button>

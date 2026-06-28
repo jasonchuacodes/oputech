@@ -83,7 +83,15 @@ export class AuthService {
   }
 
   async me(payload: { userId: string }) {
-    return this.users.findById(payload.userId)
+    const user = await this.users.findById(payload.userId)
+    if (!user) return null
+    return {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      activityStatus: user.activityStatus,
+    }
   }
 
   logout(res: Response) {

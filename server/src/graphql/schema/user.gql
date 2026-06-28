@@ -1,8 +1,14 @@
+type ActivityStatus {
+  status: String!
+  message: String
+}
+
 type User {
   id: ID!
   username: String!
   email: String
   role: String!
+  activityStatus: ActivityStatus!
 }
 
 extend type Query {
@@ -16,6 +22,12 @@ input CreateUserInput {
   role: String
 }
 
+input ActivityStatusInput {
+  status: String!
+  message: String
+}
+
 extend type Mutation {
   createUser(input: CreateUserInput!): User!
+  updateActivityStatus(id: ID!, input: ActivityStatusInput!): User!
 }

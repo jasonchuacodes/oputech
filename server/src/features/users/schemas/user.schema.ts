@@ -8,6 +8,16 @@ export enum UserRole {
   Admin = 'ADMIN',
 }
 
+export enum UserStatus {
+  Active = 'ACTIVE',
+  Inactive = 'INACTIVE',
+}
+
+export class ActivityStatus {
+  status: UserStatus;
+  message?: string;
+}
+
 @Schema({ timestamps: true })
 export class User {
   @Prop({ required: true, unique: true, trim: true })
@@ -21,6 +31,15 @@ export class User {
 
   @Prop({ enum: UserRole, default: UserRole.User })
   role: UserRole;
+
+  @Prop({
+    type: {
+      status: { type: String, enum: UserStatus },
+      message: { type: String },
+    },
+    default: { status: UserStatus.Active },
+  })
+  activityStatus: ActivityStatus;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
