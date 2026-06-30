@@ -24,7 +24,7 @@ export const CurrentSale = ({
   onCancel,
   onRemoveItem,
 }: CurrentSaleProps) => {
-  const total = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const hasItems = items.length > 0
   const selectedItems = hasItems && paymentType !== null
 
@@ -51,23 +51,23 @@ export const CurrentSale = ({
             Select a product to get started.
           </p>
         ) : (
-          items.map(({ product, quantity }) => (
+          items.map((item) => (
             <div
-              key={product.id}
+              key={item.productId}
               className="flex items-start justify-between gap-2 rounded-md border px-3 py-2"
             >
               <div className="flex min-w-0 flex-col gap-0.5">
-                <span className="truncate text-sm font-medium text-slate-800">{product.name}</span>
+                <span className="truncate text-sm font-medium text-slate-800">{item.name}</span>
                 <span className="text-xs text-slate-500">
-                  {formatCurrency(product.price)} × {quantity}
+                  {formatCurrency(item.price)} × {item.quantity}
                 </span>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="text-sm font-semibold text-slate-900">
-                  {formatCurrency(product.price * quantity)}
+                  {formatCurrency(item.price * item.quantity)}
                 </span>
                 <button
-                  onClick={() => onRemoveItem(product.id)}
+                  onClick={() => onRemoveItem(item.productId)}
                   className="text-slate-300 transition-colors hover:text-red-400"
                 >
                   <X size={14} />

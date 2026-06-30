@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { ShoppingCart } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
 import { Input } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
 import { PaymentType, TransactionItem } from '../../services/pos/pos.types'
@@ -13,12 +12,13 @@ import { CurrentSale } from './components/CurrentSale'
 import { CartSheet } from './components/CartSheet'
 
 const POSPage = () => {
-  const [transactionItems, setTransactionItems] = useState<TransactionItem[]>([])
+  const [transactionItems, setTransactionItems] = useState<TransactionItem[]>(
+    []
+  )
   const [paymentType, setPaymentType] = useState<PaymentType>(PaymentType.Cash)
   const [search, setSearch] = useState('')
   const cart = useDisclosure()
 
-  const queryClient = useQueryClient()
   const { data: rawProducts = [], isLoading } = useProducts(search)
   const { mutate: createTransaction } = useCreateTransaction()
 
@@ -26,23 +26,23 @@ const POSPage = () => {
     ...item,
     quantity:
       item.quantity -
-      (transactionItems.find((s) => s.product.id === item.id)?.quantity ?? 0),
+      (transactionItems.find((s) => s.productId === item.id)?.quantity ?? 0),
   }))
 
   const handleProductClick = (product: Product) => {
     setTransactionItems((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id)
+      const existing = prev.find((i) => i.productId === product.id)
       if (existing) {
         return prev.map((i) =>
-          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i,
+          i.productId === product.id ? { ...i, quantity: i.quantity + 1 } : i
         )
       }
-      return [...prev, { product, quantity: 1 }]
+      return [...prev, { productId: product.id, name: product.name, price: product.price, quantity: 1 }]
     })
   }
 
   const handleRemoveItem = (productId: string) => {
-    setTransactionItems((prev) => prev.filter((i) => i.product.id !== productId))
+    setTransactionItems((prev) => prev.filter((i) => i.productId !== productId))
   }
 
   const handleClear = () => setTransactionItems([])
@@ -53,27 +53,21 @@ const POSPage = () => {
   }
 
   const handleSubmit = () => {
-    createTransaction(
-      {
-        items: transactionItems.map((i) => ({
-          productId: i.product.id,
-          quantity: i.quantity,
-        })),
-        paymentType,
-      },
-      {
-        onSuccess: () => {
-          handleClear()
-          cart.onClose()
-          queryClient.invalidateQueries({ queryKey: ['inventory'] })
-        },
-      },
-    )
+    const items = transactionItems.map((i) => ({
+      productId: i.productId,
+      quantity: i.quantity,
+    }))
+    handleClear()
+    cart.onClose()
+    createTransaction({ items, paymentType })
   }
 
   return (
     <div className="flex h-full flex-col gap-6 p-6">
-      <PageHeader title="Point of Sale" description="Create a new transaction" />
+      <PageHeader
+        title="Point of Sale"
+        description="Create a new transaction"
+      />
 
       <div className="flex min-h-0 flex-1 gap-4">
         <div className="flex min-w-0 flex-1 flex-col gap-4">
@@ -96,7 +90,11 @@ const POSPage = () => {
               </p>
             )}
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} onClick={handleProductClick} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                onClick={handleProductClick}
+              />
             ))}
           </div>
 
