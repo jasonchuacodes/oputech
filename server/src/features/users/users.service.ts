@@ -31,7 +31,7 @@ export class UsersService {
 
   updateStatus(id: string, input: UpdateUserStatusDto): Promise<UserDocument | null> {
     return this.user
-      .findByIdAndUpdate(id, { activityStatus: input.activityStatus }, { new: true })
+      .findByIdAndUpdate(id, { activityStatus: input.activityStatus }, { returnDocument: 'after' })
       .select('-password')
       .exec()
   }

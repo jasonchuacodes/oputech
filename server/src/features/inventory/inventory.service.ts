@@ -30,7 +30,7 @@ export class InventoryService {
     const update: Record<string, unknown> = {}
     if (Object.keys(fields).length) update.$set = fields
     if (addQuantity) update.$inc = { quantity: addQuantity }
-    return this.product.findByIdAndUpdate(id, update, { new: true }).exec()
+    return this.product.findByIdAndUpdate(id, update, { returnDocument: 'after' }).exec()
   }
 
   remove(id: string): Promise<ProductDocument | null> {
