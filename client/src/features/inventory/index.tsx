@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Plus, Pencil } from 'lucide-react'
 import { Button, Input, PageHeader } from '../../components'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
-import { useInventoryItems } from '../../services/inventory/inventory.queries'
-import { InventoryItem, InventoryStatus } from '../../services/inventory/inventory.types'
+import { useProducts } from '../../services/inventory/inventory.queries'
+import { Product, ProductStatus } from '../../services/inventory/inventory.types'
 import { formatCurrency } from '../../utils/number'
 import { cn } from '../../utils/cn'
 import { AddItemModal } from './components/AddItemModal'
@@ -11,7 +11,7 @@ import { EditItemModal } from './components/EditItemModal'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { ActionsDropdown } from './components/ActionsDropdown'
 
-const statusConfig: Record<InventoryStatus, { label: string; className: string }> = {
+const statusConfig: Record<ProductStatus, { label: string; className: string }> = {
   IN_STOCK: { label: 'In Stock', className: 'bg-green-100 text-green-700' },
   LOW: { label: 'Low', className: 'bg-amber-100 text-amber-700' },
   OUT_OF_STOCK: { label: 'Out of Stock', className: 'bg-red-100 text-red-700' },
@@ -20,23 +20,23 @@ const statusConfig: Record<InventoryStatus, { label: string; className: string }
 const InventoryPage = () => {
   const [search, setSearch] = useState('')
   const [addOpen, setAddOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null)
+  const [selectedItem, setSelectedItem] = useState<Product | null>(null)
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  const { data, isLoading } = useInventoryItems(search || undefined)
+  const { data, isLoading } = useProducts(search || undefined)
 
-  const openEdit = (item: InventoryItem) => {
+  const openEdit = (item: Product) => {
     setSelectedItem(item)
     setEditOpen(true)
   }
 
-  const openDelete = (item: InventoryItem) => {
+  const openDelete = (item: Product) => {
     setSelectedItem(item)
     setDeleteOpen(true)
   }
 
-  const columns: DataTableColumn<InventoryItem>[] = [
+  const columns: DataTableColumn<Product>[] = [
     {
       id: 'name',
       heading: 'Name',

@@ -1,40 +1,40 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getInventoryItems, createInventoryItem, updateInventoryItem, deleteInventoryItem } from './inventory.api'
-import { CreateInventoryItemInput, UpdateInventoryItemInput } from './inventory.types'
+import { getProducts, createProduct, updateProduct, deleteProduct } from './inventory.api'
+import { CreateProductInput, UpdateProductInput } from './inventory.types'
 
-export function useInventoryItems(search?: string) {
+export function useProducts(search?: string) {
   return useQuery({
     queryKey: ['inventory', search],
-    queryFn: () => getInventoryItems(search),
+    queryFn: () => getProducts(search),
     staleTime: 5 * 60 * 1000,
   })
 }
 
-export function useCreateInventoryItem() {
+export function useCreateProduct() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input: CreateInventoryItemInput) => createInventoryItem(input),
+    mutationFn: (input: CreateProductInput) => createProduct(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inventory'] })
     },
   })
 }
 
-export function useUpdateInventoryItem() {
+export function useUpdateProduct() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdateInventoryItemInput }) =>
-      updateInventoryItem(id, input),
+    mutationFn: ({ id, input }: { id: string; input: UpdateProductInput }) =>
+      updateProduct(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inventory'] })
     },
   })
 }
 
-export function useDeleteInventoryItem() {
+export function useDeleteProduct() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => deleteInventoryItem(id),
+    mutationFn: (id: string) => deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inventory'] })
     },

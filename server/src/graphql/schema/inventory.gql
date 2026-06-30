@@ -1,37 +1,37 @@
-enum InventoryStatus {
+enum ProductStatus {
   IN_STOCK
   LOW
   OUT_OF_STOCK
 }
 
-type InventoryItem {
+type Product {
   id: ID!
   name: String!
   quantity: Int!
   price: Float!
   imageUrl: String
-  status: InventoryStatus!
+  status: ProductStatus!
 }
 
 extend type Query {
-  inventoryItems(search: String): [InventoryItem!]!
+  products(search: String): [Product!]!
 }
 
-input CreateInventoryItemInput {
+input CreateProductInput {
   name: String!
   quantity: Int!
   price: Float!
   imageUrl: String
 }
 
-input UpdateInventoryItemInput {
+input UpdateProductInput {
   name: String
   price: Float
   addQuantity: Int
 }
 
 extend type Mutation {
-  createInventoryItem(input: CreateInventoryItemInput!): InventoryItem!
-  updateInventoryItem(id: ID!, input: UpdateInventoryItemInput!): InventoryItem!
-  deleteInventoryItem(id: ID!): Boolean!
+  createProduct(input: CreateProductInput!): Product!
+  updateProduct(id: ID!, input: UpdateProductInput!): Product!
+  deleteProduct(id: ID!): Boolean!
 }

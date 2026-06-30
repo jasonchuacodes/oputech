@@ -2,54 +2,54 @@ import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/g
 import { UseGuards } from '@nestjs/common'
 import { InventoryService } from '../../features/inventory/inventory.service'
 import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
-import { InventoryItemDocument } from '../../features/inventory/schemas/inventory.schema'
+import { ProductDocument } from '../../features/inventory/schemas/inventory.schema'
 
-interface CreateInventoryItemInput {
+interface CreateProductInput {
   name: string
   quantity: number
   price: number
   imageUrl?: string
 }
 
-interface UpdateInventoryItemInput {
+interface UpdateProductInput {
   name?: string
   price?: number
   addQuantity?: number
 }
 
 @UseGuards(JwtAuthGuard)
-@Resolver('InventoryItem')
+@Resolver('Product')
 export class InventoryResolver {
   constructor(private readonly inventory: InventoryService) {}
 
   @Query()
-  inventoryItems(@Args('search') search?: string) {
+  products(@Args('search') search?: string) {
     return this.inventory.findAll(search)
   }
 
   @Mutation()
-  createInventoryItem(@Args('input') input: CreateInventoryItemInput) {
+  createProduct(@Args('input') input: CreateProductInput) {
     return this.inventory.create(input)
   }
 
   @Mutation()
-  updateInventoryItem(@Args('id') id: string, @Args('input') input: UpdateInventoryItemInput) {
+  updateProduct(@Args('id') id: string, @Args('input') input: UpdateProductInput) {
     return this.inventory.update(id, input)
   }
 
   @Mutation()
-  async deleteInventoryItem(@Args('id') id: string): Promise<boolean> {
+  async deleteProduct(@Args('id') id: string): Promise<boolean> {
     const result = await this.inventory.remove(id)
     return result !== null
   }
 
   @ResolveField('id')
-  id(@Parent() item: InventoryItemDocument): string {
+  id(@Parent() item: ProductDocument): string {
     return item._id.toString()
   }
 
   @ResolveField('status')
-  status(@Parent() item: InventoryItemDocument): string {
+  status(@Parent() item: ProductDocument): string {
     if (item.quantity === 0) return 'OUT_OF_STOCK'
     if (item.quantity <= 10) return 'LOW'
     return 'IN_STOCK'

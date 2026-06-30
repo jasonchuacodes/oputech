@@ -4,25 +4,25 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Pencil } from 'lucide-react'
 import { CustomModal, Input, Label } from '../../../components'
-import { useUpdateInventoryItem } from '../../../services/inventory/inventory.queries'
-import { InventoryItem } from '../../../services/inventory/inventory.types'
+import { useUpdateProduct } from '../../../services/inventory/inventory.queries'
+import { Product } from '../../../services/inventory/inventory.types'
 
-const EditInventoryItemSchema = z.object({
+const EditProductSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   price: z.number().min(0, 'Price must be at least 0'),
   addQuantity: z.number().int().min(0, 'Must be 0 or more').optional(),
 })
 
-type EditInventoryItemInput = z.infer<typeof EditInventoryItemSchema>
+type EditProductInput = z.infer<typeof EditProductSchema>
 
 interface Props {
-  item: InventoryItem | null
+  item: Product | null
   open: boolean
   onClose: () => void
 }
 
 export const EditItemModal = ({ item, open, onClose }: Props) => {
-  const updateItem = useUpdateInventoryItem()
+  const updateItem = useUpdateProduct()
 
   const {
     register,
@@ -30,8 +30,8 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
     reset,
     control,
     formState: { errors },
-  } = useForm<EditInventoryItemInput>({
-    resolver: zodResolver(EditInventoryItemSchema),
+  } = useForm<EditProductInput>({
+    resolver: zodResolver(EditProductSchema),
   })
 
   const addQuantity = useWatch({ control, name: 'addQuantity' })
@@ -47,7 +47,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
     reset()
   }
 
-  const onSubmit = (data: EditInventoryItemInput) => {
+  const onSubmit = (data: EditProductInput) => {
     if (!item) return
     updateItem.mutate(
       {

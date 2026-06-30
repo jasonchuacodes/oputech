@@ -1,16 +1,16 @@
 import { Trash2 } from 'lucide-react'
 import { CustomModal } from '../../../components'
-import { useDeleteInventoryItem } from '../../../services/inventory/inventory.queries'
-import { InventoryItem } from '../../../services/inventory/inventory.types'
+import { useDeleteProduct } from '../../../services/inventory/inventory.queries'
+import { Product } from '../../../services/inventory/inventory.types'
 
 interface Props {
-  item: InventoryItem | null
+  item: Product | null
   open: boolean
   onClose: () => void
 }
 
 export const DeleteConfirmModal = ({ item, open, onClose }: Props) => {
-  const deleteItem = useDeleteInventoryItem()
+  const deleteItem = useDeleteProduct()
 
   const handleConfirm = () => {
     if (!item) return

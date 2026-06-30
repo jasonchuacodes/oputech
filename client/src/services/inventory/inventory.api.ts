@@ -1,9 +1,9 @@
 import axios from '../../lib/axios'
-import { InventoryItem, CreateInventoryItemInput, UpdateInventoryItemInput } from './inventory.types'
+import { Product, CreateProductInput, UpdateProductInput } from './inventory.types'
 
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
-const INVENTORY_ITEM_FIELDS = `
+const PRODUCT_FIELDS = `
   id
   name
   quantity
@@ -12,69 +12,64 @@ const INVENTORY_ITEM_FIELDS = `
   status
 `
 
-const GET_INVENTORY_ITEMS = `
-  query GetInventoryItems($search: String) {
-    inventoryItems(search: $search) {
-      ${INVENTORY_ITEM_FIELDS}
+const GET_PRODUCTS = `
+  query GetProducts($search: String) {
+    products(search: $search) {
+      ${PRODUCT_FIELDS}
     }
   }
 `
 
-export async function getInventoryItems(search?: string): Promise<InventoryItem[]> {
+export async function getProducts(search?: string): Promise<Product[]> {
   const res = await axios.post(GRAPHQL_URL, {
-    query: GET_INVENTORY_ITEMS,
+    query: GET_PRODUCTS,
     variables: { search: search || undefined },
   })
-  return res.data.data.inventoryItems
+  return res.data.data.products
 }
 
-const CREATE_INVENTORY_ITEM = `
-  mutation CreateInventoryItem($input: CreateInventoryItemInput!) {
-    createInventoryItem(input: $input) {
-      ${INVENTORY_ITEM_FIELDS}
+const CREATE_PRODUCT = `
+  mutation CreateProduct($input: CreateProductInput!) {
+    createProduct(input: $input) {
+      ${PRODUCT_FIELDS}
     }
   }
 `
 
-export async function createInventoryItem(
-  input: CreateInventoryItemInput,
-): Promise<InventoryItem> {
+export async function createProduct(input: CreateProductInput): Promise<Product> {
   const res = await axios.post(GRAPHQL_URL, {
-    query: CREATE_INVENTORY_ITEM,
+    query: CREATE_PRODUCT,
     variables: { input },
   })
-  return res.data.data.createInventoryItem
+  return res.data.data.createProduct
 }
 
-const UPDATE_INVENTORY_ITEM = `
-  mutation UpdateInventoryItem($id: ID!, $input: UpdateInventoryItemInput!) {
-    updateInventoryItem(id: $id, input: $input) {
-      ${INVENTORY_ITEM_FIELDS}
+const UPDATE_PRODUCT = `
+  mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
+    updateProduct(id: $id, input: $input) {
+      ${PRODUCT_FIELDS}
     }
   }
 `
 
-export async function updateInventoryItem(
-  id: string,
-  input: UpdateInventoryItemInput,
-): Promise<InventoryItem> {
+export async function updateProduct(id: string, input: UpdateProductInput): Promise<Product> {
   const res = await axios.post(GRAPHQL_URL, {
-    query: UPDATE_INVENTORY_ITEM,
+    query: UPDATE_PRODUCT,
     variables: { id, input },
   })
-  return res.data.data.updateInventoryItem
+  return res.data.data.updateProduct
 }
 
-const DELETE_INVENTORY_ITEM = `
-  mutation DeleteInventoryItem($id: ID!) {
-    deleteInventoryItem(id: $id)
+const DELETE_PRODUCT = `
+  mutation DeleteProduct($id: ID!) {
+    deleteProduct(id: $id)
   }
 `
 
-export async function deleteInventoryItem(id: string): Promise<boolean> {
+export async function deleteProduct(id: string): Promise<boolean> {
   const res = await axios.post(GRAPHQL_URL, {
-    query: DELETE_INVENTORY_ITEM,
+    query: DELETE_PRODUCT,
     variables: { id },
   })
-  return res.data.data.deleteInventoryItem
+  return res.data.data.deleteProduct
 }

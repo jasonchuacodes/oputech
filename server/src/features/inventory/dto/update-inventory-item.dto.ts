@@ -1,4 +1,4 @@
-export class UpdateInventoryItemDto {
+export class UpdateProductDto {
   name?: string
   price?: number
   addQuantity?: number

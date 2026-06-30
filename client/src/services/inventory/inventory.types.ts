@@ -1,22 +1,22 @@
-export type InventoryStatus = 'IN_STOCK' | 'LOW' | 'OUT_OF_STOCK'
+export type ProductStatus = 'IN_STOCK' | 'LOW' | 'OUT_OF_STOCK'
 
-export interface InventoryItem {
+export interface Product {
   id: string
   name: string
   quantity: number
   price: number
   imageUrl?: string
-  status: InventoryStatus
+  status: ProductStatus
 }
 
-export interface CreateInventoryItemInput {
+export interface CreateProductInput {
   name: string
   quantity: number
   price: number
   imageUrl?: string
 }
 
-export interface UpdateInventoryItemInput {
+export interface UpdateProductInput {
   name?: string
   price?: number
   addQuantity?: number

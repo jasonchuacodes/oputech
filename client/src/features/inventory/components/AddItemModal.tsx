@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ImagePlus, PackagePlus } from 'lucide-react'
 import { CustomModal, Input, Label } from '../../../components'
-import { useCreateInventoryItem } from '../../../services/inventory/inventory.queries'
+import { useCreateProduct } from '../../../services/inventory/inventory.queries'
 import {
   AddInventoryItemSchema,
   AddInventoryItemInput,
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export const AddItemModal = ({ open, onClose }: Props) => {
-  const createItem = useCreateInventoryItem()
+  const createItem = useCreateProduct()
 
   const {
     register,
