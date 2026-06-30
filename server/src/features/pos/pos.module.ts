@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
-import { Sale, SaleSchema } from './schemas/sale.schema'
-import { InventoryItem, InventoryItemSchema } from '../inventory/schemas/inventory.schema'
+import { Transaction, TransactionSchema } from './schemas/transaction.schema'
+import { Product, ProductSchema } from '../inventory/schemas/inventory.schema'
 import { PosService } from './pos.service'
 import { PosResolver } from '../../graphql/resolvers/pos.resolver'
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Sale.name, schema: SaleSchema },
-      { name: InventoryItem.name, schema: InventoryItemSchema },
+      { name: Transaction.name, schema: TransactionSchema },
+      { name: Product.name, schema: ProductSchema },
     ]),
   ],
   providers: [PosService, PosResolver],

@@ -1,18 +1,11 @@
-export interface Product {
-  id: string
-  name: string
-  price: number
-  stock: number
-  image?: string
-  category?: string
-}
+import { Product } from '../inventory/inventory.types'
 
-export interface SaleItem {
+export interface TransactionItem {
   product: Product
   quantity: number
 }
 
-export enum PaymentMode {
+export enum PaymentType {
   Cash = 'CASH',
   GCash = 'GCASH',
 }

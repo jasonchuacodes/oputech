@@ -3,38 +3,38 @@ import { ShoppingCart } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Input } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
-import { PaymentMode, Product, SaleItem } from '../../services/pos/pos.types'
-import { useInventoryItems } from '../../services/inventory/inventory.queries'
-import { useCreateSale } from '../../services/pos/pos.queries'
+import { PaymentType, TransactionItem } from '../../services/pos/pos.types'
+import { Product } from '../../services/inventory/inventory.types'
+import { useProducts } from '../../services/inventory/inventory.queries'
+import { useCreateTransaction } from '../../services/pos/pos.queries'
 import { useDisclosure } from '../../hooks/useDisclosure'
 import { ProductCard } from './components/ProductCard'
 import { CurrentSale } from './components/CurrentSale'
 import { CartSheet } from './components/CartSheet'
 
 const POSPage = () => {
-  const [saleItems, setSaleItems] = useState<SaleItem[]>([])
-  const [paymentMode, setPaymentMode] = useState<PaymentMode>(PaymentMode.Cash)
+  const [transactionItems, setTransactionItems] = useState<TransactionItem[]>([])
+  const [paymentType, setPaymentType] = useState<PaymentType>(PaymentType.Cash)
   const [search, setSearch] = useState('')
   const cart = useDisclosure()
 
   const queryClient = useQueryClient()
-  const { data: inventoryItems = [], isLoading } = useInventoryItems(search)
-  const { mutate: createSale } = useCreateSale()
+  const { data: rawProducts = [], isLoading } = useProducts(search)
+  const { mutate: createTransaction } = useCreateTransaction()
 
-  const products: Product[] = inventoryItems.map((item) => ({
-    id: item.id,
-    name: item.name,
-    price: item.price,
-    stock: item.quantity - (saleItems.find((s) => s.product.id === item.id)?.quantity ?? 0),
-    image: item.imageUrl,
+  const products: Product[] = rawProducts.map((item) => ({
+    ...item,
+    quantity:
+      item.quantity -
+      (transactionItems.find((s) => s.product.id === item.id)?.quantity ?? 0),
   }))
 
   const handleProductClick = (product: Product) => {
-    setSaleItems((prev) => {
+    setTransactionItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id)
       if (existing) {
         return prev.map((i) =>
-          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i,
         )
       }
       return [...prev, { product, quantity: 1 }]
@@ -42,10 +42,10 @@ const POSPage = () => {
   }
 
   const handleRemoveItem = (productId: string) => {
-    setSaleItems((prev) => prev.filter((i) => i.product.id !== productId))
+    setTransactionItems((prev) => prev.filter((i) => i.product.id !== productId))
   }
 
-  const handleClear = () => setSaleItems([])
+  const handleClear = () => setTransactionItems([])
 
   const handleCancel = () => {
     handleClear()
@@ -53,13 +53,13 @@ const POSPage = () => {
   }
 
   const handleSubmit = () => {
-    createSale(
+    createTransaction(
       {
-        items: saleItems.map((i) => ({
-          inventoryItemId: i.product.id,
+        items: transactionItems.map((i) => ({
+          productId: i.product.id,
           quantity: i.quantity,
         })),
-        paymentMode,
+        paymentType,
       },
       {
         onSuccess: () => {
@@ -73,7 +73,7 @@ const POSPage = () => {
 
   return (
     <div className="flex h-full flex-col gap-6 p-6">
-      <PageHeader title="Point of Sale" description="Create a new sale" />
+      <PageHeader title="Point of Sale" description="Create a new transaction" />
 
       <div className="flex min-h-0 flex-1 gap-4">
         <div className="flex min-w-0 flex-1 flex-col gap-4">
@@ -96,11 +96,7 @@ const POSPage = () => {
               </p>
             )}
             {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onClick={handleProductClick}
-              />
+              <ProductCard key={product.id} product={product} onClick={handleProductClick} />
             ))}
           </div>
 
@@ -111,9 +107,9 @@ const POSPage = () => {
             >
               <ShoppingCart size={18} />
               Cart
-              {saleItems.length > 0 && (
+              {transactionItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                  {saleItems.length}
+                  {transactionItems.length}
                 </span>
               )}
             </button>
@@ -122,9 +118,9 @@ const POSPage = () => {
 
         <div className="hidden w-80 shrink-0 md:flex md:flex-col">
           <CurrentSale
-            items={saleItems}
-            paymentMode={paymentMode}
-            onPaymentModeChange={setPaymentMode}
+            items={transactionItems}
+            paymentType={paymentType}
+            onPaymentTypeChange={setPaymentType}
             onSubmit={handleSubmit}
             onClear={handleClear}
             onCancel={handleCancel}
@@ -136,9 +132,9 @@ const POSPage = () => {
       <CartSheet
         open={cart.open}
         onClose={cart.onClose}
-        items={saleItems}
-        paymentMode={paymentMode}
-        onPaymentModeChange={setPaymentMode}
+        items={transactionItems}
+        paymentType={paymentType}
+        onPaymentTypeChange={setPaymentType}
         onSubmit={handleSubmit}
         onClear={handleClear}
         onCancel={handleCancel}

@@ -1,33 +1,34 @@
-enum PaymentMode {
+enum PaymentType {
   CASH
   GCASH
 }
 
-type SaleItem {
-  inventoryItemId: ID!
+type TransactionItem {
+  productId: ID!
   name: String!
   price: Float!
   quantity: Int!
 }
 
-type Sale {
+type Transaction {
   id: ID!
-  items: [SaleItem!]!
-  paymentMode: PaymentMode!
+  items: [TransactionItem!]!
+  paymentType: PaymentType!
   total: Float!
+  processed: Boolean!
   createdAt: String!
 }
 
-input SaleItemInput {
-  inventoryItemId: ID!
+input TransactionItemInput {
+  productId: ID!
   quantity: Int!
 }
 
-input CreateSaleInput {
-  items: [SaleItemInput!]!
-  paymentMode: PaymentMode!
+input CreateTransactionInput {
+  items: [TransactionItemInput!]!
+  paymentType: PaymentType!
 }
 
 extend type Mutation {
-  createSale(input: CreateSaleInput!): Sale!
+  createTransaction(input: CreateTransactionInput!): Transaction!
 }

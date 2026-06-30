@@ -1,40 +1,40 @@
 import axios from '../../lib/axios'
-import { PaymentMode } from './pos.types'
+import { PaymentType } from './pos.types'
 
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
-export interface CreateSaleItemInput {
-  inventoryItemId: string
+export interface CreateTransactionItemInput {
+  productId: string
   quantity: number
 }
 
-export interface CreateSaleInput {
-  items: CreateSaleItemInput[]
-  paymentMode: PaymentMode
+export interface CreateTransactionInput {
+  items: CreateTransactionItemInput[]
+  paymentType: PaymentType
 }
 
-export interface Sale {
+export interface Transaction {
   id: string
   total: number
-  paymentMode: PaymentMode
+  paymentType: PaymentType
   createdAt: string
 }
 
-const CREATE_SALE = `
-  mutation CreateSale($input: CreateSaleInput!) {
-    createSale(input: $input) {
+const CREATE_TRANSACTION = `
+  mutation CreateTransaction($input: CreateTransactionInput!) {
+    createTransaction(input: $input) {
       id
       total
-      paymentMode
+      paymentType
       createdAt
     }
   }
 `
 
-export async function createSale(input: CreateSaleInput): Promise<Sale> {
+export async function createTransaction(input: CreateTransactionInput): Promise<Transaction> {
   const res = await axios.post(GRAPHQL_URL, {
-    query: CREATE_SALE,
+    query: CREATE_TRANSACTION,
     variables: { input },
   })
-  return res.data.data.createSale
+  return res.data.data.createTransaction
 }
