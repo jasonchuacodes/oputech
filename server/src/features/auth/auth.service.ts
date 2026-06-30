@@ -9,6 +9,7 @@ import { Request, Response } from 'express'
 import { UsersService } from '../users/users.service'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
+import { UserStatus } from '../users/schemas/user.schema'
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,10 @@ export class AuthService {
 
     const match = await bcrypt.compare(input.password, user.password)
     if (!match) throw new UnauthorizedException('Invalid credentials')
+
+    await this.users.updateStatus(String(user._id), {
+      activityStatus: { status: UserStatus.Active },
+    })
 
     const accessToken = this.jwt.sign({ sub: user._id, role: user.role })
 
