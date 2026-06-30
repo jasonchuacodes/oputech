@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   FileBarChart,
   ShoppingCart,
-  Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -26,10 +25,10 @@ const navGroups = [
       { label: 'Users', icon: Users, to: '/users' },
     ],
   },
-  {
-    label: 'Account',
-    items: [{ label: 'Settings', icon: Settings, to: '/settings' }],
-  },
+  // {
+  //   label: 'Account',
+  //   items: [{ label: 'Settings', icon: Settings, to: '/settings' }],
+  // },
 ]
 
 interface SidebarProps {
