@@ -1,0 +1,33 @@
+type ProductSale {
+  productId: String!
+  name: String!
+  quantitySold: Int!
+  pricePerUnit: Float!
+  total: Float!
+}
+
+type Report {
+  id: ID!
+  createdBy: User!
+  fromDate: String!
+  toDate: String!
+  products: [ProductSale!]!
+  totalCash: Float!
+  totalGCash: Float!
+  totalIncome: Float!
+  createdAt: String!
+  updatedAt: String!
+}
+
+input CreateReportInput {
+  fromDate: String!
+  toDate: String!
+}
+
+extend type Query {
+  reports: [Report!]!
+}
+
+extend type Mutation {
+  createReport(input: CreateReportInput!): Report!
+}

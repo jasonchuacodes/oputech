@@ -14,6 +14,7 @@ import UserHome from '../features/dashboard'
 import Users from '../features/user'
 import Inventory from '../features/inventory'
 import POS from '../features/pos'
+import Report from '../features/report'
 import { UserRole } from '../types'
 
 export const PublicRoutes = {
@@ -28,6 +29,7 @@ export const UserRoutes = {
   Users: '/users',
   Inventory: '/inventory',
   POS: '/pos',
+  Report: '/report',
 }
 
 export const router = createBrowserRouter(
@@ -49,6 +51,7 @@ export const router = createBrowserRouter(
           <Route path={UserRoutes.Users} element={<Users />} />
           <Route path={UserRoutes.Inventory} element={<Inventory />} />
           <Route path={UserRoutes.POS} element={<POS />} />
+          <Route path={UserRoutes.Report} element={<Report />} />
         </Route>
       </Route>
     </Route>
