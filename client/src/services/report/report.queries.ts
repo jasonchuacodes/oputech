@@ -16,6 +16,7 @@ export const useCreateReport = () => {
     onSuccess: () => {
       toast.success('Report generated successfully!')
       queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
     onError: (error: Error) => {
       toast.error(error.message)
