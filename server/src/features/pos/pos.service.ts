@@ -21,6 +21,18 @@ export class PosService {
     @InjectModel(Product.name) private product: Model<ProductDocument>,
   ) {}
 
+  async getTransactionsByDate(date: string): Promise<TransactionDocument[]> {
+    const day = new Date(date)
+    const from = new Date(day)
+    from.setHours(0, 0, 0, 0)
+    const to = new Date(day)
+    to.setHours(23, 59, 59, 999)
+    return this.transactionModel
+      .find({ processed: { $ne: true }, createdAt: { $gte: from, $lte: to } })
+      .sort({ createdAt: 1 })
+      .exec()
+  }
+
   async createTransaction(input: CreateTransactionInput): Promise<TransactionDocument> {
     const ids = input.items.map((i) => i.productId)
     const products = await this.product.find({ _id: { $in: ids } }).exec()

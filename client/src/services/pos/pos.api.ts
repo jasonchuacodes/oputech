@@ -1,5 +1,5 @@
 import axios from '../../lib/axios'
-import { PaymentType } from './pos.types'
+import { Transaction, PaymentType } from './pos.types'
 
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
@@ -13,12 +13,18 @@ export interface CreateTransactionInput {
   paymentType: PaymentType
 }
 
-export interface Transaction {
-  id: string
-  total: number
-  paymentType: PaymentType
-  createdAt: string
-}
+const GET_TRANSACTIONS = `
+  query GetTransactions($date: String!) {
+    transactions(date: $date) {
+      id
+      items { productId name price quantity }
+      paymentType
+      total
+      processed
+      createdAt
+    }
+  }
+`
 
 const CREATE_TRANSACTION = `
   mutation CreateTransaction($input: CreateTransactionInput!) {
@@ -30,6 +36,14 @@ const CREATE_TRANSACTION = `
     }
   }
 `
+
+export async function getTransactions(date: string): Promise<Transaction[]> {
+  const res = await axios.post(GRAPHQL_URL, {
+    query: GET_TRANSACTIONS,
+    variables: { date },
+  })
+  return res.data.data.transactions
+}
 
 export async function createTransaction(input: CreateTransactionInput): Promise<Transaction> {
   const res = await axios.post(GRAPHQL_URL, {

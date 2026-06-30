@@ -29,6 +29,10 @@ input CreateTransactionInput {
   paymentType: PaymentType!
 }
 
+extend type Query {
+  transactions(date: String!): [Transaction!]!
+}
+
 extend type Mutation {
   createTransaction(input: CreateTransactionInput!): Transaction!
 }

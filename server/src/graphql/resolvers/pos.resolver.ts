@@ -1,4 +1,4 @@
-import { Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
+import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
 import { PosService } from '../../features/pos/pos.service'
 import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
@@ -18,6 +18,11 @@ interface CreateTransactionInput {
 @Resolver('Transaction')
 export class PosResolver {
   constructor(private readonly pos: PosService) {}
+
+  @Query()
+  transactions(@Args('date') date: string) {
+    return this.pos.getTransactionsByDate(date)
+  }
 
   @Mutation()
   createTransaction(@Args('input') input: CreateTransactionInput) {
