@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AuthUser } from './auth.types'
 import { getMe, login, logout, register } from './auth.api'
 
@@ -17,10 +17,15 @@ const useRegisterMutation = () =>
     mutationFn: register,
   })
 
-const useLoginMutation = () =>
-  useMutation({
+const useLoginMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
     mutationFn: login,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
   })
+}
 
 const useLogoutMutation = () =>
   useMutation({
