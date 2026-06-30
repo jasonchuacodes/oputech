@@ -90,7 +90,7 @@ function DataTableComponent<T>({
                 key={column.id}
                 style={{ width: column.width }}
                 className={cn(
-                  'bg-surface h-12 px-4 text-sm font-medium whitespace-nowrap text-slate-600',
+                  'bg-surface h-10 px-4 text-sm font-medium whitespace-nowrap text-slate-600',
                   alignClass[column.align ?? 'left'],
                   column.orderable && 'cursor-pointer select-none'
                 )}
