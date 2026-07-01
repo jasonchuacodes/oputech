@@ -41,3 +41,8 @@ export interface UpdateUserInput {
   email?: string
   role?: string
 }
+
+export interface ResetPasswordInput {
+  id: string
+  password: string
+}

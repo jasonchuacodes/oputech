@@ -96,3 +96,19 @@ export async function updateActivityStatus(id: string, input: UpdateActivityStat
   })
   return res.data.data.updateActivityStatus
 }
+
+const RESET_PASSWORD = `
+  mutation ResetPassword($id: ID!, $password: String!) {
+    resetPassword(id: $id, password: $password) {
+      id
+    }
+  }
+`
+
+export async function resetPassword(id: string, password: string): Promise<User> {
+  const res = await axios.post(GRAPHQL_URL, {
+    query: RESET_PASSWORD,
+    variables: { id, password },
+  })
+  return res.data.data.resetPassword
+}

@@ -7,6 +7,7 @@ import { User, UserStatus } from '../../services/users/users.types'
 import { AddUserModal } from './components/AddUserModal'
 import { EditUserModal } from './components/EditUserModal'
 import { DeleteUserModal } from './components/DeleteUserModal'
+import { ResetPasswordModal } from './components/ResetPasswordModal'
 import { ActionsDropdown } from './components/ActionsDropdown'
 import { cn } from '../../utils/cn'
 
@@ -16,6 +17,7 @@ const UsersPage = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [resetPasswordOpen, setResetPasswordOpen] = useState(false)
 
   const openEdit = (user: User) => {
     setSelectedUser(user)
@@ -25,6 +27,11 @@ const UsersPage = () => {
   const openDelete = (user: User) => {
     setSelectedUser(user)
     setDeleteOpen(true)
+  }
+
+  const openResetPassword = (user: User) => {
+    setSelectedUser(user)
+    setResetPasswordOpen(true)
   }
 
   const columns: DataTableColumn<User>[] = [
@@ -76,7 +83,11 @@ const UsersPage = () => {
       align: 'right',
       cell: (u) => (
         <div className="flex items-center justify-end gap-1">
-          <ActionsDropdown onEdit={() => openEdit(u)} onDelete={() => openDelete(u)} />
+          <ActionsDropdown
+            onEdit={() => openEdit(u)}
+            onResetPassword={() => openResetPassword(u)}
+            onDelete={() => openDelete(u)}
+          />
         </div>
       ),
     },
@@ -124,6 +135,15 @@ const UsersPage = () => {
         open={deleteOpen}
         onClose={() => {
           setDeleteOpen(false)
+          setSelectedUser(null)
+        }}
+      />
+
+      <ResetPasswordModal
+        user={selectedUser}
+        open={resetPasswordOpen}
+        onClose={() => {
+          setResetPasswordOpen(false)
           setSelectedUser(null)
         }}
       />

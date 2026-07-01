@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getUsers, createUser, updateUser, deleteUser, updateActivityStatus } from './users.api'
+import { getUsers, createUser, updateUser, deleteUser, updateActivityStatus, resetPassword } from './users.api'
 import { CreateUserInput, UpdateUserInput, UpdateActivityStatusInput } from './users.types'
 
 export function useUsers() {
@@ -49,5 +49,12 @@ export function useUpdateActivityStatus() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
     },
+  })
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: ({ id, password }: { id: string; password: string }) =>
+      resetPassword(id, password),
   })
 }
