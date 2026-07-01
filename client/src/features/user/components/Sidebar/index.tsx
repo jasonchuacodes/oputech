@@ -1,35 +1,10 @@
 import { Link, useLocation } from 'react-router-dom'
-import {
-  LayoutDashboard,
-  FileBarChart,
-  ShoppingCart,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
-  Users,
-  Package,
-} from 'lucide-react'
+import { LogOut, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuthContext } from '../../../../context/auth/useAuthContext'
 import { Button } from '../../../../components'
 import { cn } from '../../../../utils/cn'
 import { StatusToggler } from './StatusToggler'
-
-const navGroups = [
-  {
-    label: 'Main',
-    items: [
-      { label: 'Dashboard', icon: LayoutDashboard, to: '/' },
-      { label: 'Report', icon: FileBarChart, to: '/report' },
-      { label: 'POS', icon: ShoppingCart, to: '/pos' },
-      { label: 'Inventory', icon: Package, to: '/inventory' },
-      { label: 'Users', icon: Users, to: '/users' },
-    ],
-  },
-  // {
-  //   label: 'Account',
-  //   items: [{ label: 'Settings', icon: Settings, to: '/settings',  }],
-  // },
-]
+import { useSidebarItems } from './useSidebarItems'
 
 interface SidebarProps {
   open: boolean
@@ -40,6 +15,7 @@ interface SidebarProps {
 export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
   const location = useLocation()
   const { logout } = useAuthContext()
+  const navGroups = useSidebarItems()
 
   return (
     <>
