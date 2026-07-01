@@ -7,7 +7,8 @@
     "start": "nest start",
     "dev": "nest start --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "register-admin": "ts-node scripts/register-admin.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.13.0",

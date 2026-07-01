@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Post,
@@ -20,7 +22,13 @@ export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   @Post('register')
-  register(@Body() input: RegisterDto) {
+  register(
+    @Body() input: RegisterDto,
+    @Headers('x-admin-script-secret') secret: string
+  ) {
+    if (!secret || secret !== process.env.ADMIN_SCRIPT_SECRET) {
+      throw new ForbiddenException('Invalid or missing admin script secret')
+    }
     return this.auth.register(input)
   }
 
