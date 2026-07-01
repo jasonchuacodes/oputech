@@ -4,7 +4,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '../../../shared/components/ui/dropdown-menu'
+} from '../../../components/ui/dropdown-menu'
 
 interface Props {
   onEdit: () => void
