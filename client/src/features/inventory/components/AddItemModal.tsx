@@ -4,9 +4,9 @@ import { ImagePlus, PackagePlus } from 'lucide-react'
 import { CustomModal, Input, Label } from '../../../components'
 import { useCreateProduct } from '../../../services/inventory/inventory.queries'
 import {
-  AddInventoryItemSchema,
-  AddInventoryItemInput,
-} from '../schemas/add-inventory-item.schema'
+  AddProductSchema,
+  AddProductInput,
+} from '../schemas/add-product.schema'
 
 interface Props {
   open: boolean
@@ -21,8 +21,8 @@ export const AddItemModal = ({ open, onClose }: Props) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<AddInventoryItemInput>({
-    resolver: zodResolver(AddInventoryItemSchema),
+  } = useForm<AddProductInput>({
+    resolver: zodResolver(AddProductSchema),
   })
 
   const handleClose = () => {
@@ -30,7 +30,7 @@ export const AddItemModal = ({ open, onClose }: Props) => {
     reset()
   }
 
-  const onSubmit = (data: AddInventoryItemInput) => {
+  const onSubmit = (data: AddProductInput) => {
     createItem.mutate(
       {
         name: data.name,
