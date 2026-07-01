@@ -18,6 +18,7 @@ import {
 
 interface CreateUserInput {
   username: string
+  fullName?: string
   email?: string
   password: string
   role?: string
@@ -26,6 +27,13 @@ interface CreateUserInput {
 interface ActivityStatusInput {
   status: string
   message?: string
+}
+
+interface UpdateUserInput {
+  username?: string
+  fullName?: string
+  email?: string
+  role?: string
 }
 
 @UseGuards(JwtAuthGuard)
@@ -43,10 +51,27 @@ export class UsersResolver {
     const hashed = await bcrypt.hash(input.password, 10)
     return this.usersService.create({
       username: input.username,
+      fullName: input.fullName,
       email: input.email,
       password: hashed,
       role: (input.role as UserRole) ?? UserRole.User,
     })
+  }
+
+  @Mutation()
+  updateUser(@Args('id') id: string, @Args('input') input: UpdateUserInput) {
+    return this.usersService.update(id, {
+      username: input.username,
+      fullName: input.fullName,
+      email: input.email,
+      role: input.role as UserRole,
+    })
+  }
+
+  @Mutation()
+  async deleteUser(@Args('id') id: string): Promise<boolean> {
+    const result = await this.usersService.remove(id)
+    return result !== null
   }
 
   @Mutation()
