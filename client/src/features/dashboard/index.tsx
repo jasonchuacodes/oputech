@@ -12,7 +12,6 @@ import { AnalyticsRange } from '../../services/analytics/analytics.types'
 import { SummaryCards } from './components/SummaryCards'
 import { SalesExpensesChart } from './components/SalesExpensesChart'
 import { TopProducts } from './components/TopProducts'
-import { LowStockActions } from './components/LowStockActions'
 
 const RANGE_OPTIONS: { value: AnalyticsRange; label: string }[] = [
   { value: 'LAST_7_DAYS', label: 'Last 7 days' },
@@ -70,7 +69,6 @@ const DashboardPage = () => {
           <SalesExpensesChart series={data.series} />
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <TopProducts products={data.topProducts} />
-            <LowStockActions products={data.lowStock} />
           </div>
         </>
       )}

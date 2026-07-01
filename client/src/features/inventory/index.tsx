@@ -3,19 +3,12 @@ import { Plus, Pencil } from 'lucide-react'
 import { Button, Input, PageHeader } from '../../components'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
 import { useProducts } from '../../services/inventory/inventory.queries'
-import { Product, ProductStatus } from '../../services/inventory/inventory.types'
+import { Product } from '../../services/inventory/inventory.types'
 import { formatCurrency } from '../../utils/number'
-import { cn } from '../../utils/cn'
 import { AddItemModal } from './components/AddItemModal'
 import { EditItemModal } from './components/EditItemModal'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { ActionsDropdown } from './components/ActionsDropdown'
-
-const statusConfig: Record<ProductStatus, { label: string; className: string }> = {
-  IN_STOCK: { label: 'In Stock', className: 'bg-green-100 text-green-700' },
-  LOW: { label: 'Low', className: 'bg-amber-100 text-amber-700' },
-  OUT_OF_STOCK: { label: 'Out of Stock', className: 'bg-red-100 text-red-700' },
-}
 
 const InventoryPage = () => {
   const [search, setSearch] = useState('')
@@ -44,33 +37,10 @@ const InventoryPage = () => {
       orderable: true,
     },
     {
-      id: 'quantity',
-      heading: 'Quantity',
-      cell: (item) => item.quantity,
-      orderable: true,
-    },
-    {
       id: 'price',
       heading: 'Price',
       cell: (item) => formatCurrency(item.price),
       orderable: true,
-    },
-    {
-      id: 'status',
-      heading: 'Status',
-      cell: (item) => {
-        const config = statusConfig[item.status]
-        return (
-          <span
-            className={cn(
-              'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-              config.className
-            )}
-          >
-            {config.label}
-          </span>
-        )
-      },
     },
     {
       id: 'actions',

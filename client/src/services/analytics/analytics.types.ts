@@ -16,16 +16,9 @@ export interface TopProduct {
   quantitySold: number
 }
 
-export interface LowStockProduct {
-  id: string
-  name: string
-  quantity: number
-}
-
 export interface Analytics {
   series: AnalyticsPoint[]
   topProducts: TopProduct[]
-  lowStock: LowStockProduct[]
   totalSales: number
   totalExpenses: number
 }

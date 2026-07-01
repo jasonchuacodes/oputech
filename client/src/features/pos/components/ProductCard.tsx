@@ -9,17 +9,12 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, onClick }: ProductCardProps) => {
-  const outOfStock = product.quantity === 0
-
   return (
     <button
       onClick={() => onClick(product)}
-      disabled={outOfStock}
       className={cn(
         'flex min-w-[120px] flex-col gap-2 rounded-md border bg-white p-3 text-left transition-all',
-        outOfStock
-          ? 'cursor-not-allowed opacity-50'
-          : 'cursor-pointer hover:border-slate-300 hover:shadow-sm active:scale-[0.98]',
+        'cursor-pointer hover:border-slate-300 hover:shadow-sm active:scale-[0.98]',
       )}
     >
       <div className="flex h-24 w-full items-center justify-center rounded-md bg-slate-100">
@@ -31,11 +26,6 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
           {product.name}
         </span>
         <span className="text-sm font-semibold text-slate-900">{formatCurrency(product.price)}</span>
-        <span
-          className={cn('text-xs', product.quantity <= 5 ? 'text-red-500' : 'text-slate-400')}
-        >
-          Stock: {product.quantity}
-        </span>
       </div>
     </button>
   )

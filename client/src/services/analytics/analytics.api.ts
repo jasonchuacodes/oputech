@@ -16,11 +16,6 @@ const GET_ANALYTICS = `
         name
         quantitySold
       }
-      lowStock {
-        id
-        name
-        quantity
-      }
       totalSales
       totalExpenses
     }

@@ -34,7 +34,6 @@ export const AddItemModal = ({ open, onClose }: Props) => {
     createItem.mutate(
       {
         name: data.name,
-        quantity: data.quantity,
         price: data.price,
       },
       { onSuccess: handleClose }
@@ -71,23 +70,6 @@ export const AddItemModal = ({ open, onClose }: Props) => {
           />
           {errors.name && (
             <p className="text-destructive text-xs">{errors.name.message}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="quantity">Quantity *</Label>
-          <Input
-            id="quantity"
-            type="number"
-            placeholder="0"
-            min={0}
-            aria-invalid={!!errors.quantity}
-            {...register('quantity', { valueAsNumber: true })}
-          />
-          {errors.quantity && (
-            <p className="text-destructive text-xs">
-              {errors.quantity.message}
-            </p>
           )}
         </div>
 

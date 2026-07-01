@@ -6,10 +6,8 @@ const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 const PRODUCT_FIELDS = `
   id
   name
-  quantity
   price
   imageUrl
-  status
 `
 
 const GET_PRODUCTS = `

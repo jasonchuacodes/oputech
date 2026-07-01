@@ -19,15 +19,8 @@ const POSPage = () => {
   const [search, setSearch] = useState('')
   const cart = useDisclosure()
 
-  const { data: rawProducts = [], isLoading } = useProducts(search)
+  const { data: products = [], isLoading } = useProducts(search)
   const { mutate: createTransaction } = useCreateTransaction()
-
-  const products: Product[] = rawProducts.map((item) => ({
-    ...item,
-    quantity:
-      item.quantity -
-      (transactionItems.find((s) => s.productId === item.id)?.quantity ?? 0),
-  }))
 
   const handleProductClick = (product: Product) => {
     setTransactionItems((prev) => {
