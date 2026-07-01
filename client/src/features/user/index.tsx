@@ -5,50 +5,82 @@ import { DataTable, DataTableColumn } from '../../components/ui/data-table'
 import { useUsers } from '../../services/users/users.queries'
 import { User, UserStatus } from '../../services/users/users.types'
 import { AddUserModal } from './components/AddUserModal'
+import { EditUserModal } from './components/EditUserModal'
+import { DeleteUserModal } from './components/DeleteUserModal'
+import { ActionsDropdown } from './components/ActionsDropdown'
 import { cn } from '../../utils/cn'
-
-const columns: DataTableColumn<User>[] = [
-  {
-    id: 'username',
-    heading: 'Username',
-    cell: (u) => u.username,
-    orderable: true,
-  },
-  {
-    id: 'email',
-    heading: 'Email',
-    cell: (u) => u.email ?? '—',
-    orderable: true,
-  },
-  {
-    id: 'role',
-    heading: 'Role',
-    cell: (u) => u.role,
-    orderable: true,
-  },
-  {
-    id: 'status',
-    heading: 'Status',
-    cell: (u) => (
-      <div className="flex items-center gap-2">
-        <span
-          className={cn(
-            'h-2 w-2 shrink-0 rounded-full',
-            u.activityStatus.status === UserStatus.Active ? 'bg-green-500' : 'bg-gray-400'
-          )}
-        />
-        <span className="text-sm">
-          {u.activityStatus.message ??
-            (u.activityStatus.status === UserStatus.Active ? 'Active' : 'Inactive')}
-        </span>
-      </div>
-    ),
-  },
-]
 
 const UsersPage = () => {
   const { data, isLoading } = useUsers()
   const [modalOpen, setModalOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+
+  const openEdit = (user: User) => {
+    setSelectedUser(user)
+    setEditOpen(true)
+  }
+
+  const openDelete = (user: User) => {
+    setSelectedUser(user)
+    setDeleteOpen(true)
+  }
+
+  const columns: DataTableColumn<User>[] = [
+    {
+      id: 'username',
+      heading: 'Username',
+      cell: (u) => u.username,
+      orderable: true,
+    },
+    {
+      id: 'fullName',
+      heading: 'Full Name',
+      cell: (u) => u.fullName ?? '—',
+      orderable: true,
+    },
+    {
+      id: 'email',
+      heading: 'Email',
+      cell: (u) => u.email ?? '—',
+      orderable: true,
+    },
+    {
+      id: 'role',
+      heading: 'Role',
+      cell: (u) => u.role,
+      orderable: true,
+    },
+    {
+      id: 'status',
+      heading: 'Status',
+      cell: (u) => (
+        <div className="flex items-center gap-2">
+          <span
+            className={cn(
+              'h-2 w-2 shrink-0 rounded-full',
+              u.activityStatus.status === UserStatus.Active ? 'bg-green-500' : 'bg-gray-400'
+            )}
+          />
+          <span className="text-sm">
+            {u.activityStatus.message ??
+              (u.activityStatus.status === UserStatus.Active ? 'Active' : 'Inactive')}
+          </span>
+        </div>
+      ),
+    },
+    {
+      id: 'actions',
+      heading: '',
+      align: 'right',
+      cell: (u) => (
+        <div className="flex items-center justify-end gap-1">
+          <ActionsDropdown onEdit={() => openEdit(u)} onDelete={() => openDelete(u)} />
+        </div>
+      ),
+    },
+  ]
 
   const collection = DataTable.collection({
     items: data ?? [],
@@ -77,6 +109,24 @@ const UsersPage = () => {
       />
 
       <AddUserModal open={modalOpen} onClose={() => setModalOpen(false)} />
+
+      <EditUserModal
+        user={selectedUser}
+        open={editOpen}
+        onClose={() => {
+          setEditOpen(false)
+          setSelectedUser(null)
+        }}
+      />
+
+      <DeleteUserModal
+        user={selectedUser}
+        open={deleteOpen}
+        onClose={() => {
+          setDeleteOpen(false)
+          setSelectedUser(null)
+        }}
+      />
     </div>
   )
 }

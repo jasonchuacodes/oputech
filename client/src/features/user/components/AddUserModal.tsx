@@ -40,6 +40,7 @@ export const AddUserModal = ({ open, onClose }: Props) => {
     createUser.mutate(
       {
         username: data.username,
+        fullName: data.fullName || undefined,
         password: data.password,
         role: data.role,
       },
@@ -69,6 +70,19 @@ export const AddUserModal = ({ open, onClose }: Props) => {
           />
           {errors.username && (
             <p className="text-destructive text-xs">{errors.username.message}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="fullName">Full Name</Label>
+          <Input
+            id="fullName"
+            placeholder="e.g. John Doe"
+            aria-invalid={!!errors.fullName}
+            {...register('fullName')}
+          />
+          {errors.fullName && (
+            <p className="text-destructive text-xs">{errors.fullName.message}</p>
           )}
         </div>
 

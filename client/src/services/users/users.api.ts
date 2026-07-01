@@ -1,5 +1,5 @@
 import axios from '../../lib/axios'
-import { User, CreateUserInput, UpdateActivityStatusInput } from './users.types'
+import { User, CreateUserInput, UpdateUserInput, UpdateActivityStatusInput } from './users.types'
 
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
@@ -8,6 +8,7 @@ const GET_USERS = `
     users {
       id
       username
+      fullName
       email
       role
       activityStatus {
@@ -28,6 +29,7 @@ const CREATE_USER = `
     createUser(input: $input) {
       id
       username
+      fullName
       email
       role
     }
@@ -39,6 +41,40 @@ export async function createUser(input: CreateUserInput): Promise<User> {
     variables: { input },
   })
   return res.data.data.createUser
+}
+
+const UPDATE_USER = `
+  mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+    updateUser(id: $id, input: $input) {
+      id
+      username
+      fullName
+      email
+      role
+    }
+  }
+`
+
+export async function updateUser(id: string, input: UpdateUserInput): Promise<User> {
+  const res = await axios.post(GRAPHQL_URL, {
+    query: UPDATE_USER,
+    variables: { id, input },
+  })
+  return res.data.data.updateUser
+}
+
+const DELETE_USER = `
+  mutation DeleteUser($id: ID!) {
+    deleteUser(id: $id)
+  }
+`
+
+export async function deleteUser(id: string): Promise<boolean> {
+  const res = await axios.post(GRAPHQL_URL, {
+    query: DELETE_USER,
+    variables: { id },
+  })
+  return res.data.data.deleteUser
 }
 
 const UPDATE_ACTIVITY_STATUS = `

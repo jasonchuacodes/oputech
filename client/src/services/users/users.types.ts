@@ -16,6 +16,7 @@ export interface ActivityStatus {
 export interface User {
   id: string
   username: string
+  fullName?: string
   email?: string
   role: string
   activityStatus: ActivityStatus
@@ -28,7 +29,15 @@ export interface UpdateActivityStatusInput {
 
 export interface CreateUserInput {
   username: string
+  fullName?: string
   email?: string
   password: string
+  role?: string
+}
+
+export interface UpdateUserInput {
+  username?: string
+  fullName?: string
+  email?: string
   role?: string
 }
