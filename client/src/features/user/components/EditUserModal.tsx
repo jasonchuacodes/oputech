@@ -30,7 +30,7 @@ export const EditUserModal = ({ user, open, onClose }: Props) => {
     handleSubmit,
     reset,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<EditUserFormValues>({ resolver: zodResolver(editUserSchema) })
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export const EditUserModal = ({ user, open, onClose }: Props) => {
           role: data.role,
         },
       },
-      { onSuccess: handleClose },
+      { onSuccess: handleClose }
     )
   }
 
@@ -75,6 +75,7 @@ export const EditUserModal = ({ user, open, onClose }: Props) => {
       loading={updateUser.isPending}
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
+      disabled={!isValid}
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
@@ -86,7 +87,9 @@ export const EditUserModal = ({ user, open, onClose }: Props) => {
             {...register('username')}
           />
           {errors.username && (
-            <p className="text-destructive text-xs">{errors.username.message}</p>
+            <p className="text-destructive text-xs">
+              {errors.username.message}
+            </p>
           )}
         </div>
 
@@ -99,7 +102,9 @@ export const EditUserModal = ({ user, open, onClose }: Props) => {
             {...register('fullName')}
           />
           {errors.fullName && (
-            <p className="text-destructive text-xs">{errors.fullName.message}</p>
+            <p className="text-destructive text-xs">
+              {errors.fullName.message}
+            </p>
           )}
         </div>
 
