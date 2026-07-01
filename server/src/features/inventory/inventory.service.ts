@@ -26,11 +26,9 @@ export class InventoryService {
   }
 
   update(id: string, input: UpdateProductDto): Promise<ProductDocument | null> {
-    const { addQuantity, ...fields } = input
-    const update: Record<string, unknown> = {}
-    if (Object.keys(fields).length) update.$set = fields
-    if (addQuantity) update.$inc = { quantity: addQuantity }
-    return this.product.findByIdAndUpdate(id, update, { returnDocument: 'after' }).exec()
+    return this.product
+      .findByIdAndUpdate(id, { $set: input }, { returnDocument: 'after' })
+      .exec()
   }
 
   remove(id: string): Promise<ProductDocument | null> {

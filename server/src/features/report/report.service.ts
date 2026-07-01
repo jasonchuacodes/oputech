@@ -4,8 +4,6 @@ import { Model } from 'mongoose'
 import { Report, ReportDocument } from './schemas/report.schema'
 import { Aggregate, AggregateDocument } from './schemas/aggregate.schema'
 import { Transaction, TransactionDocument, PaymentType } from '../pos/schemas/transaction.schema'
-import { Product, ProductDocument } from '../inventory/schemas/inventory.schema'
-import { LOW_STOCK_THRESHOLD } from '../inventory/inventory.constants'
 import { CreateReportDto } from './dto/create-report.dto'
 
 export enum AnalyticsRange {
@@ -40,7 +38,6 @@ export class ReportService {
     @InjectModel(Report.name) private reportModel: Model<ReportDocument>,
     @InjectModel(Aggregate.name) private aggregateModel: Model<AggregateDocument>,
     @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
-    @InjectModel(Product.name) private productModel: Model<ProductDocument>,
   ) {}
 
   async create(input: CreateReportDto, userId: string): Promise<ReportDocument> {
@@ -137,20 +134,10 @@ export class ReportService {
     }
 
     const topProducts = await this.getTopProducts(start)
-    const lowStockProducts = await this.productModel
-      .find({ quantity: { $lte: LOW_STOCK_THRESHOLD } })
-      .sort({ quantity: 1 })
-      .exec()
-    const lowStock = lowStockProducts.map((p) => ({
-      id: p._id.toString(),
-      name: p.name,
-      quantity: p.quantity,
-    }))
 
     return {
       series,
       topProducts,
-      lowStock,
       totalSales: series.reduce((sum, p) => sum + p.totalSales, 0),
       totalExpenses: series.reduce((sum, p) => sum + p.totalExpenses, 0),
     }

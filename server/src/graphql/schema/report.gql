@@ -43,16 +43,9 @@ type TopProduct {
   quantitySold: Int!
 }
 
-type LowStockProduct {
-  id: ID!
-  name: String!
-  quantity: Int!
-}
-
 type Analytics {
   series: [AnalyticsPoint!]!
   topProducts: [TopProduct!]!
-  lowStock: [LowStockProduct!]!
   totalSales: Float!
   totalExpenses: Float!
 }

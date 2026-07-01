@@ -9,9 +9,6 @@ export class Product {
   name: string
 
   @Prop({ required: true })
-  quantity: number
-
-  @Prop({ required: true })
   price: number
 
   @Prop()

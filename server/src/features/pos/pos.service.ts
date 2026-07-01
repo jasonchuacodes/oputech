@@ -37,15 +37,9 @@ export class PosService {
     const ids = input.items.map((i) => i.productId)
     const products = await this.product.find({ _id: { $in: ids } }).exec()
 
-    for (const { productId, quantity } of input.items) {
+    for (const { productId } of input.items) {
       const item = products.find((p) => p._id.toString() === productId)
       if (!item) throw new BadRequestException(`Product ${productId} not found`)
-
-      if (quantity > item.quantity) {
-        throw new BadRequestException(
-          `Insufficient stock for "${item.name}": requested ${quantity}, available ${item.quantity}`,
-        )
-      }
     }
 
     const transactionItems = input.items.map(({ productId, quantity }) => {
@@ -54,12 +48,6 @@ export class PosService {
     })
 
     const total = transactionItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
-
-    await Promise.all(
-      input.items.map(({ productId, quantity }) =>
-        this.product.findByIdAndUpdate(productId, { $inc: { quantity: -quantity } }),
-      ),
-    )
 
     return this.transactionModel.create({
       items: transactionItems,
