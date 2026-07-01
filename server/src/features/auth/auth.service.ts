@@ -99,7 +99,21 @@ export class AuthService {
     }
   }
 
-  logout(res: Response) {
+  async logout(req: Request, res: Response) {
+    const token = req.cookies?.refresh_token
+    if (token) {
+      try {
+        const payload = this.jwt.verify<{ sub: string }>(token, {
+          secret: process.env.JWT_REFRESH_SECRET,
+        })
+        await this.users.updateStatus(payload.sub, {
+          activityStatus: { status: UserStatus.Inactive },
+        })
+      } catch {
+        // Refresh token missing/invalid/expired — still proceed to clear cookies
+      }
+    }
+
     res.clearCookie('access_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
