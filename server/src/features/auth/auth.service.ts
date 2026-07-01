@@ -9,7 +9,7 @@ import { Request, Response } from 'express'
 import { UsersService } from '../users/users.service'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
-import { UserStatus } from '../users/schemas/user.schema'
+import { UserRole, UserStatus } from '../users/schemas/user.schema'
 
 @Injectable()
 export class AuthService {
@@ -117,7 +117,11 @@ export class AuthService {
     if (existing) throw new ConflictException('Username already in use')
 
     const password = await bcrypt.hash(input.password, 10)
-    const user = await this.users.create({ ...input, password })
+    const user = await this.users.create({
+      ...input,
+      password,
+      role: UserRole.Admin,
+    })
 
     return {
       id: user._id,
