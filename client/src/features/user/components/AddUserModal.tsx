@@ -28,8 +28,11 @@ export const AddUserModal = ({ open, onClose }: Props) => {
     handleSubmit,
     reset,
     control,
-    formState: { errors },
-  } = useForm<AddUserFormValues>({ resolver: zodResolver(addUserSchema) })
+    formState: { isValid, errors },
+  } = useForm<AddUserFormValues>({
+    defaultValues: { role: UserRole.User },
+    resolver: zodResolver(addUserSchema),
+  })
 
   const handleClose = () => {
     onClose()
@@ -40,11 +43,10 @@ export const AddUserModal = ({ open, onClose }: Props) => {
     createUser.mutate(
       {
         username: data.username,
-        fullName: data.fullName || undefined,
         password: data.password,
         role: data.role,
       },
-      { onSuccess: handleClose },
+      { onSuccess: handleClose }
     )
   }
 
@@ -58,6 +60,7 @@ export const AddUserModal = ({ open, onClose }: Props) => {
       loading={createUser.isPending}
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
+      disabled={!isValid}
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
@@ -69,20 +72,9 @@ export const AddUserModal = ({ open, onClose }: Props) => {
             {...register('username')}
           />
           {errors.username && (
-            <p className="text-destructive text-xs">{errors.username.message}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="fullName">Full Name</Label>
-          <Input
-            id="fullName"
-            placeholder="e.g. John Doe"
-            aria-invalid={!!errors.fullName}
-            {...register('fullName')}
-          />
-          {errors.fullName && (
-            <p className="text-destructive text-xs">{errors.fullName.message}</p>
+            <p className="text-destructive text-xs">
+              {errors.username.message}
+            </p>
           )}
         </div>
 
@@ -96,7 +88,9 @@ export const AddUserModal = ({ open, onClose }: Props) => {
             {...register('password')}
           />
           {errors.password && (
-            <p className="text-destructive text-xs">{errors.password.message}</p>
+            <p className="text-destructive text-xs">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
@@ -107,7 +101,7 @@ export const AddUserModal = ({ open, onClose }: Props) => {
             control={control}
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full min-h-10">
                   <SelectValue placeholder="Select a role…" />
                 </SelectTrigger>
                 <SelectContent>
