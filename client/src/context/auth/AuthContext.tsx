@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
 import { type AuthUser } from '../../services/auth/auth.types'
-import { PublicRoutes } from '../../routes'
+import { PublicRoutes } from '../../routes/paths'
 import { useGetMe, useLogoutMutation } from '../../services/auth/auth.queries'
 
 type AuthContextType = {

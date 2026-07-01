@@ -10,27 +10,13 @@ import AdminLogin from '../features/auth/AdminLogin'
 import Register from '../features/auth/Register'
 import ForgotPassword from '../features/auth/ForgotPassword'
 import { UserMainLayout } from '../features/user/MainLayout'
-import UserHome from '../features/dashboard'
+import Dashboard from '../features/dashboard'
 import Users from '../features/user'
 import Inventory from '../features/inventory'
 import POS from '../features/pos'
 import Report from '../features/report'
 import { UserRole } from '../types'
-
-export const PublicRoutes = {
-  Login: '/login',
-  LoginAdmin: '/admin/login',
-  Register: '/register',
-  ForgotPassword: '/forgot-password',
-}
-
-export const UserRoutes = {
-  Home: '/',
-  Users: '/users',
-  Inventory: '/inventory',
-  POS: '/pos',
-  Report: '/report',
-}
+import { PublicRoutes, UserRoutes } from './paths'
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -41,14 +27,24 @@ export const router = createBrowserRouter(
       <Route path={PublicRoutes.Register} element={<Register />} />
       <Route path={PublicRoutes.ForgotPassword} element={<ForgotPassword />} />
 
-      {/* User Routes */}
+      {/* Admin-only Routes */}
       <Route
         path="/"
-        element={<ProtectedRoute allowedRoles={[UserRole.USER]} />}
+        element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]} />}
       >
         <Route element={<UserMainLayout />}>
-          <Route index element={<UserHome />} />
+          <Route index element={<Dashboard />} />
           <Route path={UserRoutes.Users} element={<Users />} />
+        </Route>
+      </Route>
+
+      {/* Shared User + Admin Routes */}
+      <Route
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]} />
+        }
+      >
+        <Route element={<UserMainLayout />}>
           <Route path={UserRoutes.Inventory} element={<Inventory />} />
           <Route path={UserRoutes.POS} element={<POS />} />
           <Route path={UserRoutes.Report} element={<Report />} />
