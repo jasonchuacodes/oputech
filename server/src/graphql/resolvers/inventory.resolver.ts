@@ -3,6 +3,7 @@ import { UseGuards } from '@nestjs/common'
 import { InventoryService } from '../../features/inventory/inventory.service'
 import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
 import { ProductDocument } from '../../features/inventory/schemas/inventory.schema'
+import { LOW_STOCK_THRESHOLD } from '../../features/inventory/inventory.constants'
 
 interface CreateProductInput {
   name: string
@@ -51,7 +52,7 @@ export class InventoryResolver {
   @ResolveField('status')
   status(@Parent() item: ProductDocument): string {
     if (item.quantity === 0) return 'OUT_OF_STOCK'
-    if (item.quantity <= 10) return 'LOW'
+    if (item.quantity <= LOW_STOCK_THRESHOLD) return 'LOW'
     return 'IN_STOCK'
   }
 }

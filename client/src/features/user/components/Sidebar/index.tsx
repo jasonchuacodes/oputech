@@ -27,7 +27,7 @@ const navGroups = [
   },
   // {
   //   label: 'Account',
-  //   items: [{ label: 'Settings', icon: Settings, to: '/settings' }],
+  //   items: [{ label: 'Settings', icon: Settings, to: '/settings',  }],
   // },
 ]
 

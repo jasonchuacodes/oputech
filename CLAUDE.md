@@ -101,3 +101,5 @@ create(input: CreateUserDto) {}
 const handleSubmit = () => { ... }
 const MyComponent = () => { ... }
 ```
+
+**Border radius** — use `rounded-sm` or `rounded-md` for components (buttons, inputs, cards, list items, badges, dropdowns, etc.). Reserve `rounded-lg` (and larger) for large surfaces like modals/dialogs. Don't use `rounded-lg` on small components.
