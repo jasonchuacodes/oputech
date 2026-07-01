@@ -7,9 +7,8 @@ import { App } from '../App'
 import { ProtectedRoute } from '../components/ProtectedRoute'
 import Login from '../features/auth/Login'
 import AdminLogin from '../features/auth/AdminLogin'
-import Register from '../features/auth/Register'
 import ForgotPassword from '../features/auth/ForgotPassword'
-import { UserMainLayout } from '../features/user/MainLayout'
+import { MainLayout } from '../features/layout/MainLayout'
 import Dashboard from '../features/dashboard'
 import Users from '../features/user'
 import Inventory from '../features/inventory'
@@ -24,7 +23,6 @@ export const router = createBrowserRouter(
       {/* Public Routes */}
       <Route path={PublicRoutes.Login} element={<Login />} />
       <Route path={PublicRoutes.LoginAdmin} element={<AdminLogin />} />
-      <Route path={PublicRoutes.Register} element={<Register />} />
       <Route path={PublicRoutes.ForgotPassword} element={<ForgotPassword />} />
 
       {/* Admin-only Routes */}
@@ -32,7 +30,7 @@ export const router = createBrowserRouter(
         path="/"
         element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]} />}
       >
-        <Route element={<UserMainLayout />}>
+        <Route element={<MainLayout />}>
           <Route index element={<Dashboard />} />
           <Route path={UserRoutes.Users} element={<Users />} />
         </Route>
@@ -44,7 +42,7 @@ export const router = createBrowserRouter(
           <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]} />
         }
       >
-        <Route element={<UserMainLayout />}>
+        <Route element={<MainLayout />}>
           <Route path={UserRoutes.Inventory} element={<Inventory />} />
           <Route path={UserRoutes.POS} element={<POS />} />
           <Route path={UserRoutes.Report} element={<Report />} />

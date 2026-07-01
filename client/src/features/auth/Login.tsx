@@ -130,15 +130,6 @@ export default function LoginPage() {
               >
                 {isPending ? 'Signing in…' : 'Sign in'}
               </Button>
-              <p className="mt-6 text-center text-sm text-gray-500">
-                Don't have an account?{' '}
-                <Link
-                  to={PublicRoutes.Register}
-                  className="font-medium text-gray-900 hover:underline"
-                >
-                  Register
-                </Link>
-              </p>
             </form>
           </div>
         </div>

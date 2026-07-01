@@ -16,7 +16,7 @@ function useIsMobile() {
   return isMobile
 }
 
-export function UserMainLayout() {
+export function MainLayout() {
   const isMobile = useIsMobile()
   const [open, setOpen] = useState(!isMobile)
 
