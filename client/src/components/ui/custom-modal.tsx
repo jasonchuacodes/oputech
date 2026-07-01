@@ -9,7 +9,7 @@ type ModalType = 'default' | 'danger'
 interface CustomModalProps {
   open: boolean
   title: string
-  subheader?: string
+  subheader?: string | React.ReactNode
   children?: React.ReactNode
   disabled?: boolean
   loading?: boolean
@@ -56,7 +56,7 @@ export function CustomModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" />
       <div
-        className="border-border bg-white relative mx-auto flex w-[95%] flex-col overflow-hidden rounded-lg border shadow-lg sm:w-[95%]"
+        className="border-border relative mx-auto flex w-[95%] flex-col overflow-hidden rounded-lg border bg-white shadow-lg sm:w-[95%]"
         style={{ maxWidth, maxHeight: '90vh' }}
       >
         {/* Header */}
@@ -68,14 +68,7 @@ export function CustomModal({
                 type === 'danger' ? 'bg-destructive' : 'bg-primary'
               )}
             >
-              <Icon
-                className={cn(
-                  'relative z-10 size-5',
-                  type === 'danger'
-                    ? 'text-destructive-foreground'
-                    : 'text-primary-foreground'
-                )}
-              />
+              <Icon className="text-primary-foreground relative z-10 size-5" />
             </div>
           )}
           <div className="flex-1 overflow-hidden">
