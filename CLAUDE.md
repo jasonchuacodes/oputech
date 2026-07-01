@@ -47,7 +47,7 @@ Both `client/` and `server/` are fully TypeScript. The client uses a split tscon
 
 ## Client architecture
 
-**Structure** — domain-based. Each feature owns its own components and hooks. Truly shared UI and utilities live in `shared/`.
+**Structure** — domain-based. Each feature owns its own components and hooks. Truly shared UI lives in `components/`.
 
 ```
 src/
@@ -55,10 +55,9 @@ src/
 │   ├── components/   ← components used only by this feature
 │   ├── hooks/        ← TanStack Query hooks + local state hooks for this feature
 │   └── <Domain>Page.tsx
-├── shared/
-│   ├── components/   ← generic UI primitives (Button, Input, …); barrel-exported from index.ts
-│   ├── api/          ← axios client + per-resource fetch functions
-│   └── hooks/        ← query hooks shared across multiple features
+├── components/
+│   ├── ui/           ← generic UI primitives (Button, Input, Select, …); barrel-exported from index.ts
+│   └── ProtectedRoute.tsx
 └── App.tsx           ← QueryClientProvider + BrowserRouter + route definitions
 ```
 
@@ -72,7 +71,7 @@ src/
 
 **Styling** — Tailwind v4 via `@tailwindcss/vite` plugin (no `tailwind.config.js` needed). `@import "tailwindcss"` is at the top of `src/index.css`.
 
-**UI libraries** — [shadcn/ui](https://ui.shadcn.com/) (Radix UI + Tailwind). Components live in `src/shared/components/ui/` and are barrel-exported from `src/shared/components/index.ts`. Add new components with `pnpm dlx shadcn@latest add <name>`. The `cn()` utility is at `src/shared/lib/utils.ts`. Icons via `lucide-react` (installed at root).
+**UI libraries** — [shadcn/ui](https://ui.shadcn.com/) (Radix UI + Tailwind). Components live in `src/components/ui/` and are barrel-exported from `src/components/index.ts`. Add new components with `pnpm dlx shadcn@latest add <name>`. The `cn()` utility is at `src/utils/cn.ts`. Icons via `lucide-react` (installed at root).
 
 ## Server architecture
 
