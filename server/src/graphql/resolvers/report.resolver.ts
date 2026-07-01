@@ -1,6 +1,6 @@
 import { Query, Mutation, ResolveField, Resolver, Parent, Args, Context } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { ReportService } from '../../features/report/report.service'
+import { ReportService, AnalyticsRange } from '../../features/report/report.service'
 import { UsersService } from '../../features/users/users.service'
 import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
 import { ReportDocument } from '../../features/report/schemas/report.schema'
@@ -19,10 +19,20 @@ export class ReportResolver {
     return this.reportService.findAll()
   }
 
+  @Query()
+  analytics(@Args('range') range: AnalyticsRange) {
+    return this.reportService.getAnalytics(range)
+  }
+
   @Mutation()
   createReport(@Args('input') input: { fromDate: string; toDate: string }, @Context() context: any) {
     const userId: string = context.req.user.userId
     return this.reportService.create(input, userId)
+  }
+
+  @Mutation()
+  deleteReport(@Args('id') id: string): Promise<boolean> {
+    return this.reportService.delete(id)
   }
 
   @ResolveField('id')

@@ -24,10 +24,45 @@ input CreateReportInput {
   toDate: String!
 }
 
+enum AnalyticsRange {
+  LAST_7_DAYS
+  LAST_15_DAYS
+  LAST_MONTH
+  LAST_6_MONTHS
+}
+
+type AnalyticsPoint {
+  date: String!
+  totalSales: Float!
+  totalExpenses: Float!
+}
+
+type TopProduct {
+  productId: String!
+  name: String!
+  quantitySold: Int!
+}
+
+type LowStockProduct {
+  id: ID!
+  name: String!
+  quantity: Int!
+}
+
+type Analytics {
+  series: [AnalyticsPoint!]!
+  topProducts: [TopProduct!]!
+  lowStock: [LowStockProduct!]!
+  totalSales: Float!
+  totalExpenses: Float!
+}
+
 extend type Query {
   reports: [Report!]!
+  analytics(range: AnalyticsRange!): Analytics!
 }
 
 extend type Mutation {
   createReport(input: CreateReportInput!): Report!
+  deleteReport(id: ID!): Boolean!
 }

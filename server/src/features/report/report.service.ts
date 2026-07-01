@@ -1,15 +1,46 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Report, ReportDocument } from './schemas/report.schema'
+import { Aggregate, AggregateDocument } from './schemas/aggregate.schema'
 import { Transaction, TransactionDocument, PaymentType } from '../pos/schemas/transaction.schema'
+import { Product, ProductDocument } from '../inventory/schemas/inventory.schema'
+import { LOW_STOCK_THRESHOLD } from '../inventory/inventory.constants'
 import { CreateReportDto } from './dto/create-report.dto'
+
+export enum AnalyticsRange {
+  LAST_7_DAYS = 'LAST_7_DAYS',
+  LAST_15_DAYS = 'LAST_15_DAYS',
+  LAST_MONTH = 'LAST_MONTH',
+  LAST_6_MONTHS = 'LAST_6_MONTHS',
+}
+
+const RANGE_DAYS: Record<AnalyticsRange, number> = {
+  [AnalyticsRange.LAST_7_DAYS]: 7,
+  [AnalyticsRange.LAST_15_DAYS]: 15,
+  [AnalyticsRange.LAST_MONTH]: 30,
+  [AnalyticsRange.LAST_6_MONTHS]: 180,
+}
+
+export interface AnalyticsPoint {
+  date: string
+  totalSales: number
+  totalExpenses: number
+}
+
+export interface TopProduct {
+  productId: string
+  name: string
+  quantitySold: number
+}
 
 @Injectable()
 export class ReportService {
   constructor(
     @InjectModel(Report.name) private reportModel: Model<ReportDocument>,
+    @InjectModel(Aggregate.name) private aggregateModel: Model<AggregateDocument>,
     @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
+    @InjectModel(Product.name) private productModel: Model<ProductDocument>,
   ) {}
 
   async create(input: CreateReportDto, userId: string): Promise<ReportDocument> {
@@ -45,6 +76,9 @@ export class ReportService {
 
     await this.transactionModel.updateMany({ _id: { $in: ids } }, { processed: true }).exec()
 
+    const totalSales = transactions.reduce((sum, t) => sum + t.total, 0)
+    await this.aggregate(this.startOfDay(to), totalSales, 0)
+
     return this.reportModel.create({
       createdBy: userId,
       fromDate: from,
@@ -52,6 +86,24 @@ export class ReportService {
       transactionIds: ids,
       products,
     })
+  }
+
+  async delete(reportId: string): Promise<boolean> {
+    const report = await this.reportModel.findById(reportId).exec()
+    if (!report) throw new NotFoundException('Report not found')
+
+    const transactions = await this.transactionModel
+      .find({ _id: { $in: report.transactionIds } })
+      .exec()
+    const totalSales = transactions.reduce((sum, t) => sum + t.total, 0)
+
+    await this.deaggregate(this.startOfDay(report.toDate), totalSales, 0)
+    await this.transactionModel
+      .updateMany({ _id: { $in: report.transactionIds } }, { processed: false })
+      .exec()
+    await report.deleteOne()
+
+    return true
   }
 
   async getTotalByPaymentType(transactionIds: string[], paymentType: PaymentType): Promise<number> {
@@ -63,5 +115,111 @@ export class ReportService {
 
   findAll(): Promise<ReportDocument[]> {
     return this.reportModel.find().sort({ createdAt: -1 }).exec()
+  }
+
+  async getAnalytics(range: AnalyticsRange) {
+    const start = this.startOfDay(new Date())
+    start.setDate(start.getDate() - (RANGE_DAYS[range] - 1))
+
+    const aggregates = await this.aggregateModel
+      .find({ date: { $gte: start } })
+      .sort({ date: 1 })
+      .exec()
+
+    let series: AnalyticsPoint[] = aggregates.map((a) => ({
+      date: a.date.toISOString(),
+      totalSales: a.totalSales,
+      totalExpenses: a.totalExpenses,
+    }))
+
+    if (range === AnalyticsRange.LAST_6_MONTHS) {
+      series = this.bucketWeekly(aggregates)
+    }
+
+    const topProducts = await this.getTopProducts(start)
+    const lowStockProducts = await this.productModel
+      .find({ quantity: { $lte: LOW_STOCK_THRESHOLD } })
+      .sort({ quantity: 1 })
+      .exec()
+    const lowStock = lowStockProducts.map((p) => ({
+      id: p._id.toString(),
+      name: p.name,
+      quantity: p.quantity,
+    }))
+
+    return {
+      series,
+      topProducts,
+      lowStock,
+      totalSales: series.reduce((sum, p) => sum + p.totalSales, 0),
+      totalExpenses: series.reduce((sum, p) => sum + p.totalExpenses, 0),
+    }
+  }
+
+  private async getTopProducts(start: Date): Promise<TopProduct[]> {
+    const rows = await this.reportModel.aggregate([
+      { $match: { toDate: { $gte: start } } },
+      { $unwind: '$products' },
+      {
+        $group: {
+          _id: '$products.productId',
+          name: { $first: '$products.name' },
+          quantitySold: { $sum: '$products.quantitySold' },
+        },
+      },
+      { $sort: { quantitySold: -1 } },
+      { $limit: 10 },
+    ])
+    return rows.map((r) => ({ productId: r._id, name: r.name, quantitySold: r.quantitySold }))
+  }
+
+  private bucketWeekly(aggregates: AggregateDocument[]): AnalyticsPoint[] {
+    const buckets = new Map<string, AnalyticsPoint>()
+    for (const a of aggregates) {
+      const weekStart = this.startOfWeek(a.date)
+      const key = weekStart.toISOString()
+      const existing = buckets.get(key)
+      if (existing) {
+        existing.totalSales += a.totalSales
+        existing.totalExpenses += a.totalExpenses
+      } else {
+        buckets.set(key, {
+          date: key,
+          totalSales: a.totalSales,
+          totalExpenses: a.totalExpenses,
+        })
+      }
+    }
+    return Array.from(buckets.values())
+  }
+
+  private async aggregate(date: Date, sales: number, expenses: number): Promise<void> {
+    await this.aggregateModel
+      .updateOne(
+        { date },
+        { $inc: { totalSales: sales, totalExpenses: expenses }, $setOnInsert: { date } },
+        { upsert: true },
+      )
+      .exec()
+  }
+
+  private async deaggregate(date: Date, sales: number, expenses: number): Promise<void> {
+    await this.aggregate(date, -sales, -expenses)
+  }
+
+  // Truncate to local midnight. Assumes the deployment runs in a single locale;
+  // sales are attributed to the report's toDate day.
+  private startOfDay(d: Date): Date {
+    const day = new Date(d)
+    day.setHours(0, 0, 0, 0)
+    return day
+  }
+
+  // Monday-anchored start of the week containing d (local time).
+  private startOfWeek(d: Date): Date {
+    const day = this.startOfDay(d)
+    const offset = (day.getDay() + 6) % 7
+    day.setDate(day.getDate() - offset)
+    return day
   }
 }
