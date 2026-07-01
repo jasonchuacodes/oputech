@@ -44,6 +44,13 @@ export class UsersService {
       .exec()
   }
 
+  resetPassword(id: string, hashedPassword: string): Promise<UserDocument | null> {
+    return this.user
+      .findByIdAndUpdate(id, { password: hashedPassword }, { returnDocument: 'after' })
+      .select('-password')
+      .exec()
+  }
+
   remove(id: string): Promise<UserDocument | null> {
     return this.user.findByIdAndDelete(id).exec()
   }

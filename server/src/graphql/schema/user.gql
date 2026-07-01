@@ -41,4 +41,5 @@ extend type Mutation {
   updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(id: ID!): Boolean!
   updateActivityStatus(id: ID!, input: ActivityStatusInput!): User!
+  resetPassword(id: ID!, password: String!): User!
 }

@@ -84,6 +84,15 @@ export class UsersResolver {
     })
   }
 
+  @Mutation()
+  async resetPassword(
+    @Args('id') id: string,
+    @Args('password') password: string,
+  ) {
+    const hashed = await bcrypt.hash(password, 10)
+    return this.usersService.resetPassword(id, hashed)
+  }
+
   @ResolveField('id')
   id(@Parent() user: UserDocument): string {
     return user._id.toString()
