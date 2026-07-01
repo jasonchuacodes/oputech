@@ -1,3 +1,5 @@
+import { UserRole as AppUserRole } from '../../types'
+
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
@@ -17,7 +19,7 @@ export interface AuthUser {
   id: string
   username: string
   email: string
-  role: string
+  role: AppUserRole
 }
 
 export interface LoginResponse {

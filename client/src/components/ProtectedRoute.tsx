@@ -1,7 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { UserRole } from '../types'
-import { PublicRoutes } from '../routes'
+import { PublicRoutes, UserRoutes } from '../routes/paths'
 import { useAuthContext } from '../context/auth/useAuthContext'
+
+const DEFAULT_ROUTE_BY_ROLE: Record<UserRole, string> = {
+  [UserRole.ADMIN]: UserRoutes.Home,
+  [UserRole.USER]: UserRoutes.POS,
+}
 
 export function ProtectedRoute({ allowedRoles }: { allowedRoles: UserRole[] }) {
   const { auth, loading } = useAuthContext()
@@ -10,8 +15,10 @@ export function ProtectedRoute({ allowedRoles }: { allowedRoles: UserRole[] }) {
 
   if (!auth) return <Navigate to={PublicRoutes.Login} replace />
 
-  if (!allowedRoles.includes(auth.role as UserRole))
-    return <Navigate to={PublicRoutes.Login} replace />
+  if (!allowedRoles.includes(auth.role))
+    return (
+      <Navigate to={DEFAULT_ROUTE_BY_ROLE[auth.role] ?? PublicRoutes.Login} replace />
+    )
 
   return <Outlet />
 }
