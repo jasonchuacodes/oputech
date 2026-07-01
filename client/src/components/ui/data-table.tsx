@@ -81,7 +81,7 @@ function DataTableComponent<T>({
   const empty = !loading && collection.items.length === 0
 
   return (
-    <div className="overflow-x-auto rounded-sm border">
+    <div className="overflow-x-auto rounded-sm border bg-white">
       <table id={id} className="w-full min-w-162.5 text-sm">
         <thead>
           <tr className="border-b border-gray-200 bg-slate-50">
