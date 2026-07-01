@@ -3,15 +3,14 @@ import { Button } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
 import {
   useCreateReport,
+  useDeleteReport,
   useReports,
 } from '../../services/report/report.queries'
 import { useTransactions } from '../../services/pos/pos.queries'
 import { PaymentType } from '../../services/pos/pos.types'
 import { ReportDisplay } from './components/ReportDisplay'
 import { dayjsLocal } from '../../utils/date'
-
-const formatTime = (iso: string) =>
-  new Date(iso).toLocaleString('en-PH', { timeStyle: 'short' })
+import { Report } from '../../services/report/report.types'
 
 const ReportPage = () => {
   const today = dayjsLocal().format('YYYY-MM-DD')
@@ -19,6 +18,7 @@ const ReportPage = () => {
   const { data: allReports, isLoading: reportsLoading } = useReports()
   const { data: transactions, isLoading: txLoading } = useTransactions(today)
   const { mutate: generate, isPending } = useCreateReport()
+  const { mutate: removeReport } = useDeleteReport()
 
   const todayReports = useMemo(
     () =>
@@ -112,10 +112,14 @@ const ReportPage = () => {
         <div className="flex flex-col gap-4">
           {hasReports
             ? todayReports.map((report, i) => (
-                <ReportDisplay key={i} report={report} />
+                <ReportDisplay
+                  key={i}
+                  report={report}
+                  onDelete={removeReport}
+                />
               ))
             : previewReport && (
-                <ReportDisplay report={previewReport} isPreview />
+                <ReportDisplay report={previewReport as Report} isPreview />
               )}
         </div>
       )}

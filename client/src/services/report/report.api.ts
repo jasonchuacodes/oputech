@@ -49,3 +49,17 @@ export async function createReport(input: CreateReportInput): Promise<Report> {
   })
   return res.data.data.createReport
 }
+
+const DELETE_REPORT = `
+  mutation DeleteReport($id: ID!) {
+    deleteReport(id: $id)
+  }
+`
+
+export async function deleteReport(id: string): Promise<boolean> {
+  const res = await axios.post(GRAPHQL_URL, {
+    query: DELETE_REPORT,
+    variables: { id },
+  })
+  return res.data.data.deleteReport
+}
