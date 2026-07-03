@@ -12,16 +12,23 @@ const useGetMe = () => {
   })
 }
 
-const useRegisterMutation = () =>
-  useMutation({
+const useRegisterMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
     mutationFn: register,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['auth'] })
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
   })
+}
 
 const useLoginMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: login,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['auth'] })
       queryClient.invalidateQueries({ queryKey: ['users'] })
     },
   })

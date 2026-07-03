@@ -31,8 +31,8 @@ export default function LoginPage() {
 
   const onSubmit = (data: LoginInput) => {
     login(data, {
-      onSuccess: () => {
-        refetchAuth()
+      onSuccess: async () => {
+        await refetchAuth()
         setError(null)
         navigate('/')
       },
