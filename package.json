@@ -1,6 +1,7 @@
 {
   "name": "oputech",
   "private": true,
+  "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "pnpm --filter client dev & pnpm --filter server start:dev",
     "dev:client": "pnpm --filter client dev",
