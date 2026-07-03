@@ -11,6 +11,14 @@ import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
 import { UserRole, UserStatus } from '../users/schemas/user.schema'
 
+const isProduction = process.env.NODE_ENV === 'production'
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -40,16 +48,12 @@ export class AuthService {
     )
 
     res.cookie('access_token', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      ...cookieOptions,
       maxAge: 15 * 60 * 1000,
     })
 
     res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      ...cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
 
@@ -80,9 +84,7 @@ export class AuthService {
     const accessToken = this.jwt.sign({ sub: user._id, role: user.role })
 
     res.cookie('access_token', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      ...cookieOptions,
       maxAge: 15 * 60 * 1000,
     })
   }
@@ -114,16 +116,8 @@ export class AuthService {
       }
     }
 
-    res.clearCookie('access_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    })
-    res.clearCookie('refresh_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    })
+    res.clearCookie('access_token', cookieOptions)
+    res.clearCookie('refresh_token', cookieOptions)
   }
 
   async register(input: RegisterDto) {
