@@ -1,4 +1,5 @@
 import { UserRole as AppUserRole } from '../../types'
+import { ActivityStatus } from '../users/users.types'
 
 export enum UserRole {
   USER = 'user',
@@ -20,6 +21,7 @@ export interface AuthUser {
   username: string
   email: string
   role: AppUserRole
+  activityStatus: ActivityStatus
 }
 
 export interface LoginResponse {

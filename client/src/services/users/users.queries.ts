@@ -48,6 +48,7 @@ export function useUpdateActivityStatus() {
       updateActivityStatus(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.invalidateQueries({ queryKey: ['auth'] })
     },
   })
 }

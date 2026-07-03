@@ -9,11 +9,9 @@ import {
 } from '../../../../components'
 import { cn } from '../../../../utils/cn'
 import { UserStatus } from '../../../../services/users/users.types'
-import {
-  useUsers,
-  useUpdateActivityStatus,
-} from '../../../../services/users/users.queries'
+import { useUpdateActivityStatus } from '../../../../services/users/users.queries'
 import { useAuthContext } from '../../../../context/auth/useAuthContext'
+import { useCurrentUserActivityStatus } from '../../hooks/useCurrentUserActivityStatus'
 
 interface StatusTogglerProps {
   open: boolean
@@ -25,14 +23,8 @@ export const StatusToggler = ({ open }: StatusTogglerProps) => {
   const [manualInput, setManualInput] = useState('')
   const [showManualInput, setShowManualInput] = useState(false)
 
-  const { data: users } = useUsers()
   const updateActivityStatus = useUpdateActivityStatus()
-
-  const currentUser = users?.find((u) => u.id === auth?.id)
-  const activityStatus = currentUser?.activityStatus ?? {
-    status: UserStatus.Active,
-  }
-  const { status, message } = activityStatus
+  const { status, message } = useCurrentUserActivityStatus()
 
   const handleStatusChange = (newStatus: UserStatus, newMessage?: string) => {
     if (!auth?.id) return
