@@ -5,6 +5,7 @@ import { ApolloProvider } from '@apollo/client/react'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/auth/AuthContext'
 import { apolloClient } from './lib/apollo'
+import { PWAReloadPrompt } from './components/PWAReloadPrompt'
 
 const queryClient = new QueryClient()
 
@@ -18,6 +19,7 @@ export const App = () => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <AppLayout />
+          <PWAReloadPrompt />
           <Toaster position="top-right" />
           <ReactQueryDevtools initialIsOpen={false} />
         </AuthProvider>
