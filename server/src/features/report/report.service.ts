@@ -4,6 +4,7 @@ import { Model } from 'mongoose'
 import { Report, ReportDocument } from './schemas/report.schema'
 import { Aggregate, AggregateDocument } from './schemas/aggregate.schema'
 import { Transaction, TransactionDocument, PaymentType } from '../pos/schemas/transaction.schema'
+import { Expense, ExpenseDocument } from '../expenses/schemas/expense.schema'
 import { CreateReportDto } from './dto/create-report.dto'
 
 export enum AnalyticsRange {
@@ -38,6 +39,7 @@ export class ReportService {
     @InjectModel(Report.name) private reportModel: Model<ReportDocument>,
     @InjectModel(Aggregate.name) private aggregateModel: Model<AggregateDocument>,
     @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
+    @InjectModel(Expense.name) private expenseModel: Model<ExpenseDocument>,
   ) {}
 
   async create(input: CreateReportDto, userId: string): Promise<ReportDocument> {
@@ -110,8 +112,21 @@ export class ReportService {
     return transactions.reduce((sum, t) => sum + t.total, 0)
   }
 
+  async getTotalExpenses(reportId: string): Promise<number> {
+    const expenses = await this.expenseModel.find({ reportId }).exec()
+    return expenses.reduce((sum, e) => sum + e.amount, 0)
+  }
+
+  async adjustDailyExpenses(date: Date, delta: number): Promise<void> {
+    await this.aggregate(this.startOfDay(date), 0, delta)
+  }
+
   findAll(): Promise<ReportDocument[]> {
     return this.reportModel.find().sort({ createdAt: -1 }).exec()
+  }
+
+  findById(id: string): Promise<ReportDocument | null> {
+    return this.reportModel.findById(id).exec()
   }
 
   async getAnalytics(range: AnalyticsRange) {

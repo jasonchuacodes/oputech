@@ -22,6 +22,9 @@ const POSPage = () => {
   const { data: products = [], isLoading } = useProducts(search)
   const { mutate: createTransaction } = useCreateTransaction()
 
+  const mainProducts = products.filter((p) => p.category === 'main')
+  const addOnProducts = products.filter((p) => p.category === 'add-on')
+
   const handleProductClick = (product: Product) => {
     setTransactionItems((prev) => {
       const existing = prev.find((i) => i.productId === product.id)
@@ -71,24 +74,47 @@ const POSPage = () => {
             className="max-w-sm"
           />
 
-          <div className="grid grid-cols-2 gap-3 overflow-y-auto lg:grid-cols-3 xl:grid-cols-4">
+          <div className="flex flex-col gap-6 overflow-y-auto">
             {isLoading && (
-              <p className="col-span-full py-12 text-center text-sm text-slate-400">
+              <p className="py-12 text-center text-sm text-slate-400">
                 Loading products…
               </p>
             )}
             {!isLoading && products.length === 0 && (
-              <p className="col-span-full py-12 text-center text-sm text-slate-400">
+              <p className="py-12 text-center text-sm text-slate-400">
                 No products found.
               </p>
             )}
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onClick={handleProductClick}
-              />
-            ))}
+            {!isLoading && mainProducts.length > 0 && (
+              <div className="flex flex-col gap-3 px-1">
+                <h2 className="text-sm font-semibold text-slate-700">Main</h2>
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+                  {mainProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onClick={handleProductClick}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {!isLoading && addOnProducts.length > 0 && (
+              <div className="flex flex-col gap-3 px-1">
+                <h2 className="text-sm font-semibold text-slate-700">
+                  Add-ons
+                </h2>
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+                  {addOnProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onClick={handleProductClick}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="fixed right-0 bottom-0 -translate-x-4 -translate-y-4 md:hidden">

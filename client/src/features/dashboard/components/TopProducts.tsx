@@ -28,7 +28,7 @@ export const TopProducts = ({ products }: Props) => (
                 {p.name}
               </span>
             </div>
-            <span className="text-sm text-slate-900">
+            <span className="text-sm text-foreground">
               {p.quantitySold} sold
             </span>
           </li>

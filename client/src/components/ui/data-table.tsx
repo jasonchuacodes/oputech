@@ -85,10 +85,13 @@ function DataTableComponent<T>({
       <table id={id} className="w-full min-w-162.5 text-sm">
         <thead>
           <tr className="border-b border-gray-200 bg-slate-50">
-            {columns.map((column) => (
+            {columns.map((column, colIdx) => (
               <th
                 key={column.id}
-                style={{ width: column.width }}
+                style={{
+                  width: column.width,
+                  maxWidth: colIdx === 0 && !column.width ? 360 : undefined,
+                }}
                 className={cn(
                   'bg-surface h-10 px-4 text-sm font-medium whitespace-nowrap text-slate-600',
                   alignClass[column.align ?? 'left'],
@@ -125,12 +128,13 @@ function DataTableComponent<T>({
                 </span>
               </th>
             ))}
+            <th aria-hidden="true" />
           </tr>
         </thead>
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={columns.length} className="py-8 text-center">
+              <td colSpan={columns.length + 1} className="py-8 text-center">
                 <div className="flex justify-center">
                   <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
                 </div>
@@ -139,7 +143,7 @@ function DataTableComponent<T>({
           ) : empty ? (
             <tr>
               <td
-                colSpan={columns.length}
+                colSpan={columns.length + 1}
                 className="text-muted-foreground py-8 text-center"
               >
                 {emptyMessage}
@@ -167,15 +171,21 @@ function DataTableComponent<T>({
                       <Tag
                         key={column.id}
                         scope={colIdx === 0 ? 'row' : undefined}
+                        style={{
+                          maxWidth:
+                            colIdx === 0 && !column.width ? 360 : undefined,
+                        }}
                         className={cn(
                           'px-4 py-3 font-normal whitespace-nowrap',
-                          alignClass[column.align ?? 'left']
+                          alignClass[column.align ?? 'left'],
+                          colIdx === 0 && !column.width && 'truncate'
                         )}
                       >
                         {column.cell(item)}
                       </Tag>
                     )
                   })}
+                  <td aria-hidden="true" />
                 </tr>
               )
             })

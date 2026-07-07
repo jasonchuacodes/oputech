@@ -45,9 +45,9 @@ export function useSidebarItems(): SidebarGroup[] {
             enabled: true,
           },
           {
-            label: 'Report',
+            label: 'Reports',
             icon: FileBarChart,
-            to: UserRoutes.Report,
+            to: UserRoutes.Reports,
             enabled: true,
           },
           {

@@ -58,7 +58,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-sm">
           <div className="rounded-sm bg-white px-8 py-8 shadow-sm">
             <div className="mb-8 text-center">
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-foreground">
                 Create account
               </h1>
               <p className="mt-1 text-sm text-gray-500">
@@ -112,7 +112,7 @@ export default function RegisterPage() {
                 Already have an account?{' '}
                 <Link
                   to={PublicRoutes.Login}
-                  className="font-medium text-gray-900 hover:underline"
+                  className="font-medium text-foreground hover:underline"
                 >
                   Login
                 </Link>

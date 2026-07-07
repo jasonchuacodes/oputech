@@ -5,12 +5,17 @@ import { DataTable, DataTableColumn } from '../../components/ui/data-table'
 import { useProducts } from '../../services/inventory/inventory.queries'
 import { Product } from '../../services/inventory/inventory.types'
 import { formatCurrency } from '../../utils/number'
+import { useAuthContext } from '../../context/auth/useAuthContext'
+import { UserRole } from '../../types'
 import { AddItemModal } from './components/AddItemModal'
 import { EditItemModal } from './components/EditItemModal'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { ActionsDropdown } from './components/ActionsDropdown'
 
 const InventoryPage = () => {
+  const { auth } = useAuthContext()
+  const isAdmin = auth?.role === UserRole.ADMIN
+
   const [search, setSearch] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<Product | null>(null)
@@ -34,6 +39,7 @@ const InventoryPage = () => {
       id: 'name',
       heading: 'Name',
       cell: (item) => item.name,
+      width: 320,
       orderable: true,
     },
     {
@@ -65,8 +71,19 @@ const InventoryPage = () => {
     },
   ]
 
-  const collection = DataTable.collection({
-    items: data ?? [],
+  const mainProducts = (data ?? []).filter((item) => item.category === 'main')
+  const addOnProducts = (data ?? []).filter(
+    (item) => item.category === 'add-on'
+  )
+
+  const mainCollection = DataTable.collection({
+    items: mainProducts,
+    itemToValue: (item) => item.id,
+    itemToString: (item) => item.name,
+  })
+
+  const addOnCollection = DataTable.collection({
+    items: addOnProducts,
     itemToValue: (item) => item.id,
     itemToString: (item) => item.name,
   })
@@ -77,10 +94,12 @@ const InventoryPage = () => {
         title="Inventory"
         description="Track and manage your product stock"
         action={
-          <Button className="gap-2" onClick={() => setAddOpen(true)}>
-            <Plus size={16} />
-            Add Item
-          </Button>
+          isAdmin && (
+            <Button className="gap-2" onClick={() => setAddOpen(true)}>
+              <Plus size={16} />
+              Add Item
+            </Button>
+          )
         }
       />
 
@@ -91,14 +110,30 @@ const InventoryPage = () => {
         className="max-w-sm"
       />
 
-      <DataTable
-        collection={collection}
-        columns={columns}
-        loading={isLoading}
-        emptyMessage="No items found"
-      />
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-slate-700">Main</h2>
+        <DataTable
+          collection={mainCollection}
+          columns={columns}
+          loading={isLoading}
+          emptyMessage="No items found"
+        />
+      </div>
 
-      <AddItemModal open={addOpen} onClose={() => setAddOpen(false)} />
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-slate-700">Add-ons</h2>
+        <DataTable
+          collection={addOnCollection}
+          columns={columns}
+          loading={isLoading}
+          emptyMessage="No items found"
+        />
+      </div>
+
+      <AddItemModal
+        open={isAdmin && addOpen}
+        onClose={() => setAddOpen(false)}
+      />
 
       <EditItemModal
         item={selectedItem}

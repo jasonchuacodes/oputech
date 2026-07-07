@@ -1,6 +1,6 @@
 enum PaymentType {
   CASH
-  GCASH
+  ONLINE
 }
 
 type TransactionItem {

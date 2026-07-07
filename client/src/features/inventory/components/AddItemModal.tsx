@@ -1,7 +1,17 @@
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ImagePlus, PackagePlus } from 'lucide-react'
-import { CustomModal, Input, Label } from '../../../components'
+import {
+  CustomModal,
+  Input,
+  Label,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '../../../components'
+import { NumberInput } from '../../../components/ui/number-input'
 import { useCreateProduct } from '../../../services/inventory/inventory.queries'
 import {
   AddProductSchema,
@@ -20,8 +30,10 @@ export const AddItemModal = ({ open, onClose }: Props) => {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<AddProductInput>({
+    defaultValues: { category: 'main' },
     resolver: zodResolver(AddProductSchema),
   })
 
@@ -35,6 +47,7 @@ export const AddItemModal = ({ open, onClose }: Props) => {
       {
         name: data.name,
         price: data.price,
+        category: data.category,
       },
       { onSuccess: handleClose }
     )
@@ -75,18 +88,29 @@ export const AddItemModal = ({ open, onClose }: Props) => {
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="price">Price *</Label>
-          <Input
-            id="price"
-            type="number"
-            step="0.01"
-            placeholder="0.00"
-            min={0}
-            aria-invalid={!!errors.price}
-            {...register('price', { valueAsNumber: true })}
-          />
+          <NumberInput name="price" control={control} step={0.01} min={0} />
           {errors.price && (
             <p className="text-destructive text-xs">{errors.price.message}</p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>Category *</Label>
+          <Controller
+            name="category"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full min-h-10">
+                  <SelectValue placeholder="Select a category…" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="main">Main</SelectItem>
+                  <SelectItem value="add-on">Add-on</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
       </div>
     </CustomModal>

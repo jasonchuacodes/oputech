@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose'
 
 export enum PaymentType {
   CASH = 'CASH',
-  GCASH = 'GCASH',
+  ONLINE = 'ONLINE',
 }
 
 export type TransactionDocument = HydratedDocument<Transaction>

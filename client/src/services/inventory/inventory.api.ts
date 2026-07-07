@@ -8,6 +8,7 @@ const PRODUCT_FIELDS = `
   name
   price
   imageUrl
+  category
 `
 
 const GET_PRODUCTS = `

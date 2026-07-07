@@ -2,17 +2,19 @@ import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/g
 import { UseGuards } from '@nestjs/common'
 import { InventoryService } from '../../features/inventory/inventory.service'
 import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
-import { ProductDocument } from '../../features/inventory/schemas/inventory.schema'
+import { ProductDocument, ProductCategory } from '../../features/inventory/schemas/inventory.schema'
 
 interface CreateProductInput {
   name: string
   price: number
   imageUrl?: string
+  category: ProductCategory
 }
 
 interface UpdateProductInput {
   name?: string
   price?: number
+  category?: ProductCategory
 }
 
 @UseGuards(JwtAuthGuard)

@@ -13,8 +13,9 @@ type Report {
   toDate: String!
   products: [ProductSale!]!
   totalCash: Float!
-  totalGCash: Float!
+  totalOnline: Float!
   totalIncome: Float!
+  totalExpenses: Float!
   createdAt: String!
   updatedAt: String!
 }
@@ -52,6 +53,7 @@ type Analytics {
 
 extend type Query {
   reports: [Report!]!
+  report(id: ID!): Report
   analytics(range: AnalyticsRange!): Analytics!
 }
 

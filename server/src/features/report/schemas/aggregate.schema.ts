@@ -14,7 +14,7 @@ export class Aggregate {
   @Prop({ required: true, default: 0 })
   totalSales: number
 
-  // Scaffolded end-to-end but stays 0 until an expense source is added.
+  // Kept in sync by ExpensesService via ReportService.adjustDailyExpenses.
   @Prop({ required: true, default: 0 })
   totalExpenses: number
 }

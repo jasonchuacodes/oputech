@@ -1,8 +1,17 @@
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil } from 'lucide-react'
-import { CustomModal, Input, Label } from '../../../components'
+import {
+  CustomModal,
+  Input,
+  Label,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '../../../components'
 import { useUpdateProduct } from '../../../services/inventory/inventory.queries'
 import { Product } from '../../../services/inventory/inventory.types'
 import {
@@ -32,7 +41,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
 
   useEffect(() => {
     if (item) {
-      reset({ name: item.name, price: item.price })
+      reset({ name: item.name, price: item.price, category: item.category })
     }
   }, [item, reset])
 
@@ -49,6 +58,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
         input: {
           name: data.name,
           price: data.price,
+          category: data.category,
         },
       },
       { onSuccess: handleClose }
@@ -87,6 +97,25 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
           {errors.price && (
             <p className="text-destructive text-xs">{errors.price.message}</p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>Category</Label>
+          <Controller
+            name="category"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full min-h-10">
+                  <SelectValue placeholder="Select a category…" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="main">Main</SelectItem>
+                  <SelectItem value="add-on">Add-on</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
       </div>
     </CustomModal>

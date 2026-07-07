@@ -22,10 +22,12 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
       </div>
 
       <div className="flex flex-col gap-0.5">
-        <span className="line-clamp-2 text-sm leading-snug font-medium text-slate-800">
+        <span className="line-clamp-2 text-xs leading-snug font-medium text-muted-foreground">
           {product.name}
         </span>
-        <span className="text-sm font-semibold text-slate-900">{formatCurrency(product.price)}</span>
+        <span className="text-base font-semibold text-foreground">
+          {formatCurrency(product.price)}
+        </span>
       </div>
     </button>
   )

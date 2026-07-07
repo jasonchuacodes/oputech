@@ -68,6 +68,7 @@ export function NumberInput<T extends FieldValues>({
               {...props}
               {...field}
               value={field.value ?? ''}
+              placeholder={props.placeholder ?? '0'}
               type="number"
               min={min}
               max={max}

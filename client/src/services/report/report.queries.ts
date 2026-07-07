@@ -1,12 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { getReports, createReport, deleteReport } from './report.api'
+import { getReports, getReport, createReport, deleteReport } from './report.api'
 import { CreateReportInput } from './report.types'
 
 export const useReports = () =>
   useQuery({
     queryKey: ['reports'],
     queryFn: getReports,
+  })
+
+export const useReport = (id?: string) =>
+  useQuery({
+    queryKey: ['report', id],
+    queryFn: () => getReport(id!),
+    enabled: !!id,
   })
 
 export const useCreateReport = () => {

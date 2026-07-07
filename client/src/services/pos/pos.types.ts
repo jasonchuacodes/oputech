@@ -16,5 +16,5 @@ export interface Transaction {
 
 export enum PaymentType {
   Cash = 'CASH',
-  GCash = 'GCASH',
+  Online = 'ONLINE',
 }

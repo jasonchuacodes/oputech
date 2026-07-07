@@ -10,5 +10,8 @@ export const UserRoutes = {
   Users: '/users',
   Inventory: '/inventory',
   POS: '/pos',
-  Report: '/report',
+  Reports: '/reports',
+  ReportDetail: '/reports/:reportId',
 }
+
+export const reportDetailPath = (reportId: string) => `/reports/${reportId}`

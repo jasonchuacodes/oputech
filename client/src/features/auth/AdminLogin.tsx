@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
               <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
                 Admin Portal
               </p>
-              <h1 className="mt-2 text-2xl font-bold text-gray-900">Sign in</h1>
+              <h1 className="mt-2 text-2xl font-bold text-foreground">Sign in</h1>
               <p className="mt-1 text-sm text-gray-500">
                 Restricted access — authorised users only
               </p>

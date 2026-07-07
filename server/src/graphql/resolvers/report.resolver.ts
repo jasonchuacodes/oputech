@@ -20,6 +20,11 @@ export class ReportResolver {
   }
 
   @Query()
+  report(@Args('id') id: string) {
+    return this.reportService.findById(id)
+  }
+
+  @Query()
   analytics(@Args('range') range: AnalyticsRange) {
     return this.reportService.getAnalytics(range)
   }
@@ -50,18 +55,23 @@ export class ReportResolver {
     return this.reportService.getTotalByPaymentType(report.transactionIds, PaymentType.CASH)
   }
 
-  @ResolveField('totalGCash')
-  totalGCash(@Parent() report: ReportDocument): Promise<number> {
-    return this.reportService.getTotalByPaymentType(report.transactionIds, PaymentType.GCASH)
+  @ResolveField('totalOnline')
+  totalOnline(@Parent() report: ReportDocument): Promise<number> {
+    return this.reportService.getTotalByPaymentType(report.transactionIds, PaymentType.ONLINE)
   }
 
   @ResolveField('totalIncome')
   async totalIncome(@Parent() report: ReportDocument): Promise<number> {
-    const [cash, gcash] = await Promise.all([
+    const [cash, online] = await Promise.all([
       this.reportService.getTotalByPaymentType(report.transactionIds, PaymentType.CASH),
-      this.reportService.getTotalByPaymentType(report.transactionIds, PaymentType.GCASH),
+      this.reportService.getTotalByPaymentType(report.transactionIds, PaymentType.ONLINE),
     ])
-    return cash + gcash
+    return cash + online
+  }
+
+  @ResolveField('totalExpenses')
+  totalExpenses(@Parent() report: ReportDocument): Promise<number> {
+    return this.reportService.getTotalExpenses(report._id.toString())
   }
 
   @ResolveField('fromDate')

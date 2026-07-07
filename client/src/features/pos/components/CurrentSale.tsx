@@ -63,7 +63,7 @@ export const CurrentSale = ({
                 </span>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <span className="text-sm font-semibold text-slate-900">
+                <span className="text-sm font-semibold text-foreground">
                   {formatCurrency(item.price * item.quantity)}
                 </span>
                 <button
@@ -89,7 +89,7 @@ export const CurrentSale = ({
         <div className="flex flex-col gap-1.5 border-t py-3">
           <span className="text-xs font-medium text-slate-500">Mode of Payment</span>
           <div className="flex gap-2">
-            {([PaymentType.Cash, PaymentType.GCash] as PaymentType[]).map((type) => (
+            {([PaymentType.Cash, PaymentType.Online] as PaymentType[]).map((type) => (
               <Button
                 key={type}
                 variant={paymentType === type ? 'default' : 'outline'}
@@ -98,7 +98,7 @@ export const CurrentSale = ({
                 onClick={() => onPaymentTypeChange(type)}
                 className="flex-1"
               >
-                {type === PaymentType.GCash ? 'GCash' : toTitleCase(type)}
+                {toTitleCase(type)}
               </Button>
             ))}
           </div>

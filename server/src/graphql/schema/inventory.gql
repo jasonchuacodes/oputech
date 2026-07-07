@@ -3,6 +3,7 @@ type Product {
   name: String!
   price: Float!
   imageUrl: String
+  category: String!
 }
 
 extend type Query {
@@ -13,11 +14,13 @@ input CreateProductInput {
   name: String!
   price: Float!
   imageUrl: String
+  category: String!
 }
 
 input UpdateProductInput {
   name: String
   price: Float
+  category: String
 }
 
 extend type Mutation {

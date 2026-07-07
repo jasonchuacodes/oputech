@@ -18,8 +18,9 @@ export interface Report {
   toDate: string
   products: ProductSale[]
   totalCash: number
-  totalGCash: number
+  totalOnline: number
   totalIncome: number
+  totalExpenses: number
   createdAt: string
 }
 

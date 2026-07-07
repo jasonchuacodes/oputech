@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
+import { DataTable, DataTableColumn } from '../../components/ui/data-table'
 import {
   useCreateReport,
   useDeleteReport,
@@ -10,9 +12,16 @@ import { useTransactions } from '../../services/pos/pos.queries'
 import { PaymentType } from '../../services/pos/pos.types'
 import { ReportDisplay } from './components/ReportDisplay'
 import { dayjsLocal } from '../../utils/date'
+import { formatCurrency } from '../../utils/number'
 import { Report } from '../../services/report/report.types'
+import { reportDetailPath } from '../../routes/paths'
+import { useAuthContext } from '../../context/auth/useAuthContext'
+import { UserRole } from '../../types'
 
 const ReportPage = () => {
+  const navigate = useNavigate()
+  const { auth } = useAuthContext()
+  const isAdmin = auth?.role === UserRole.ADMIN
   const today = dayjsLocal().format('YYYY-MM-DD')
 
   const { data: allReports, isLoading: reportsLoading } = useReports()
@@ -36,11 +45,11 @@ const ReportPage = () => {
       { name: string; pricePerUnit: number; quantitySold: number }
     >()
     let totalCash = 0
-    let totalGCash = 0
+    let totalOnline = 0
 
     for (const tx of transactions) {
       if (tx.paymentType === PaymentType.Cash) totalCash += tx.total
-      else totalGCash += tx.total
+      else totalOnline += tx.total
 
       for (const item of tx.items) {
         const existing = productMap.get(item.productId)
@@ -62,12 +71,13 @@ const ReportPage = () => {
         ...v,
       })),
       totalCash,
-      totalGCash,
-      totalIncome: totalCash + totalGCash,
+      totalOnline,
+      totalIncome: totalCash + totalOnline,
+      totalExpenses: 0,
     }
   }, [transactions])
 
-  const isLoading = reportsLoading || txLoading
+  const isLoading = isAdmin ? reportsLoading : reportsLoading || txLoading
   const hasTransactions = (transactions?.length ?? 0) > 0
   const hasReports = todayReports.length > 0
 
@@ -78,19 +88,69 @@ const ReportPage = () => {
     })
   }
 
+  const reportColumns: DataTableColumn<Report>[] = [
+    {
+      id: 'date',
+      heading: 'Date',
+      orderable: true,
+      cell: (r) => dayjsLocal(r.toDate).format('MMM D, YYYY'),
+    },
+    {
+      id: 'totalCash',
+      heading: 'Cash',
+      cell: (r) => formatCurrency(r.totalCash),
+    },
+    {
+      id: 'totalGCash',
+      heading: 'Online Payments',
+      cell: (r) => formatCurrency(r.totalOnline),
+    },
+    {
+      id: 'totalIncome',
+      heading: 'Total Income',
+      cell: (r) => formatCurrency(r.totalIncome),
+    },
+    {
+      id: 'totalExpenses',
+      heading: 'Expenses',
+      cell: (r) => formatCurrency(r.totalExpenses),
+    },
+  ]
+
+  const reportsCollection = DataTable.collection({
+    items: allReports ?? [],
+    itemToValue: (r) => r.id,
+    itemToString: (r) => dayjsLocal(r.toDate).format('MMM D, YYYY'),
+  })
+
   return (
     <div className="flex flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
-        <PageHeader title="Report" description="Today's sales report" />
-        <Button
-          onClick={handleGenerate}
-          disabled={isPending || !hasTransactions}
-        >
-          {isPending ? 'Generating…' : 'Generate Report'}
-        </Button>
+        <PageHeader
+          title="Reports"
+          description={
+            isAdmin ? 'All generated reports' : "Today's sales report"
+          }
+        />
+        {!isAdmin && (
+          <Button
+            onClick={handleGenerate}
+            disabled={isPending || !hasTransactions}
+          >
+            {isPending ? 'Generating…' : 'Generate Report'}
+          </Button>
+        )}
       </div>
 
-      {isLoading ? (
+      {isAdmin ? (
+        <DataTable
+          collection={reportsCollection}
+          columns={reportColumns}
+          loading={reportsLoading}
+          emptyMessage="No reports generated yet."
+          onRowClick={(r) => navigate(reportDetailPath(r.id))}
+        />
+      ) : isLoading ? (
         <div className="flex flex-col gap-4">
           {Array.from({ length: 2 }).map((_, i) => (
             <div
@@ -110,17 +170,12 @@ const ReportPage = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {hasReports
-            ? todayReports.map((report, i) => (
-                <ReportDisplay
-                  key={i}
-                  report={report}
-                  onDelete={removeReport}
-                />
-              ))
-            : previewReport && (
-                <ReportDisplay report={previewReport as Report} isPreview />
-              )}
+          {todayReports.map((report, i) => (
+            <ReportDisplay key={i} report={report} onDelete={removeReport} />
+          ))}
+          {previewReport && (
+            <ReportDisplay report={previewReport as Report} isPreview />
+          )}
         </div>
       )}
     </div>

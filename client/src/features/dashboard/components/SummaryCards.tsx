@@ -24,7 +24,7 @@ export const SummaryCards = ({ totalSales, totalExpenses }: Props) => {
       </div>
       <div className="flex flex-col gap-1 rounded-md border bg-slate-50 p-4">
         <span className="text-xs font-medium text-slate-500">Net</span>
-        <span className="text-2xl font-bold text-slate-900">
+        <span className="text-2xl font-bold text-foreground">
           {formatCurrency(net)}
         </span>
       </div>

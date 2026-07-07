@@ -16,14 +16,23 @@ const REPORT_FIELDS = `
     total
   }
   totalCash
-  totalGCash
+  totalOnline
   totalIncome
+  totalExpenses
   createdAt
 `
 
 const GET_REPORTS = `
   query GetReports {
     reports {
+      ${REPORT_FIELDS}
+    }
+  }
+`
+
+const GET_REPORT = `
+  query GetReport($id: ID!) {
+    report(id: $id) {
       ${REPORT_FIELDS}
     }
   }
@@ -40,6 +49,14 @@ const CREATE_REPORT = `
 export async function getReports(): Promise<Report[]> {
   const res = await axios.post(GRAPHQL_URL, { query: GET_REPORTS })
   return res.data.data.reports
+}
+
+export async function getReport(id: string): Promise<Report> {
+  const res = await axios.post(GRAPHQL_URL, {
+    query: GET_REPORT,
+    variables: { id },
+  })
+  return res.data.data.report
 }
 
 export async function createReport(input: CreateReportInput): Promise<Report> {
