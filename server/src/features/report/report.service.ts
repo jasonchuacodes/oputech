@@ -95,11 +95,13 @@ export class ReportService {
       .find({ _id: { $in: report.transactionIds } })
       .exec()
     const totalSales = transactions.reduce((sum, t) => sum + t.total, 0)
+    const totalExpenses = await this.getTotalExpenses(reportId)
 
-    await this.deaggregate(this.startOfDay(report.toDate), totalSales, 0)
+    await this.deaggregate(this.startOfDay(report.toDate), totalSales, totalExpenses)
     await this.transactionModel
       .updateMany({ _id: { $in: report.transactionIds } }, { processed: false })
       .exec()
+    await this.expenseModel.deleteMany({ reportId }).exec()
     await report.deleteOne()
 
     return true
