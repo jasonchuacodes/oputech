@@ -21,7 +21,7 @@ export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
     <>
       {isMobile && open && (
         <div
-          className="fixed inset-0 w-[1200] bg-black/40"
+          className="fixed inset-0 z-100 w-[1200] bg-black/40"
           onClick={() => onOpenChange(false)}
         />
       )}
@@ -30,7 +30,7 @@ export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
         className={cn(
           'flex h-full w-[1200] flex-col border-r border-gray-200 bg-white transition-all duration-200',
           open ? 'w-60' : 'w-18',
-          isMobile ? 'fixed inset-y-0 left-0' : 'relative',
+          isMobile ? 'fixed inset-y-0 left-0 z-150' : 'relative z-150',
           isMobile && !open && '-translate-x-full'
         )}
       >
