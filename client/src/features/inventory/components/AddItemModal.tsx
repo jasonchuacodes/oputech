@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ImagePlus, PackagePlus } from 'lucide-react'
+import { PackagePlus } from 'lucide-react'
 import {
   CustomModal,
   Input,
@@ -10,6 +11,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
+  ImageDropzone,
 } from '../../../components'
 import { NumberInput } from '../../../components/ui/number-input'
 import { useCreateProduct } from '../../../services/inventory/inventory.queries'
@@ -25,6 +27,7 @@ interface Props {
 
 export const AddItemModal = ({ open, onClose }: Props) => {
   const createItem = useCreateProduct()
+  const [imageError, setImageError] = useState<string | null>(null)
 
   const {
     register,
@@ -40,6 +43,7 @@ export const AddItemModal = ({ open, onClose }: Props) => {
   const handleClose = () => {
     onClose()
     reset()
+    setImageError(null)
   }
 
   const onSubmit = (data: AddProductInput) => {
@@ -47,6 +51,7 @@ export const AddItemModal = ({ open, onClose }: Props) => {
       {
         name: data.name,
         price: data.price,
+        imageUrl: data.imageUrl,
         category: data.category,
       },
       { onSuccess: handleClose }
@@ -66,11 +71,23 @@ export const AddItemModal = ({ open, onClose }: Props) => {
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <div className="border-border text-muted-foreground flex cursor-not-allowed flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed p-6 opacity-50 select-none">
-            <ImagePlus size={24} />
-            <p className="text-sm">Drag & drop or click to upload</p>
-            <p className="text-xs">Coming soon</p>
-          </div>
+          <Controller
+            name="imageUrl"
+            control={control}
+            render={({ field }) => (
+              <ImageDropzone
+                value={field.value}
+                onChange={(value) => {
+                  setImageError(null)
+                  field.onChange(value)
+                }}
+                onError={setImageError}
+              />
+            )}
+          />
+          {imageError && (
+            <p className="text-destructive text-xs">{imageError}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">

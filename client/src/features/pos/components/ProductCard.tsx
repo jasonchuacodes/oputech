@@ -17,8 +17,16 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
         'cursor-pointer hover:border-slate-300 hover:shadow-sm active:scale-[0.98]',
       )}
     >
-      <div className="flex h-24 w-full items-center justify-center rounded-md bg-slate-100">
-        <ShoppingBag size={32} className="text-slate-400" />
+      <div className="flex h-24 w-full items-center justify-center overflow-hidden rounded-md bg-slate-100">
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <ShoppingBag size={32} className="text-slate-400" />
+        )}
       </div>
 
       <div className="flex flex-col gap-0.5">

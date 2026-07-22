@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Pencil } from 'lucide-react'
+import { Plus, Pencil, ImageOff } from 'lucide-react'
 import { Button, Input, PageHeader } from '../../components'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
 import { useProducts } from '../../services/inventory/inventory.queries'
@@ -41,6 +41,23 @@ const InventoryPage = () => {
       cell: (item) => item.name,
       width: 320,
       orderable: true,
+    },
+    {
+      id: 'image',
+      heading: '',
+      width: 48,
+      cell: (item) =>
+        item.imageUrl ? (
+          <img
+            src={item.imageUrl}
+            alt=""
+            className="h-10 w-10 rounded-md object-cover"
+          />
+        ) : (
+          <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-md">
+            <ImageOff size={16} className="text-muted-foreground" />
+          </div>
+        ),
     },
     {
       id: 'price',

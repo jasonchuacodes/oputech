@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const AddProductSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   price: z.number().min(0, 'Price must be at least ₱0.01'),
+  imageUrl: z.string().optional(),
   category: z.enum(['main', 'add-on']),
 })
 

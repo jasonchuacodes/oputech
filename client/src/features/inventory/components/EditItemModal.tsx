@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil } from 'lucide-react'
@@ -11,6 +11,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
+  ImageDropzone,
 } from '../../../components'
 import { useUpdateProduct } from '../../../services/inventory/inventory.queries'
 import { Product } from '../../../services/inventory/inventory.types'
@@ -28,6 +29,7 @@ interface Props {
 
 export const EditItemModal = ({ item, open, onClose }: Props) => {
   const updateItem = useUpdateProduct()
+  const [imageError, setImageError] = useState<string | null>(null)
 
   const {
     register,
@@ -41,13 +43,19 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
 
   useEffect(() => {
     if (item) {
-      reset({ name: item.name, price: item.price, category: item.category })
+      reset({
+        name: item.name,
+        price: item.price,
+        imageUrl: item.imageUrl,
+        category: item.category,
+      })
     }
   }, [item, reset])
 
   const handleClose = () => {
     onClose()
     reset()
+    setImageError(null)
   }
 
   const onSubmit = (data: EditProductInput) => {
@@ -58,6 +66,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
         input: {
           name: data.name,
           price: data.price,
+          imageUrl: data.imageUrl ?? '',
           category: data.category,
         },
       },
@@ -77,6 +86,26 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
+          <Controller
+            name="imageUrl"
+            control={control}
+            render={({ field }) => (
+              <ImageDropzone
+                value={field.value}
+                onChange={(value) => {
+                  setImageError(null)
+                  field.onChange(value)
+                }}
+                onError={setImageError}
+              />
+            )}
+          />
+          {imageError && (
+            <p className="text-destructive text-xs">{imageError}</p>
+          )}
+        </div>
+
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="edit-name">Name</Label>
           <Input
