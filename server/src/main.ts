@@ -1,14 +1,12 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
-import { json } from 'express';
 import { AppModule } from './app.module';
 import { corsMiddleware } from './common/middleware/cors.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(json({ limit: '10mb' }));
   app.use(corsMiddleware());
   app.use(cookieParser());
   app.setGlobalPrefix('api');
