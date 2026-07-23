@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 import { getProducts, createProduct, updateProduct, deleteProduct } from './inventory.api'
 import { CreateProductInput, UpdateProductInput } from './inventory.types'
 
@@ -16,6 +17,9 @@ export function useCreateProduct() {
     mutationFn: (input: CreateProductInput) => createProduct(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inventory'] })
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to create item')
     },
   })
 }

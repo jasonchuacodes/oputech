@@ -16,7 +16,7 @@ export const ImageDropzone = ({
   onChange,
   onError,
   disabled,
-  maxSizeBytes = 2 * 1024 * 1024,
+  maxSizeBytes = 5 * 1024 * 1024,
   className,
 }: ImageDropzoneProps) => {
   const inputRef = useRef<HTMLInputElement>(null)

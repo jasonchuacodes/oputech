@@ -1,5 +1,5 @@
 import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
-import { UseGuards } from '@nestjs/common'
+import { UseGuards, BadRequestException } from '@nestjs/common'
 import { InventoryService } from '../../features/inventory/inventory.service'
 import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
 import { ProductDocument, ProductCategory } from '../../features/inventory/schemas/inventory.schema'
@@ -29,8 +29,38 @@ export class InventoryResolver {
   }
 
   @Mutation()
-  createProduct(@Args('input') input: CreateProductInput) {
+  async createProduct(@Args('input') input: CreateProductInput) {
+    if (input.imageUrl) {
+      this.validateImageUrl(input.imageUrl)
+    }
     return this.inventory.create(input)
+  }
+
+  private validateImageUrl(imageUrl: string): void {
+    if (!imageUrl.startsWith('data:image/')) {
+      throw new BadRequestException('Invalid image format')
+    }
+
+    const imageSizeBytes = this.getBase64Size(imageUrl)
+    const maxSizeBytes = 5 * 1024 * 1024
+    const minSizeBytes = 0
+
+    if (imageSizeBytes > maxSizeBytes) {
+      throw new BadRequestException(
+        `Image size must be smaller than 5MB (received ${Math.round(imageSizeBytes / (1024 * 1024))}MB)`
+      )
+    }
+
+    if (imageSizeBytes < minSizeBytes) {
+      throw new BadRequestException('Image size is too small')
+    }
+  }
+
+  private getBase64Size(dataUrl: string): number {
+    const base64 = dataUrl.split(',')[1]
+    if (!base64) return 0
+    const padding = (base64.match(/=/g) || []).length
+    return Math.floor((base64.length * 3) / 4) - padding
   }
 
   @Mutation()
