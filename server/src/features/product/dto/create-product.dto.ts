@@ -1,4 +1,4 @@
-import { ProductCategory } from '../schemas/inventory.schema'
+import { ProductCategory } from '../schemas/product.schema'
 
 export class CreateProductDto {
   name: string

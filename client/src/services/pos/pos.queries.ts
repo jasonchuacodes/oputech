@@ -20,7 +20,7 @@ export const useCreateTransaction = () => {
       toast.success('Transaction completed successfully!')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['inventory'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
     },
   })
 }

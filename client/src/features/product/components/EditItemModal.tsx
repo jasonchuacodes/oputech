@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PackagePlus } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import {
   CustomModal,
   Input,
@@ -13,20 +13,22 @@ import {
   SelectItem,
   ImageDropzone,
 } from '../../../components'
-import { NumberInput } from '../../../components/ui/number-input'
-import { useCreateProduct } from '../../../services/inventory/inventory.queries'
+import { useUpdateProduct } from '../../../services/product/product.queries'
+import { Product } from '../../../services/product/product.types'
 import {
-  AddProductSchema,
-  AddProductInput,
-} from '../schemas/add-product.schema'
+  EditProductInput,
+  EditProductSchema,
+} from '../schemas/edit-product.schema'
+import { NumberInput } from '../../../components/ui/number-input'
 
 interface Props {
+  item: Product | null
   open: boolean
   onClose: () => void
 }
 
-export const AddItemModal = ({ open, onClose }: Props) => {
-  const createItem = useCreateProduct()
+export const EditItemModal = ({ item, open, onClose }: Props) => {
+  const updateItem = useUpdateProduct()
   const [imageError, setImageError] = useState<string | null>(null)
 
   const {
@@ -35,10 +37,21 @@ export const AddItemModal = ({ open, onClose }: Props) => {
     reset,
     control,
     formState: { errors },
-  } = useForm<AddProductInput>({
-    defaultValues: { category: 'main' },
-    resolver: zodResolver(AddProductSchema),
+  } = useForm<EditProductInput>({
+    resolver: zodResolver(EditProductSchema),
   })
+
+  useEffect(() => {
+    if (item) {
+      reset({
+        name: item.name,
+        price: item.price,
+        imageUrl: item.imageUrl,
+        printCount: item.printCount,
+        category: item.category,
+      })
+    }
+  }, [item, reset])
 
   const handleClose = () => {
     onClose()
@@ -46,14 +59,18 @@ export const AddItemModal = ({ open, onClose }: Props) => {
     setImageError(null)
   }
 
-  const onSubmit = (data: AddProductInput) => {
-    createItem.mutate(
+  const onSubmit = (data: EditProductInput) => {
+    if (!item) return
+    updateItem.mutate(
       {
-        name: data.name,
-        price: data.price,
-        imageUrl: data.imageUrl,
-        printCount: data.printCount,
-        category: data.category,
+        id: item.id,
+        input: {
+          name: data.name,
+          price: data.price,
+          imageUrl: data.imageUrl ?? '',
+          printCount: data.printCount,
+          category: data.category,
+        },
       },
       { onSuccess: handleClose }
     )
@@ -62,15 +79,15 @@ export const AddItemModal = ({ open, onClose }: Props) => {
   return (
     <CustomModal
       open={open}
-      title="Add Item"
-      subheader="Add a new item to your inventory."
-      icon={PackagePlus}
-      submitText="Add Item"
-      loading={createItem.isPending}
+      title="Edit Item"
+      subheader="Update item details."
+      icon={Pencil}
+      submitText="Save"
+      loading={updateItem.isPending}
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
           <Controller
             name="imageUrl"
@@ -92,9 +109,9 @@ export const AddItemModal = ({ open, onClose }: Props) => {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="name">Name *</Label>
+          <Label htmlFor="edit-name">Name</Label>
           <Input
-            id="name"
+            id="edit-name"
             placeholder="e.g. Wireless Mouse"
             aria-invalid={!!errors.name}
             {...register('name')}
@@ -105,15 +122,16 @@ export const AddItemModal = ({ open, onClose }: Props) => {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="price">Price *</Label>
-          <NumberInput name="price" control={control} step={0.01} min={0} />
+          <Label htmlFor="edit-price">Price</Label>
+          <NumberInput name="price" control={control} />
+
           {errors.price && (
             <p className="text-destructive text-xs">{errors.price.message}</p>
           )}
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="printCount">Print Count</Label>
+          <Label htmlFor="edit-printCount">Print Count</Label>
           <NumberInput name="printCount" control={control} step={1} min={0} />
           {errors.printCount && (
             <p className="text-destructive text-xs">
@@ -123,7 +141,7 @@ export const AddItemModal = ({ open, onClose }: Props) => {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label>Category *</Label>
+          <Label>Category</Label>
           <Controller
             name="category"
             control={control}

@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Plus, Pencil, ImageOff } from 'lucide-react'
 import { Button, Input, PageHeader } from '../../components'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
-import { useProducts } from '../../services/inventory/inventory.queries'
-import { Product } from '../../services/inventory/inventory.types'
+import { useProducts } from '../../services/product/product.queries'
+import { Product } from '../../services/product/product.types'
 import { formatCurrency } from '../../utils/number'
 import { useAuthContext } from '../../context/auth/useAuthContext'
 import { UserRole } from '../../types'
@@ -12,7 +12,7 @@ import { EditItemModal } from './components/EditItemModal'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { ActionsDropdown } from './components/ActionsDropdown'
 
-const InventoryPage = () => {
+const ProductPage = () => {
   const { auth } = useAuthContext()
   const isAdmin = auth?.role === UserRole.ADMIN
 
@@ -173,4 +173,4 @@ const InventoryPage = () => {
   )
 }
 
-export default InventoryPage
+export default ProductPage

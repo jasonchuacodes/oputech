@@ -1,5 +1,5 @@
 import axios from '../../lib/axios'
-import { Product, CreateProductInput, UpdateProductInput } from './inventory.types'
+import { Product, CreateProductInput, UpdateProductInput } from './product.types'
 
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 

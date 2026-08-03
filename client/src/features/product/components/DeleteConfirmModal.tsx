@@ -1,7 +1,7 @@
 import { Trash2 } from 'lucide-react'
 import { CustomModal } from '../../../components'
-import { useDeleteProduct } from '../../../services/inventory/inventory.queries'
-import { Product } from '../../../services/inventory/inventory.types'
+import { useDeleteProduct } from '../../../services/product/product.queries'
+import { Product } from '../../../services/product/product.types'
 
 interface Props {
   item: Product | null

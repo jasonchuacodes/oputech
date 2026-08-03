@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Transaction, TransactionDocument, PaymentType } from './schemas/transaction.schema'
-import { Product, ProductDocument } from '../inventory/schemas/inventory.schema'
+import { Product, ProductDocument } from '../product/schemas/product.schema'
 import { getDayBoundsUTC } from '../../common/utils/date'
 
 interface TransactionItemInput {

@@ -1,8 +1,8 @@
 import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
 import { UseGuards, BadRequestException } from '@nestjs/common'
-import { InventoryService } from '../../features/inventory/inventory.service'
+import { ProductService } from '../../features/product/product.service'
 import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
-import { ProductDocument, ProductCategory } from '../../features/inventory/schemas/inventory.schema'
+import { ProductDocument, ProductCategory } from '../../features/product/schemas/product.schema'
 
 interface CreateProductInput {
   name: string
@@ -22,12 +22,12 @@ interface UpdateProductInput {
 
 @UseGuards(JwtAuthGuard)
 @Resolver('Product')
-export class InventoryResolver {
-  constructor(private readonly inventory: InventoryService) {}
+export class ProductResolver {
+  constructor(private readonly product: ProductService) {}
 
   @Query()
   products(@Args('search') search?: string) {
-    return this.inventory.findAll(search)
+    return this.product.findAll(search)
   }
 
   @Mutation()
@@ -35,7 +35,7 @@ export class InventoryResolver {
     if (input.imageUrl) {
       this.validateImageUrl(input.imageUrl)
     }
-    return this.inventory.create(input)
+    return this.product.create(input)
   }
 
   private validateImageUrl(imageUrl: string): void {
@@ -67,12 +67,12 @@ export class InventoryResolver {
 
   @Mutation()
   updateProduct(@Args('id') id: string, @Args('input') input: UpdateProductInput) {
-    return this.inventory.update(id, input)
+    return this.product.update(id, input)
   }
 
   @Mutation()
   async deleteProduct(@Args('id') id: string): Promise<boolean> {
-    const result = await this.inventory.remove(id)
+    const result = await this.product.remove(id)
     return result !== null
   }
 

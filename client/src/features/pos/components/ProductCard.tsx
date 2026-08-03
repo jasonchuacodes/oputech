@@ -1,7 +1,7 @@
 import { ShoppingBag } from 'lucide-react'
 import { cn } from '../../../utils/cn'
 import { formatCurrency } from '../../../utils/number'
-import { Product } from '../../../services/inventory/inventory.types'
+import { Product } from '../../../services/product/product.types'
 
 interface ProductCardProps {
   product: Product

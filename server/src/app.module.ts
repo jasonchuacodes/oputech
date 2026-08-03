@@ -7,7 +7,7 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { UsersModule } from './features/users/users.module'
 import { AuthModule } from './features/auth/auth.module'
-import { InventoryModule } from './features/inventory/inventory.module'
+import { ProductModule } from './features/product/product.module'
 import { PosModule } from './features/pos/pos.module'
 import { ReportModule } from './features/report/report.module'
 import { ExpensesModule } from './features/expenses/expenses.module'
@@ -22,7 +22,7 @@ import { ExpensesModule } from './features/expenses/expenses.module'
     }),
     UsersModule,
     AuthModule,
-    InventoryModule,
+    ProductModule,
     PosModule,
     ReportModule,
     ExpensesModule,
