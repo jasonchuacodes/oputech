@@ -5,6 +5,7 @@ import { UsersService } from '../users/users.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { ReportDocument } from './schemas/report.schema'
 import { PaymentType } from '../pos/schemas/transaction.schema'
+import { CreateReportDto } from './dto/create-report.dto'
 
 @UseGuards(JwtAuthGuard)
 @Resolver('Report')
@@ -30,7 +31,7 @@ export class ReportResolver {
   }
 
   @Mutation()
-  createReport(@Args('input') input: { fromDate: string; toDate: string }, @Context() context: any) {
+  createReport(@Args('input') input: CreateReportDto, @Context() context: any) {
     const userId: string = context.req.user.userId
     return this.reportService.create(input, userId)
   }
