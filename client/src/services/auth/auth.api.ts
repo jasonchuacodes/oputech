@@ -20,6 +20,10 @@ export async function logout(): Promise<void> {
   await axios.post('/auth/logout')
 }
 
+export async function refresh(): Promise<void> {
+  await axios.post('/auth/refresh')
+}
+
 export async function getMe(): Promise<AuthUser> {
   const res = await axios.get<AuthUser>('/auth/me')
   return res.data
