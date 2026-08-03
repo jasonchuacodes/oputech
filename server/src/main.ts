@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import { NestFactory } from '@nestjs/core'
+import { ValidationPipe } from '@nestjs/common'
 import cookieParser from 'cookie-parser'
 import { AppModule } from './app.module'
 import { corsMiddleware } from './common/middleware/cors.middleware'
@@ -12,6 +13,7 @@ async function bootstrap() {
   app.use(corsMiddleware())
   app.use(cookieParser())
   app.setGlobalPrefix('api')
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
 
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0')
 }

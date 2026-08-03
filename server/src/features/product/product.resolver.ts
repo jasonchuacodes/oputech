@@ -2,23 +2,9 @@ import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/g
 import { UseGuards, BadRequestException } from '@nestjs/common'
 import { ProductService } from './product.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
-import { ProductDocument, ProductCategory } from './schemas/product.schema'
-
-interface CreateProductInput {
-  name: string
-  price: number
-  imageUrl?: string
-  printCount?: number
-  category: ProductCategory
-}
-
-interface UpdateProductInput {
-  name?: string
-  price?: number
-  imageUrl?: string
-  printCount?: number
-  category?: ProductCategory
-}
+import { ProductDocument } from './schemas/product.schema'
+import { CreateProductDto } from './dto/create-product.dto'
+import { UpdateProductDto } from './dto/update-product.dto'
 
 @UseGuards(JwtAuthGuard)
 @Resolver('Product')
@@ -31,7 +17,7 @@ export class ProductResolver {
   }
 
   @Mutation()
-  async createProduct(@Args('input') input: CreateProductInput) {
+  async createProduct(@Args('input') input: CreateProductDto) {
     if (input.imageUrl) {
       this.validateImageUrl(input.imageUrl)
     }
@@ -66,7 +52,7 @@ export class ProductResolver {
   }
 
   @Mutation()
-  updateProduct(@Args('id') id: string, @Args('input') input: UpdateProductInput) {
+  updateProduct(@Args('id') id: string, @Args('input') input: UpdateProductDto) {
     return this.product.update(id, input)
   }
 
