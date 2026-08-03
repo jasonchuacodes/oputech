@@ -1,8 +1,8 @@
 import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
 import { UseGuards, BadRequestException } from '@nestjs/common'
-import { ProductService } from '../../features/product/product.service'
-import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
-import { ProductDocument, ProductCategory } from '../../features/product/schemas/product.schema'
+import { ProductService } from './product.service'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { ProductDocument, ProductCategory } from './schemas/product.schema'
 
 interface CreateProductInput {
   name: string

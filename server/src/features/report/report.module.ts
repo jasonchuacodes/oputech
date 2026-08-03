@@ -7,7 +7,7 @@ import { Product, ProductSchema } from '../product/schemas/product.schema'
 import { Expense, ExpenseSchema } from '../expenses/schemas/expense.schema'
 import { UsersModule } from '../users/users.module'
 import { ReportService } from './report.service'
-import { ReportResolver, ProductSaleResolver } from '../../graphql/resolvers/report.resolver'
+import { ReportResolver, ProductSaleResolver } from './report.resolver'
 
 @Module({
   imports: [

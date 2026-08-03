@@ -8,13 +8,13 @@ import {
 } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
-import { UsersService } from '../../features/users/users.service'
-import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
+import { UsersService } from './users.service'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import {
   UserDocument,
   UserRole,
   UserStatus,
-} from '../../features/users/schemas/user.schema'
+} from './schemas/user.schema'
 
 interface CreateUserInput {
   username: string

@@ -1,8 +1,8 @@
 import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { PosService } from '../../features/pos/pos.service'
-import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
-import { TransactionDocument, PaymentType } from '../../features/pos/schemas/transaction.schema'
+import { PosService } from './pos.service'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { TransactionDocument, PaymentType } from './schemas/transaction.schema'
 
 interface TransactionItemInput {
   productId: string

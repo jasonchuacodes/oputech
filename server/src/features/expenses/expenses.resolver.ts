@@ -1,8 +1,8 @@
 import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { ExpensesService } from '../../features/expenses/expenses.service'
-import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
-import { ExpenseDocument } from '../../features/expenses/schemas/expense.schema'
+import { ExpensesService } from './expenses.service'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { ExpenseDocument } from './schemas/expense.schema'
 
 interface CreateExpenseInput {
   reportId: string

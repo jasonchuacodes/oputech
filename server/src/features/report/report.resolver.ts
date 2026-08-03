@@ -1,10 +1,10 @@
 import { Query, Mutation, ResolveField, Resolver, Parent, Args, Context } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { ReportService, AnalyticsRange } from '../../features/report/report.service'
-import { UsersService } from '../../features/users/users.service'
-import { JwtAuthGuard } from '../../features/auth/guards/jwt-auth.guard'
-import { ReportDocument } from '../../features/report/schemas/report.schema'
-import { PaymentType } from '../../features/pos/schemas/transaction.schema'
+import { ReportService, AnalyticsRange } from './report.service'
+import { UsersService } from '../users/users.service'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { ReportDocument } from './schemas/report.schema'
+import { PaymentType } from '../pos/schemas/transaction.schema'
 
 @UseGuards(JwtAuthGuard)
 @Resolver('Report')
