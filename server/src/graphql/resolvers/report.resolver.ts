@@ -74,6 +74,11 @@ export class ReportResolver {
     return this.reportService.getTotalExpenses(report._id.toString())
   }
 
+  @ResolveField('totalPrintCount')
+  totalPrintCount(@Parent() report: ReportDocument): number {
+    return report.products.reduce((sum, p) => sum + p.printCount * p.quantitySold, 0)
+  }
+
   @ResolveField('fromDate')
   fromDate(@Parent() report: ReportDocument): string {
     return report.fromDate.toISOString()

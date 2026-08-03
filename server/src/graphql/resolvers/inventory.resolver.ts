@@ -8,6 +8,7 @@ interface CreateProductInput {
   name: string
   price: number
   imageUrl?: string
+  printCount?: number
   category: ProductCategory
 }
 
@@ -15,6 +16,7 @@ interface UpdateProductInput {
   name?: string
   price?: number
   imageUrl?: string
+  printCount?: number
   category?: ProductCategory
 }
 

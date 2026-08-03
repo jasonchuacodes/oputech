@@ -13,12 +13,14 @@ const REPORT_FIELDS = `
     name
     quantitySold
     pricePerUnit
+    printCount
     total
   }
   totalCash
   totalOnline
   totalIncome
   totalExpenses
+  totalPrintCount
   createdAt
 `
 

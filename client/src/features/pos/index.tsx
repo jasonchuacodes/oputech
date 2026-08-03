@@ -33,7 +33,16 @@ const POSPage = () => {
           i.productId === product.id ? { ...i, quantity: i.quantity + 1 } : i
         )
       }
-      return [...prev, { productId: product.id, name: product.name, price: product.price, quantity: 1 }]
+      return [
+        ...prev,
+        {
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+          printCount: product.printCount ?? 0,
+          quantity: 1,
+        },
+      ]
     })
   }
 

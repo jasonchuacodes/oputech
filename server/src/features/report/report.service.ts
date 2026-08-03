@@ -52,7 +52,10 @@ export class ReportService {
 
     const ids = transactions.map((t) => t._id.toString())
 
-    const productMap = new Map<string, { name: string; pricePerUnit: number; quantitySold: number }>()
+    const productMap = new Map<
+      string,
+      { name: string; pricePerUnit: number; printCount: number; quantitySold: number }
+    >()
     for (const tx of transactions) {
       for (const item of tx.items) {
         const existing = productMap.get(item.productId)
@@ -62,6 +65,7 @@ export class ReportService {
           productMap.set(item.productId, {
             name: item.name,
             pricePerUnit: item.price,
+            printCount: item.printCount,
             quantitySold: item.quantity,
           })
         }

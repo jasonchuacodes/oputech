@@ -19,6 +19,9 @@ class TransactionItem {
   @Prop({ required: true })
   price: number
 
+  @Prop({ required: true, default: 0 })
+  printCount: number
+
   @Prop({ required: true })
   quantity: number
 }

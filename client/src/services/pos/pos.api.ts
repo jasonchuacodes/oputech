@@ -17,7 +17,7 @@ const GET_TRANSACTIONS = `
   query GetTransactions($date: String!) {
     transactions(date: $date) {
       id
-      items { productId name price quantity }
+      items { productId name price printCount quantity }
       paymentType
       total
       processed

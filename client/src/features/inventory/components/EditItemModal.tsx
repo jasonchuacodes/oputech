@@ -47,6 +47,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
         name: item.name,
         price: item.price,
         imageUrl: item.imageUrl,
+        printCount: item.printCount,
         category: item.category,
       })
     }
@@ -67,6 +68,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
           name: data.name,
           price: data.price,
           imageUrl: data.imageUrl ?? '',
+          printCount: data.printCount,
           category: data.category,
         },
       },
@@ -125,6 +127,16 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
 
           {errors.price && (
             <p className="text-destructive text-xs">{errors.price.message}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="edit-printCount">Print Count</Label>
+          <NumberInput name="printCount" control={control} step={1} min={0} />
+          {errors.printCount && (
+            <p className="text-destructive text-xs">
+              {errors.printCount.message}
+            </p>
           )}
         </div>
 

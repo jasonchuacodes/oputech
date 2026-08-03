@@ -2,6 +2,7 @@ export interface TransactionItem {
   productId: string
   name: string
   price: number
+  printCount: number
   quantity: number
 }
 

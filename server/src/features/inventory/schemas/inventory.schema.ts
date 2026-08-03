@@ -19,6 +19,9 @@ export class Product {
   @Prop()
   imageUrl?: string
 
+  @Prop()
+  printCount?: number
+
   @Prop({ required: true, enum: Object.values(ProductCategory), default: ProductCategory.Main })
   category: ProductCategory
 }

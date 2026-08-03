@@ -3,10 +3,12 @@ import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import isBetween from 'dayjs/plugin/isBetween'
+import weekday from 'dayjs/plugin/weekday'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(isBetween)
+dayjs.extend(weekday)
 
 const APP_TZ = import.meta.env.VITE_TZ || 'Asia/Manila'
 

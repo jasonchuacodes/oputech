@@ -41,7 +41,13 @@ export class PosService {
 
     const transactionItems = input.items.map(({ productId, quantity }) => {
       const item = products.find((p) => p._id.toString() === productId)!
-      return { productId, name: item.name, price: item.price, quantity }
+      return {
+        productId,
+        name: item.name,
+        price: item.price,
+        printCount: item.printCount ?? 0,
+        quantity,
+      }
     })
 
     const total = transactionItems.reduce((sum, i) => sum + i.price * i.quantity, 0)

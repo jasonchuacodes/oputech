@@ -52,6 +52,7 @@ export const AddItemModal = ({ open, onClose }: Props) => {
         name: data.name,
         price: data.price,
         imageUrl: data.imageUrl,
+        printCount: data.printCount,
         category: data.category,
       },
       { onSuccess: handleClose }
@@ -108,6 +109,16 @@ export const AddItemModal = ({ open, onClose }: Props) => {
           <NumberInput name="price" control={control} step={0.01} min={0} />
           {errors.price && (
             <p className="text-destructive text-xs">{errors.price.message}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="printCount">Print Count</Label>
+          <NumberInput name="printCount" control={control} step={1} min={0} />
+          {errors.printCount && (
+            <p className="text-destructive text-xs">
+              {errors.printCount.message}
+            </p>
           )}
         </div>
 

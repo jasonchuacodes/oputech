@@ -16,6 +16,9 @@ class ProductSale {
 
   @Prop({ required: true })
   pricePerUnit: number
+
+  @Prop({ required: true, default: 0 })
+  printCount: number
 }
 
 const ProductSaleSchema = SchemaFactory.createForClass(ProductSale)

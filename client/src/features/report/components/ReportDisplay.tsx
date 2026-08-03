@@ -10,7 +10,12 @@ import { ExpensesSection } from './ExpensesSection'
 
 type PreviewReport = Pick<
   Report,
-  'products' | 'totalCash' | 'totalOnline' | 'totalIncome' | 'totalExpenses'
+  | 'products'
+  | 'totalCash'
+  | 'totalOnline'
+  | 'totalIncome'
+  | 'totalExpenses'
+  | 'totalPrintCount'
 > & {
   id?: string
   createdBy?: ReportUser
@@ -99,7 +104,7 @@ export const ReportDisplay = ({ report, isPreview, onDelete }: Props) => {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           <div className="flex flex-col gap-1 rounded-md border bg-slate-50 p-4">
             <span className="text-xs font-medium text-slate-500">Cash</span>
             <span className="text-foreground text-xl font-bold">
@@ -124,6 +129,14 @@ export const ReportDisplay = ({ report, isPreview, onDelete }: Props) => {
             </span>
             <span className="text-xl font-bold text-blue-700">
               {formatCurrency(report.totalIncome)}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 rounded-md border bg-slate-50 p-4">
+            <span className="text-xs font-medium text-slate-500">
+              Total Prints
+            </span>
+            <span className="text-foreground text-xl font-bold">
+              {report.totalPrintCount.toLocaleString()}
             </span>
           </div>
         </div>

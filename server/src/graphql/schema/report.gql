@@ -3,6 +3,7 @@ type ProductSale {
   name: String!
   quantitySold: Int!
   pricePerUnit: Float!
+  printCount: Int!
   total: Float!
 }
 
@@ -16,6 +17,7 @@ type Report {
   totalOnline: Float!
   totalIncome: Float!
   totalExpenses: Float!
+  totalPrintCount: Int!
   createdAt: String!
   updatedAt: String!
 }

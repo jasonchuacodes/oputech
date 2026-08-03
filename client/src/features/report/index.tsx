@@ -42,7 +42,7 @@ const ReportPage = () => {
 
     const productMap = new Map<
       string,
-      { name: string; pricePerUnit: number; quantitySold: number }
+      { name: string; pricePerUnit: number; printCount: number; quantitySold: number }
     >()
     let totalCash = 0
     let totalOnline = 0
@@ -59,6 +59,7 @@ const ReportPage = () => {
           productMap.set(item.productId, {
             name: item.name,
             pricePerUnit: item.price,
+            printCount: item.printCount,
             quantitySold: item.quantity,
           })
         }
@@ -74,6 +75,10 @@ const ReportPage = () => {
       totalOnline,
       totalIncome: totalCash + totalOnline,
       totalExpenses: 0,
+      totalPrintCount: Array.from(productMap.values()).reduce(
+        (sum, p) => sum + p.printCount * p.quantitySold,
+        0
+      ),
     }
   }, [transactions])
 

@@ -3,6 +3,7 @@ export interface ProductSale {
   name: string
   quantitySold: number
   pricePerUnit: number
+  printCount: number
   total: number
 }
 
@@ -21,6 +22,7 @@ export interface Report {
   totalOnline: number
   totalIncome: number
   totalExpenses: number
+  totalPrintCount: number
   createdAt: string
 }
 
