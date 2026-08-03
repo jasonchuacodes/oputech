@@ -99,24 +99,22 @@ export const ReportDisplay = ({ report, isPreview, onDelete }: Props) => {
           </div>
         )}
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="flex flex-col gap-1 rounded-md border bg-slate-50 p-4">
             <span className="text-xs font-medium text-slate-500">Cash</span>
-            <span className="text-xl font-bold text-foreground">
+            <span className="text-foreground text-xl font-bold">
               {formatCurrency(report.totalCash)}
             </span>
           </div>
           <div className="flex flex-col gap-1 rounded-md border bg-slate-50 p-4">
             <span className="text-xs font-medium text-slate-500">Online</span>
-            <span className="text-xl font-bold text-foreground">
+            <span className="text-foreground text-xl font-bold">
               {formatCurrency(report.totalOnline)}
             </span>
           </div>
           <div className="flex flex-col gap-1 rounded-md border bg-slate-50 p-4">
-            <span className="text-xs font-medium text-slate-500">
-              Expenses
-            </span>
-            <span className="text-xl font-bold text-foreground">
+            <span className="text-xs font-medium text-slate-500">Expenses</span>
+            <span className="text-foreground text-xl font-bold">
               {formatCurrency(report.totalExpenses)}
             </span>
           </div>
