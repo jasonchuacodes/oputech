@@ -1,8 +1,7 @@
-import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
+import { Query, Mutation, Resolver, Args } from '@nestjs/graphql'
 import { UseGuards, BadRequestException } from '@nestjs/common'
 import { ProductService } from './product.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
-import { ProductDocument } from './schemas/product.schema'
 import { CreateProductDto } from './dto/create-product.dto'
 import { UpdateProductDto } from './dto/update-product.dto'
 
@@ -60,10 +59,5 @@ export class ProductResolver {
   async deleteProduct(@Args('id') id: string): Promise<boolean> {
     const result = await this.product.remove(id)
     return result !== null
-  }
-
-  @ResolveField('id')
-  id(@Parent() item: ProductDocument): string {
-    return item._id.toString()
   }
 }

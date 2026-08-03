@@ -41,11 +41,6 @@ export class ReportResolver {
     return this.reportService.delete(id)
   }
 
-  @ResolveField('id')
-  id(@Parent() report: ReportDocument): string {
-    return report._id.toString()
-  }
-
   @ResolveField('createdBy')
   createdBy(@Parent() report: ReportDocument) {
     return this.usersService.findById(report.createdBy)

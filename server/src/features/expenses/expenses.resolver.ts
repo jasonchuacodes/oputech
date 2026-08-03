@@ -26,11 +26,6 @@ export class ExpensesResolver {
     return result !== null
   }
 
-  @ResolveField('id')
-  id(@Parent() item: ExpenseDocument): string {
-    return item._id.toString()
-  }
-
   @ResolveField('createdAt')
   createdAt(@Parent() item: ExpenseDocument): string {
     return (item as any).createdAt.toISOString()

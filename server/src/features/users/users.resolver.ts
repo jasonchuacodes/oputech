@@ -1,9 +1,7 @@
 import {
   Query,
   Mutation,
-  ResolveField,
   Resolver,
-  Parent,
   Args,
 } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
@@ -11,7 +9,6 @@ import * as bcrypt from 'bcrypt'
 import { UsersService } from './users.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import {
-  UserDocument,
   UserRole,
   UserStatus,
 } from './schemas/user.schema'
@@ -91,10 +88,5 @@ export class UsersResolver {
   ) {
     const hashed = await bcrypt.hash(password, 10)
     return this.usersService.resetPassword(id, hashed)
-  }
-
-  @ResolveField('id')
-  id(@Parent() user: UserDocument): string {
-    return user._id.toString()
   }
 }

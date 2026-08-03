@@ -29,11 +29,6 @@ export class PosResolver {
     return this.pos.createTransaction(input)
   }
 
-  @ResolveField('id')
-  id(@Parent() transaction: TransactionDocument): string {
-    return transaction._id.toString()
-  }
-
   @ResolveField('createdAt')
   createdAt(@Parent() transaction: TransactionDocument): string {
     return (transaction as any).createdAt.toISOString()
