@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Product, ProductDocument } from './schemas/product.schema'
-import { CreateProductDto } from './dto/create-product.dto'
-import { UpdateProductDto } from './dto/update-product.dto'
+import { CreateProductInput, UpdateProductInput } from './product.types'
 
 @Injectable()
 export class ProductService {
@@ -21,11 +20,11 @@ export class ProductService {
     return this.product.find().exec()
   }
 
-  create(input: CreateProductDto): Promise<ProductDocument> {
+  create(input: CreateProductInput): Promise<ProductDocument> {
     return this.product.create(input)
   }
 
-  update(id: string, input: UpdateProductDto): Promise<ProductDocument | null> {
+  update(id: string, input: UpdateProductInput): Promise<ProductDocument | null> {
     return this.product
       .findByIdAndUpdate(id, { $set: input }, { returnDocument: 'after' })
       .exec()

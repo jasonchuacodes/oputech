@@ -5,7 +5,7 @@ import { Report, ReportDocument } from './schemas/report.schema'
 import { Aggregate, AggregateDocument } from './schemas/aggregate.schema'
 import { Transaction, TransactionDocument, PaymentType } from '../pos/schemas/transaction.schema'
 import { Expense, ExpenseDocument } from '../expenses/schemas/expense.schema'
-import { CreateReportDto } from './dto/create-report.dto'
+import { CreateReportInput } from './report.types'
 
 export enum AnalyticsRange {
   LAST_7_DAYS = 'LAST_7_DAYS',
@@ -42,7 +42,7 @@ export class ReportService {
     @InjectModel(Expense.name) private expenseModel: Model<ExpenseDocument>,
   ) {}
 
-  async create(input: CreateReportDto, userId: string): Promise<ReportDocument> {
+  async create(input: CreateReportInput, userId: string): Promise<ReportDocument> {
     const from = new Date(input.fromDate)
     const to = new Date(input.toDate)
 

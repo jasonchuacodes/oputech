@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Expense, ExpenseDocument } from './schemas/expense.schema'
-import { CreateExpenseDto } from './dto/create-expense.dto'
+import { CreateExpenseInput } from './expenses.types'
 import { ReportService } from '../report/report.service'
 
 @Injectable()
@@ -17,7 +17,7 @@ export class ExpensesService {
     return this.expense.find({ reportId }).exec()
   }
 
-  async create(input: CreateExpenseDto): Promise<ExpenseDocument> {
+  async create(input: CreateExpenseInput): Promise<ExpenseDocument> {
     const report = await this.report.findById(input.reportId)
     if (!report) throw new NotFoundException('Report not found')
 

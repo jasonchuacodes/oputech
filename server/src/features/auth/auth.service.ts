@@ -7,8 +7,7 @@ import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
 import { UsersService } from '../users/users.service'
-import { LoginDto } from './dto/login.dto'
-import { RegisterDto } from './dto/register.dto'
+import { LoginInput, RegisterInput } from './auth.types'
 import { UserRole, UserStatus } from '../users/schemas/user.schema'
 
 const isProduction = process.env.NODE_ENV === 'production'
@@ -26,7 +25,7 @@ export class AuthService {
     private readonly jwt: JwtService
   ) {}
 
-  async login(input: LoginDto, res: Response) {
+  async login(input: LoginInput, res: Response) {
     const user = await this.users.findByUsername(input.username)
     if (!user) throw new UnauthorizedException('Invalid credentials')
 
@@ -120,7 +119,7 @@ export class AuthService {
     res.clearCookie('refresh_token', cookieOptions)
   }
 
-  async register(input: RegisterDto) {
+  async register(input: RegisterInput) {
     const existing = await this.users.findByUsername(input.username)
     if (existing) throw new ConflictException('Username already in use')
 

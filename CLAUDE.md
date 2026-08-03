@@ -87,10 +87,38 @@ constructor(private readonly auth: AuthService) {}
 constructor(private readonly users: UsersService) {}
 ```
 
-**DTO parameter naming** — when a method accepts a DTO, always name the parameter `input`:
+**DTO vs. service input types** — DTOs (`dto/<name>.dto.ts`, class-validator decorated) exist only at the transport boundary (controllers/resolvers), where `ValidationPipe({ whitelist: true, transform: true })` validates and strips unknown fields. Service methods should **not** depend on the DTO class directly — that couples business logic to the validation layer. Instead, each feature declares plain interfaces for its service inputs in a single `<feature>.types.ts` file at the feature root:
+
+```
+src/features/<feature>/
+├── dto/                     ← class-validator DTOs, used only in controller/resolver signatures
+│   └── create-thing.dto.ts
+├── <feature>.types.ts       ← plain interfaces consumed by the service layer
+├── <feature>.service.ts
+└── <feature>.controller.ts | <feature>.resolver.ts
+```
+
+The controller/resolver receives and validates the DTO, then passes it straight through to the service — DTOs are structurally compatible with the matching interface, so no explicit mapping step is needed. The service method signature depends only on the plain interface:
+
 ```ts
-register(input: RegisterDto) {}
-create(input: CreateUserDto) {}
+// create-thing.types.ts
+export interface CreateThingInput {
+  name: string
+}
+
+// thing.service.ts
+create(input: CreateThingInput) { ... }
+
+// thing.controller.ts
+create(@Body() input: CreateThingDto) {
+  return this.thing.create(input) // CreateThingDto satisfies CreateThingInput
+}
+```
+
+**DTO/input parameter naming** — whether the type is a DTO (controller/resolver) or a plain input interface (service), always name the parameter `input`:
+```ts
+register(input: RegisterDto) {}   // controller
+register(input: RegisterInput) {} // service
 ```
 
 ## Client code style

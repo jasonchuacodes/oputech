@@ -3,12 +3,7 @@ import { UseGuards } from '@nestjs/common'
 import { ExpensesService } from './expenses.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { ExpenseDocument } from './schemas/expense.schema'
-
-interface CreateExpenseInput {
-  reportId: string
-  label: string
-  amount: number
-}
+import { CreateExpenseDto } from './dto/create-expense.dto'
 
 @UseGuards(JwtAuthGuard)
 @Resolver('Expense')
@@ -21,7 +16,7 @@ export class ExpensesResolver {
   }
 
   @Mutation()
-  createExpense(@Args('input') input: CreateExpenseInput) {
+  createExpense(@Args('input') input: CreateExpenseDto) {
     return this.expenses.create(input)
   }
 
