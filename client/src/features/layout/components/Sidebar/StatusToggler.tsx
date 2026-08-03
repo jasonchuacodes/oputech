@@ -122,7 +122,7 @@ export const StatusToggler = ({ open }: StatusTogglerProps) => {
                     handleSetManualStatus()
                   }
                 }}
-                className="border-border placeholder-muted-foreground focus:ring-ring/50 rounded-md border bg-white px-2 py-1.5 text-sm focus:ring-2 focus:outline-none"
+                className="border-border placeholder-muted-foreground focus:ring-ring/50 rounded-md border bg-white px-2 py-1.5 text-base focus:ring-2 focus:outline-none md:text-sm"
                 autoFocus
               />
               <div className="flex gap-1">

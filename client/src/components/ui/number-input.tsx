@@ -83,7 +83,7 @@ export function NumberInput<T extends FieldValues>({
 
                 field.onChange(round(Number(v)))
               }}
-              className="flex-1 [appearance:textfield] bg-white px-3 text-sm outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="flex-1 [appearance:textfield] bg-white px-3 text-base outline-none md:text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
 
             <div className="border-border flex w-10 flex-col border-l">

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Transaction, TransactionDocument, PaymentType } from './schemas/transaction.schema'
 import { Product, ProductDocument } from '../inventory/schemas/inventory.schema'
+import { getDayBoundsUTC } from '../../common/utils/date'
 
 interface TransactionItemInput {
   productId: string
@@ -22,11 +23,7 @@ export class PosService {
   ) {}
 
   async getTransactionsByDate(date: string): Promise<TransactionDocument[]> {
-    const day = new Date(date)
-    const from = new Date(day)
-    from.setHours(0, 0, 0, 0)
-    const to = new Date(day)
-    to.setHours(23, 59, 59, 999)
+    const { from, to } = getDayBoundsUTC(date)
     return this.transactionModel
       .find({ processed: { $ne: true }, createdAt: { $gte: from, $lte: to } })
       .sort({ createdAt: 1 })

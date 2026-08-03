@@ -1,16 +1,18 @@
-import 'dotenv/config';
-import { NestFactory } from '@nestjs/core';
-import cookieParser from 'cookie-parser';
-import { AppModule } from './app.module';
-import { corsMiddleware } from './common/middleware/cors.middleware';
+import 'dotenv/config'
+import { NestFactory } from '@nestjs/core'
+import cookieParser from 'cookie-parser'
+import { AppModule } from './app.module'
+import { corsMiddleware } from './common/middleware/cors.middleware'
+
+process.env.TZ = process.env.TZ ?? 'Asia/Manila'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule)
 
-  app.use(corsMiddleware());
-  app.use(cookieParser());
-  app.setGlobalPrefix('api');
+  app.use(corsMiddleware())
+  app.use(cookieParser())
+  app.setGlobalPrefix('api')
 
-  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0')
 }
-bootstrap();
+bootstrap()
