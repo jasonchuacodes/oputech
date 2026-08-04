@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { isAxiosError } from 'axios'
 import { useEffect, useState } from 'react'
-import { Button, Input, Label } from '../../components'
+import { Button, Input, Label, PasswordInput } from '../../components'
 import { LoginLayout } from './components/LoginLayout'
 import { PublicRoutes } from '../../routes/paths'
 import { registerSchema } from './schemas/register.schema'
@@ -54,70 +54,71 @@ export default function RegisterPage() {
 
   return (
     <LoginLayout>
-      <main className="flex h-full flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-sm">
-          <div className="rounded-sm bg-white px-8 py-8 shadow-sm">
-            <div className="mb-8 text-center">
-              <h1 className="text-2xl font-bold text-foreground">
-                Create account
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Get started with Spincam
-              </p>
-            </div>
-            <form
-              className="flex flex-col gap-5"
-              onSubmit={handleSubmit(onSubmit)}
-            >
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Choose a username"
-                  autoComplete="username"
-                  {...register('username')}
-                />
-                {errors.username && (
-                  <p className="text-sm text-red-500">
-                    {errors.username.message}
-                  </p>
-                )}
+      <main className="flex h-full min-h-full flex-col px-4 py-12">
+        <div className="flex flex-1 flex-col items-center justify-center">
+          <div className="w-full max-w-sm">
+            <div className="rounded-sm bg-white px-8 py-8 shadow-sm">
+              <div className="mb-8 text-center">
+                <h1 className="text-2xl font-bold text-foreground">
+                  Create account
+                </h1>
+                <p className="mt-1 text-sm text-gray-500">
+                  Get started with Spincam
+                </p>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Create a password"
-                  autoComplete="new-password"
-                  {...register('password')}
-                />
-                {errors.password && (
-                  <p className="text-sm text-red-500">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button
-                type="submit"
-                size="lg"
-                className="mt-1 w-full"
-                disabled={isPending}
+              <form
+                className="flex flex-col gap-5"
+                onSubmit={handleSubmit(onSubmit)}
               >
-                {isPending ? 'Creating account…' : 'Create account'}
-              </Button>
-              <p className="mt-6 text-center text-sm text-gray-500">
-                Already have an account?{' '}
-                <Link
-                  to={PublicRoutes.Login}
-                  className="font-medium text-foreground hover:underline"
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="Choose a username"
+                    autoComplete="username"
+                    {...register('username')}
+                  />
+                  {errors.username && (
+                    <p className="text-sm text-red-500">
+                      {errors.username.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="password">Password</Label>
+                  <PasswordInput
+                    id="password"
+                    placeholder="Create a password"
+                    autoComplete="new-password"
+                    {...register('password')}
+                  />
+                  {errors.password && (
+                    <p className="text-sm text-red-500">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
+                {error && <p className="text-sm text-red-500">{error}</p>}
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="mt-1 w-full"
+                  disabled={isPending}
                 >
-                  Login
-                </Link>
-              </p>
-            </form>
+                  {isPending ? 'Creating account…' : 'Create account'}
+                </Button>
+                <p className="mt-6 text-center text-sm text-gray-500">
+                  Already have an account?{' '}
+                  <Link
+                    to={PublicRoutes.Login}
+                    className="font-medium text-foreground hover:underline"
+                  >
+                    Login
+                  </Link>
+                </p>
+              </form>
+            </div>
           </div>
         </div>
         <Footer />
