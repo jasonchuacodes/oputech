@@ -4,7 +4,7 @@ import { cn } from '../../utils/cn'
 
 interface ImageDropzoneProps {
   value?: string
-  onChange: (value: string | undefined) => void
+  onChange: (value: string) => void
   onError?: (message: string) => void
   disabled?: boolean
   maxSizeBytes?: number
@@ -49,8 +49,7 @@ export const ImageDropzone = ({
   }
 
   const handleRemove = () => {
-    onChange(undefined)
-    if (inputRef.current) inputRef.current.value = ''
+    onChange('')
   }
 
   if (value) {
@@ -66,7 +65,7 @@ export const ImageDropzone = ({
             type="button"
             onClick={handleRemove}
             aria-label="Remove image"
-            className="bg-foreground text-background absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-md"
+            className="bg-foreground text-background absolute -top-2 -right-2 flex h-6 w-6 cursor-pointer items-center justify-center rounded-md"
           >
             <X size={14} />
           </button>

@@ -121,6 +121,10 @@ register(input: RegisterDto) {}   // controller
 register(input: RegisterInput) {} // service
 ```
 
+## Workflow notes
+
+**UI verification** — do not start the dev server or drive the browser yourself to verify UI/frontend changes. The user tests changes manually and prefers to do so themselves rather than wait on it. Rely on `tsc --noEmit` and `pnpm lint` for correctness, explain what to click/check, and let the user confirm behavior.
+
 ## Client code style
 
 **Functions** — prefer arrow functions over `function` declarations in client code:

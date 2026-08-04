@@ -36,7 +36,7 @@ export const AddItemModal = ({ open, onClose }: Props) => {
     control,
     formState: { errors },
   } = useForm<AddProductInput>({
-    defaultValues: { category: 'main' },
+    defaultValues: { category: 'main', price: 0, printCount: 0 },
     resolver: zodResolver(AddProductSchema),
   })
 
@@ -129,7 +129,7 @@ export const AddItemModal = ({ open, onClose }: Props) => {
             control={control}
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full min-h-10">
+                <SelectTrigger className="min-h-10 w-full">
                   <SelectValue placeholder="Select a category…" />
                 </SelectTrigger>
                 <SelectContent>

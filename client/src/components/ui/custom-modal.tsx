@@ -75,9 +75,9 @@ export function CustomModal({
           <div className="flex-1 overflow-hidden">
             <p className="text-foreground text-lg font-bold">{title}</p>
             {subheader && (
-              <p className="text-muted-foreground mt-0.5 text-sm">
+              <div className="text-muted-foreground mt-0.5 text-sm">
                 {subheader}
-              </p>
+              </div>
             )}
           </div>
           <button

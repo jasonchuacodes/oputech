@@ -36,22 +36,19 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
     handleSubmit,
     reset,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<EditProductInput>({
     resolver: zodResolver(EditProductSchema),
+    defaultValues: item
+      ? {
+          name: item.name,
+          price: item.price,
+          imageUrl: item.imageUrl,
+          printCount: item.printCount,
+          category: item.category,
+        }
+      : undefined,
   })
-
-  useEffect(() => {
-    if (item) {
-      reset({
-        name: item.name,
-        price: item.price,
-        imageUrl: item.imageUrl,
-        printCount: item.printCount,
-        category: item.category,
-      })
-    }
-  }, [item, reset])
 
   const handleClose = () => {
     onClose()
@@ -76,6 +73,9 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
     )
   }
 
+  useEffect(() => {
+    console.log('errors:', errors)
+  }, [errors])
   return (
     <CustomModal
       open={open}
@@ -86,6 +86,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
       loading={updateItem.isPending}
       onClose={handleClose}
       onSubmit={handleSubmit(onSubmit)}
+      disabled={!isValid}
     >
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
@@ -94,7 +95,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
             control={control}
             render={({ field }) => (
               <ImageDropzone
-                value={field.value}
+                value={field.value ?? ''}
                 onChange={(value) => {
                   setImageError(null)
                   field.onChange(value)
@@ -123,7 +124,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="edit-price">Price</Label>
-          <NumberInput name="price" control={control} />
+          <NumberInput name="price" control={control} step={0.1} min={0} />
 
           {errors.price && (
             <p className="text-destructive text-xs">{errors.price.message}</p>
@@ -147,7 +148,7 @@ export const EditItemModal = ({ item, open, onClose }: Props) => {
             control={control}
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full min-h-10">
+                <SelectTrigger className="min-h-10 w-full">
                   <SelectValue placeholder="Select a category…" />
                 </SelectTrigger>
                 <SelectContent>

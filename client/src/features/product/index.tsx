@@ -148,11 +148,13 @@ const ProductPage = () => {
       </div>
 
       <AddItemModal
+        key={addOpen ? 'add-open' : 'add-closed'}
         open={isAdmin && addOpen}
         onClose={() => setAddOpen(false)}
       />
 
       <EditItemModal
+        key={selectedItem?.id ?? 'edit-none'}
         item={selectedItem}
         open={editOpen}
         onClose={() => {
