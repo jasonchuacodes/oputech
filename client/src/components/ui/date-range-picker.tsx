@@ -72,6 +72,7 @@ export const DateRangePicker = ({
         <Calendar
           mode="range"
           autoFocus
+          min={1}
           selected={value}
           onSelect={(range) => {
             onChange(range)
