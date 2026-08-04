@@ -1,4 +1,5 @@
 export type AnalyticsRange =
+  | 'TODAY'
   | 'LAST_7_DAYS'
   | 'LAST_15_DAYS'
   | 'LAST_MONTH'

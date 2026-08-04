@@ -6,8 +6,10 @@ import { Aggregate, AggregateDocument } from './schemas/aggregate.schema'
 import { Transaction, TransactionDocument, PaymentType } from '../transaction/schemas/transaction.schema'
 import { Expense, ExpenseDocument } from '../expenses/schemas/expense.schema'
 import { CreateReportInput } from './report.types'
+import { dayjsLocal } from '../../common/utils/date'
 
 export enum AnalyticsRange {
+  TODAY = 'TODAY',
   LAST_7_DAYS = 'LAST_7_DAYS',
   LAST_15_DAYS = 'LAST_15_DAYS',
   LAST_MONTH = 'LAST_MONTH',
@@ -15,6 +17,7 @@ export enum AnalyticsRange {
 }
 
 const RANGE_DAYS: Record<AnalyticsRange, number> = {
+  [AnalyticsRange.TODAY]: 1,
   [AnalyticsRange.LAST_7_DAYS]: 7,
   [AnalyticsRange.LAST_15_DAYS]: 15,
   [AnalyticsRange.LAST_MONTH]: 30,
@@ -136,11 +139,15 @@ export class ReportService {
   }
 
   async getAnalytics(range: AnalyticsRange) {
-    const start = this.startOfDay(new Date())
-    start.setDate(start.getDate() - (RANGE_DAYS[range] - 1))
+    const now = new Date()
+    const end = this.endOfDay(now)
+    const start = dayjsLocal(now)
+      .startOf('day')
+      .subtract(RANGE_DAYS[range] - 1, 'day')
+      .toDate()
 
     const aggregates = await this.aggregateModel
-      .find({ date: { $gte: start } })
+      .find({ date: { $gte: start, $lte: end } })
       .sort({ date: 1 })
       .exec()
 
@@ -154,7 +161,7 @@ export class ReportService {
       series = this.bucketWeekly(aggregates)
     }
 
-    const topProducts = await this.getTopProducts(start)
+    const topProducts = await this.getTopProducts(start, end)
 
     return {
       series,
@@ -164,9 +171,9 @@ export class ReportService {
     }
   }
 
-  private async getTopProducts(start: Date): Promise<TopProduct[]> {
+  private async getTopProducts(start: Date, end: Date): Promise<TopProduct[]> {
     const rows = await this.reportModel.aggregate([
-      { $match: { toDate: { $gte: start } } },
+      { $match: { toDate: { $gte: start, $lte: end } } },
       { $unwind: '$products' },
       {
         $group: {
@@ -215,19 +222,20 @@ export class ReportService {
     await this.aggregate(date, -sales, -expenses)
   }
 
-  // Truncate to local midnight. Assumes the deployment runs in a single locale;
-  // sales are attributed to the report's toDate day.
+  // Truncate to APP_TZ midnight. Sales are attributed to the report's toDate day.
   private startOfDay(d: Date): Date {
-    const day = new Date(d)
-    day.setHours(0, 0, 0, 0)
-    return day
+    return dayjsLocal(d).startOf('day').toDate()
   }
 
-  // Monday-anchored start of the week containing d (local time).
+  // End of the APP_TZ day containing d (23:59:59.999 local).
+  private endOfDay(d: Date): Date {
+    return dayjsLocal(d).endOf('day').toDate()
+  }
+
+  // Monday-anchored start of the week containing d (APP_TZ).
   private startOfWeek(d: Date): Date {
-    const day = this.startOfDay(d)
-    const offset = (day.getDay() + 6) % 7
-    day.setDate(day.getDate() - offset)
-    return day
+    const day = dayjsLocal(d).startOf('day')
+    const offset = (day.day() + 6) % 7
+    return day.subtract(offset, 'day').toDate()
   }
 }

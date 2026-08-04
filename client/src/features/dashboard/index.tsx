@@ -14,6 +14,7 @@ import { SalesExpensesChart } from './components/SalesExpensesChart'
 import { TopProducts } from './components/TopProducts'
 
 const RANGE_OPTIONS: { value: AnalyticsRange; label: string }[] = [
+  { value: 'TODAY', label: 'Today'},
   { value: 'LAST_7_DAYS', label: 'Last 7 days' },
   { value: 'LAST_15_DAYS', label: 'Last 15 days' },
   { value: 'LAST_MONTH', label: 'Last month' },
@@ -21,7 +22,7 @@ const RANGE_OPTIONS: { value: AnalyticsRange; label: string }[] = [
 ]
 
 const DashboardPage = () => {
-  const [range, setRange] = useState<AnalyticsRange>('LAST_7_DAYS')
+  const [range, setRange] = useState<AnalyticsRange>('TODAY')
   const { data, isLoading } = useAnalytics(range)
 
   return (
