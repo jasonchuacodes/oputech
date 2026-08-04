@@ -54,7 +54,7 @@ export function useSidebarItems(): SidebarGroup[] {
             label: 'Inventory',
             icon: Package,
             to: UserRoutes.Inventory,
-            enabled: true,
+            enabled: isAdmin,
           },
           {
             label: 'Users',

@@ -175,12 +175,12 @@ const ReportPage = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {todayReports.map((report, i) => (
-            <ReportDisplay key={i} report={report} onDelete={removeReport} />
-          ))}
           {previewReport && (
             <ReportDisplay report={previewReport as Report} isPreview />
           )}
+          {todayReports.map((report, i) => (
+            <ReportDisplay key={i} report={report} onDelete={removeReport} />
+          ))}
         </div>
       )}
     </div>
