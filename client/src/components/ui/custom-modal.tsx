@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { Button } from './button'
+import { Spinner } from './spinner'
 import { useEffect } from 'react'
 
 type ModalType = 'default' | 'danger'
@@ -113,7 +114,7 @@ export function CustomModal({
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  <Spinner size="xs" variant="current" />
                   {submitText}
                 </span>
               ) : (

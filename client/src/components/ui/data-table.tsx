@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import { cn } from '../../utils/cn'
+import { Spinner } from './spinner'
 
 type SortDirection = 'asc' | 'desc'
 type SortConfig = { key: string; direction: SortDirection } | null
@@ -136,7 +137,7 @@ function DataTableComponent<T>({
             <tr>
               <td colSpan={columns.length + 1} className="py-8 text-center">
                 <div className="flex justify-center">
-                  <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+                  <Spinner />
                 </div>
               </td>
             </tr>

@@ -3,6 +3,7 @@ export { PageHeader } from './ui/page-header'
 export { CustomModal } from './ui/custom-modal'
 export { Input } from './ui/input'
 export { PasswordInput } from './ui/password-input'
+export { Spinner } from './ui/spinner'
 export { Label } from './ui/label'
 export { ImageDropzone } from './ui/image-dropzone'
 export {

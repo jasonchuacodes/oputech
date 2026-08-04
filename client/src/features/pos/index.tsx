@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ShoppingCart } from 'lucide-react'
-import { Input } from '../../components'
+import { Input, Spinner } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
 import { PaymentType, TransactionItem } from '../../services/pos/pos.types'
 import { Product } from '../../services/product/product.types'
@@ -85,9 +85,9 @@ const POSPage = () => {
 
           <div className="flex flex-col gap-6 overflow-y-auto">
             {isLoading && (
-              <p className="py-12 text-center text-sm text-slate-400">
-                Loading products…
-              </p>
+              <div className="flex justify-center py-12">
+                <Spinner />
+              </div>
             )}
             {!isLoading && products.length === 0 && (
               <p className="py-12 text-center text-sm text-slate-400">
