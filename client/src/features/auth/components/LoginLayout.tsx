@@ -22,13 +22,13 @@ export function LoginLayout({
           src="/pwa-512x512.png"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -top-25 -left-25 w-64 opacity-20 brightness-150 grayscale select-none sm:w-80"
+          className="pointer-events-none absolute -top-20 -left-20 hidden opacity-20 brightness-150 grayscale select-none sm:w-60 sm:block"
         />
         <img
           src="/pwa-512x512.png"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -top-25 -right-25 w-64 -scale-x-100 opacity-20 brightness-150 grayscale select-none sm:w-80"
+          className="pointer-events-none absolute -top-20 -right-20 hidden -scale-x-100 opacity-20 brightness-150 grayscale select-none sm:w-60 sm:block"
         />
         {children}
       </div>
