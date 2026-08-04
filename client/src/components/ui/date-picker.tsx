@@ -22,6 +22,8 @@ interface DatePickerProps {
   value?: Date | null
   onChange: (date: Date | undefined) => void
   placeholder?: string
+  label?: string
+  required?: boolean
   disableFuture?: boolean
   disablePast?: boolean
   disabled?: boolean
@@ -33,6 +35,8 @@ export const DatePicker = ({
   value,
   onChange,
   placeholder = 'Pick a date',
+  label,
+  required = false,
   disableFuture = false,
   disablePast = false,
   disabled = false,
@@ -41,7 +45,7 @@ export const DatePicker = ({
 }: DatePickerProps) => {
   const [open, setOpen] = React.useState(false)
 
-  return (
+  const trigger = (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
@@ -78,6 +82,18 @@ export const DatePicker = ({
         />
       </PopoverContent>
     </Popover>
+  )
+
+  if (!label) return trigger
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label>
+        {label}
+        {required && <span className="text-destructive"> *</span>}
+      </Label>
+      {trigger}
+    </div>
   )
 }
 

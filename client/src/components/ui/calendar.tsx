@@ -1,9 +1,16 @@
 import * as React from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
-import { DayButton, DayPicker, getDefaultClassNames } from 'react-day-picker'
+import {
+  DayButton,
+  DayPicker,
+  getDefaultClassNames,
+  useDayPicker,
+  type MonthCaption,
+} from 'react-day-picker'
 
 import { cn } from '@/utils/cn'
 import { buttonVariants } from '@/components/ui/button'
+import { formatDate } from '@/utils/date'
 
 function Calendar({
   className,
@@ -23,24 +30,6 @@ function Calendar({
         root: cn('w-fit', defaultClassNames.root),
         months: cn('flex flex-col gap-4', defaultClassNames.months),
         month: cn('flex flex-col gap-3', defaultClassNames.month),
-        nav: cn(
-          'absolute inset-x-0 top-0 flex items-center justify-between',
-          defaultClassNames.nav
-        ),
-        button_previous: cn(
-          buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
-          'absolute left-1 select-none',
-          defaultClassNames.button_previous
-        ),
-        button_next: cn(
-          buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
-          'absolute right-1 select-none',
-          defaultClassNames.button_next
-        ),
-        month_caption: cn(
-          'flex h-8 items-center justify-center text-sm font-medium',
-          defaultClassNames.month_caption
-        ),
         weekdays: cn('flex', defaultClassNames.weekdays),
         weekday: cn(
           'text-muted-foreground w-8 text-center text-xs font-normal',
@@ -70,15 +59,61 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Chevron: ({ className, orientation, ...rest }) => {
-          const Icon =
-            orientation === 'left' ? ChevronLeftIcon : ChevronRightIcon
-          return <Icon className={cn('h-4 w-4', className)} {...rest} />
-        },
+        Nav: () => <></>,
+        MonthCaption: CalendarMonthCaption,
         DayButton: CalendarDayButton,
       }}
       {...props}
     />
+  )
+}
+
+function CalendarMonthCaption({
+  calendarMonth,
+  displayIndex,
+}: React.ComponentProps<typeof MonthCaption>) {
+  const { previousMonth, nextMonth, goToMonth, months } = useDayPicker()
+  const isFirstMonth = displayIndex === 0
+  const isLastMonth = displayIndex === months.length - 1
+
+  return (
+    <div className="flex h-8 items-center justify-between">
+      {isFirstMonth ? (
+        <button
+          type="button"
+          aria-label="Go to previous month"
+          disabled={!previousMonth}
+          onClick={() => previousMonth && goToMonth(previousMonth)}
+          className={cn(
+            buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
+            'select-none'
+          )}
+        >
+          <ChevronLeftIcon className="h-4 w-4" />
+        </button>
+      ) : (
+        <span className="size-8" />
+      )}
+      <span className="text-sm font-medium">
+        {formatDate(calendarMonth.date, 'MMMM YYYY')}
+      </span>
+      {isLastMonth ? (
+        <button
+          type="button"
+          aria-label="Go to next month"
+          disabled={!nextMonth}
+          onClick={() => nextMonth && goToMonth(nextMonth)}
+          className={cn(
+            buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
+            'select-none'
+          )}
+        >
+          <ChevronRightIcon className="h-4 w-4" />
+        </button>
+      ) : (
+        <span className="size-8" />
+      )}
+    </div>
   )
 }
 
@@ -106,7 +141,7 @@ function CalendarDayButton({
         'h-8 w-8 rounded-sm p-0 text-sm font-normal',
         'data-[selected-single=true]:bg-brand data-[selected-single=true]:hover:bg-brand-hover data-[selected-single=true]:text-white',
         'data-[range-middle=true]:bg-accent data-[range-middle=true]:rounded-none',
-        'data-[range-start=true]:bg-brand data-[range-end=true]:bg-brand data-[range-start=true]:text-white data-[range-end=true]:text-white',
+        'data-[range-start=true]:bg-brand data-[range-end=true]:bg-brand data-[range-end=true]:text-white data-[range-start=true]:text-white',
         className
       )}
       {...props}

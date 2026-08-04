@@ -102,6 +102,7 @@ const TransactionsPage = () => {
       />
 
       <DatePicker
+        label="Date Filter"
         value={dayjsLocal(date).toDate()}
         onChange={(next) =>
           next && setDate(dayjsLocal(next).format('YYYY-MM-DD'))

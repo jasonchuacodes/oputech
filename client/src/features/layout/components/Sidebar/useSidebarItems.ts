@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   FileBarChart,
   ShoppingCart,
+  Receipt,
   Users,
   Package,
   type LucideIcon,
@@ -46,7 +47,7 @@ export function useSidebarItems(): SidebarGroup[] {
           },
           {
             label: 'Transactions',
-            icon: ShoppingCart,
+            icon: Receipt,
             to: UserRoutes.Transactions,
             enabled: true,
           },
