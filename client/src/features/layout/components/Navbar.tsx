@@ -14,7 +14,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
       >
         <Menu size={20} />
       </button>
-      <span className="text-md font-semibold">Oputech</span>
+      <span className="text-md font-semibold">Spincam</span>
     </header>
   )
 }

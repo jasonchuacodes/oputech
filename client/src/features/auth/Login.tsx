@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate, Link } from 'react-router-dom'
 import { isAxiosError } from 'axios'
 import { useEffect, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { Button, Input, Label } from '../../components'
 import { Footer } from './components/Footer'
 import { LoginLayout } from './components/LoginLayout'
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
 
   const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const {
     handleSubmit,
@@ -60,10 +62,15 @@ export default function LoginPage() {
       <main className="flex h-full flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="rounded-sm bg-white p-8 shadow-sm">
+            <div className="mb-6 flex justify-center">
+              <img src="/pwa-192x192.png" alt="Spincam" className="h-14 w-14" />
+            </div>
             <div className="mb-8 text-center">
-              <h1 className="text-2xl font-bold text-foreground">Sign in</h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Welcome back to Oputech
+              <h1 className="text-foreground text-2xl font-bold">
+                Spincam Studios
+              </h1>
+              <p className="text-md mt-1 text-gray-500">
+                Welcome back. Please enter your details.
               </p>
             </div>
             <form
@@ -87,13 +94,30 @@ export default function LoginPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  {...register('password')}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    className="pr-10"
+                    {...register('password')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
                 {errors.password && (
                   <p className="text-sm text-red-500">
                     {errors.password.message}

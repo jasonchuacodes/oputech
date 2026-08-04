@@ -35,7 +35,7 @@ export function Sidebar({ open, onOpenChange, isMobile }: SidebarProps) {
         )}
       >
         <div className="flex h-16 items-center border-b border-gray-200 px-3">
-          {open && <span className="text-md font-semibold">Oputech</span>}
+          {open && <span className="text-md font-semibold">Spincam</span>}
           <button
             onClick={() => onOpenChange(!open)}
             className={cn(

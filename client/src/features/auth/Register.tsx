@@ -62,7 +62,7 @@ export default function RegisterPage() {
                 Create account
               </h1>
               <p className="mt-1 text-sm text-gray-500">
-                Get started with Oputech
+                Get started with Spincam
               </p>
             </div>
             <form
