@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Report, ReportDocument } from './schemas/report.schema'
 import { Aggregate, AggregateDocument } from './schemas/aggregate.schema'
-import { Transaction, TransactionDocument, PaymentType } from '../pos/schemas/transaction.schema'
+import { Transaction, TransactionDocument, PaymentType } from '../transaction/schemas/transaction.schema'
 import { Expense, ExpenseDocument } from '../expenses/schemas/expense.schema'
 import { CreateReportInput } from './report.types'
 

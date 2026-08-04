@@ -1,9 +1,9 @@
 import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { PosService } from './pos.service'
+import { TransactionService } from './transaction.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { TransactionDocument, PaymentType } from './schemas/transaction.schema'
-import { TransactionFilter } from './pos.types'
+import { TransactionFilter } from './transaction.types'
 
 interface TransactionItemInput {
   productId: string
@@ -17,17 +17,23 @@ interface CreateTransactionInput {
 
 @UseGuards(JwtAuthGuard)
 @Resolver('Transaction')
-export class PosResolver {
-  constructor(private readonly pos: PosService) {}
+export class TransactionResolver {
+  constructor(private readonly transaction: TransactionService) {}
 
   @Query()
   transactions(@Args('filter') filter?: TransactionFilter) {
-    return this.pos.getTransactions(filter)
+    return this.transaction.getTransactions(filter)
   }
 
   @Mutation()
   createTransaction(@Args('input') input: CreateTransactionInput) {
-    return this.pos.createTransaction(input)
+    return this.transaction.createTransaction(input)
+  }
+
+  @Mutation()
+  async deleteTransaction(@Args('id') id: string): Promise<boolean> {
+    const result = await this.transaction.remove(id)
+    return result !== null
   }
 
   @ResolveField('createdAt')

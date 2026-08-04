@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { QueryFilter, Model } from 'mongoose'
 import { Transaction, TransactionDocument, PaymentType } from './schemas/transaction.schema'
 import { Product, ProductDocument } from '../product/schemas/product.schema'
-import { TransactionFilter } from './pos.types'
+import { TransactionFilter } from './transaction.types'
 
 interface TransactionItemInput {
   productId: string
@@ -16,7 +16,7 @@ interface CreateTransactionInput {
 }
 
 @Injectable()
-export class PosService {
+export class TransactionService {
   constructor(
     @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
     @InjectModel(Product.name) private product: Model<ProductDocument>,
@@ -65,5 +65,17 @@ export class PosService {
       total,
       processed: false,
     })
+  }
+
+  async remove(id: string): Promise<TransactionDocument | null> {
+    const transaction = await this.transactionModel.findById(id).exec()
+    if (!transaction) return null
+
+    if (transaction.processed) {
+      throw new BadRequestException('Cannot delete a transaction already included in a report')
+    }
+
+    await transaction.deleteOne()
+    return transaction
   }
 }

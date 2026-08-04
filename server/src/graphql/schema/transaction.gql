@@ -43,3 +43,7 @@ extend type Query {
 extend type Mutation {
   createTransaction(input: CreateTransactionInput!): Transaction!
 }
+
+extend type Mutation {
+  deleteTransaction(id: ID!): Boolean!
+}

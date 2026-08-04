@@ -4,7 +4,7 @@ import { ReportService, AnalyticsRange } from './report.service'
 import { UsersService } from '../users/users.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { ReportDocument } from './schemas/report.schema'
-import { PaymentType } from '../pos/schemas/transaction.schema'
+import { PaymentType } from '../transaction/schemas/transaction.schema'
 import { CreateReportDto } from './dto/create-report.dto'
 
 @UseGuards(JwtAuthGuard)

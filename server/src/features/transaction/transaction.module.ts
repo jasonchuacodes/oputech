@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { Transaction, TransactionSchema } from './schemas/transaction.schema'
 import { Product, ProductSchema } from '../product/schemas/product.schema'
-import { PosService } from './pos.service'
-import { PosResolver } from './pos.resolver'
+import { TransactionService } from './transaction.service'
+import { TransactionResolver } from './transaction.resolver'
 
 @Module({
   imports: [
@@ -12,6 +12,6 @@ import { PosResolver } from './pos.resolver'
       { name: Product.name, schema: ProductSchema },
     ]),
   ],
-  providers: [PosService, PosResolver],
+  providers: [TransactionService, TransactionResolver],
 })
-export class PosModule {}
+export class TransactionModule {}
