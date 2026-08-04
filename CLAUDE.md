@@ -134,3 +134,5 @@ const MyComponent = () => { ... }
 ```
 
 **Border radius** — use `rounded-sm` or `rounded-md` for components (buttons, inputs, cards, list items, badges, dropdowns, etc.). Reserve `rounded-lg` (and larger) for large surfaces like modals/dialogs. Don't use `rounded-lg` on small components.
+
+**Formatting utilities** — reuse the existing helpers in `src/utils/` (`date.ts`: `dayjsLocal`, `formatDate`, `formatTime`, `formatRange`, etc.; `number.ts`: `formatNumber`, `formatCurrency`; `text.ts`) instead of calling `dayjs`/`dayjs.tz` directly in components or writing a new one-off formatting function inline. If no existing helper covers the case, add one to the relevant `src/utils/` file rather than duplicating the logic locally.

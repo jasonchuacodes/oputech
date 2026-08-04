@@ -45,6 +45,12 @@ export function useSidebarItems(): SidebarGroup[] {
             enabled: true,
           },
           {
+            label: 'Transactions',
+            icon: ShoppingCart,
+            to: UserRoutes.Transactions,
+            enabled: true,
+          },
+          {
             label: 'Reports',
             icon: FileBarChart,
             to: UserRoutes.Reports,

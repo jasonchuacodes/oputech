@@ -10,6 +10,7 @@ export const UserRoutes = {
   Users: '/users',
   Inventory: '/inventory',
   POS: '/pos',
+  Transactions: '/transactions',
   Reports: '/reports',
   ReportDetail: '/reports/:reportId',
 }

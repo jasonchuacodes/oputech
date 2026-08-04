@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { QueryFilter, Model } from 'mongoose'
 import { Transaction, TransactionDocument, PaymentType } from './schemas/transaction.schema'
 import { Product, ProductDocument } from '../product/schemas/product.schema'
-import { getDayBoundsUTC } from '../../common/utils/date'
+import { TransactionFilter } from './pos.types'
 
 interface TransactionItemInput {
   productId: string
@@ -22,12 +22,19 @@ export class PosService {
     @InjectModel(Product.name) private product: Model<ProductDocument>,
   ) {}
 
-  async getTransactionsByDate(date: string): Promise<TransactionDocument[]> {
-    const { from, to } = getDayBoundsUTC(date)
-    return this.transactionModel
-      .find({ processed: { $ne: true }, createdAt: { $gte: from, $lte: to } })
-      .sort({ createdAt: 1 })
-      .exec()
+  async getTransactions(filter?: TransactionFilter): Promise<TransactionDocument[]> {
+    const query: QueryFilter<TransactionDocument> = {}
+
+    if (filter?.from || filter?.to) {
+      query.createdAt = {
+        ...(filter.from && { $gte: new Date(filter.from) }),
+        ...(filter.to && { $lte: new Date(filter.to) }),
+      }
+    }
+
+    if (filter?.processed !== undefined) query.processed = filter.processed
+
+    return this.transactionModel.find(query).sort({ createdAt: 1 }).exec()
   }
 
   async createTransaction(input: CreateTransactionInput): Promise<TransactionDocument> {

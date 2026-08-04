@@ -30,8 +30,14 @@ input CreateTransactionInput {
   paymentType: PaymentType!
 }
 
+input TransactionFilter {
+  from: String
+  to: String
+  processed: Boolean
+}
+
 extend type Query {
-  transactions(date: String!): [Transaction!]!
+  transactions(filter: TransactionFilter): [Transaction!]!
 }
 
 extend type Mutation {

@@ -13,6 +13,7 @@ import Dashboard from '../features/dashboard'
 import Users from '../features/user'
 import Inventory from '../features/product'
 import POS from '../features/pos'
+import Transactions from '../features/transactions'
 import Reports from '../features/report'
 import ReportDetail from '../features/report/ReportDetailPage'
 import { UserRole } from '../types'
@@ -47,6 +48,7 @@ export const router = createBrowserRouter(
         <Route element={<MainLayout />}>
           <Route path={UserRoutes.Inventory} element={<Inventory />} />
           <Route path={UserRoutes.POS} element={<POS />} />
+          <Route path={UserRoutes.Transactions} element={<Transactions />} />
           <Route path={UserRoutes.Reports} element={<Reports />} />
         </Route>
       </Route>

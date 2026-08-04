@@ -13,9 +13,15 @@ export interface CreateTransactionInput {
   paymentType: PaymentType
 }
 
+export interface TransactionFilter {
+  from?: string
+  to?: string
+  processed?: boolean
+}
+
 const GET_TRANSACTIONS = `
-  query GetTransactions($date: String!) {
-    transactions(date: $date) {
+  query GetTransactions($filter: TransactionFilter) {
+    transactions(filter: $filter) {
       id
       items { productId name price printCount quantity }
       paymentType
@@ -37,10 +43,10 @@ const CREATE_TRANSACTION = `
   }
 `
 
-export async function getTransactions(date: string): Promise<Transaction[]> {
+export async function getTransactions(filter?: TransactionFilter): Promise<Transaction[]> {
   const res = await axios.post(GRAPHQL_URL, {
     query: GET_TRANSACTIONS,
-    variables: { date },
+    variables: { filter },
   })
   return res.data.data.transactions
 }

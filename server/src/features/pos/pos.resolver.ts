@@ -3,6 +3,7 @@ import { UseGuards } from '@nestjs/common'
 import { PosService } from './pos.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { TransactionDocument, PaymentType } from './schemas/transaction.schema'
+import { TransactionFilter } from './pos.types'
 
 interface TransactionItemInput {
   productId: string
@@ -20,8 +21,8 @@ export class PosResolver {
   constructor(private readonly pos: PosService) {}
 
   @Query()
-  transactions(@Args('date') date: string) {
-    return this.pos.getTransactionsByDate(date)
+  transactions(@Args('filter') filter?: TransactionFilter) {
+    return this.pos.getTransactions(filter)
   }
 
   @Mutation()

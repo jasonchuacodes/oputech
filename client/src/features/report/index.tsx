@@ -22,10 +22,12 @@ const ReportPage = () => {
   const navigate = useNavigate()
   const { auth } = useAuthContext()
   const isAdmin = auth?.role === UserRole.ADMIN
-  const today = dayjsLocal().format('YYYY-MM-DD')
-
   const { data: allReports, isLoading: reportsLoading } = useReports()
-  const { data: transactions, isLoading: txLoading } = useTransactions(today)
+  const { data: transactions, isLoading: txLoading } = useTransactions({
+    from: dayjsLocal().startOf('day').toISOString(),
+    to: dayjsLocal().endOf('day').toISOString(),
+    processed: false,
+  })
   const { mutate: generate, isPending } = useCreateReport()
   const { mutate: removeReport } = useDeleteReport()
 

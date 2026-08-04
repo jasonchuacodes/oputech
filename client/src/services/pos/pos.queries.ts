@@ -1,11 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { getTransactions, createTransaction, CreateTransactionInput } from './pos.api'
+import {
+  getTransactions,
+  createTransaction,
+  CreateTransactionInput,
+  TransactionFilter,
+} from './pos.api'
 
-export const useTransactions = (date: string) =>
+export const useTransactions = (filter?: TransactionFilter) =>
   useQuery({
-    queryKey: ['transactions', date],
-    queryFn: () => getTransactions(date),
+    queryKey: ['transactions', filter],
+    queryFn: () => getTransactions(filter),
   })
 
 export const useCreateTransaction = () => {
