@@ -1,7 +1,7 @@
 import { Trash2, X } from 'lucide-react'
 import { cn } from '../../../utils/cn'
 import { formatCurrency } from '../../../utils/number'
-import { PaymentType, TransactionItem } from '../../../services/pos/pos.types'
+import { PaymentType, TransactionItem } from '../../../services/transaction/transaction.types'
 import { toTitleCase } from '../../../utils/text'
 import { Button } from '../../../components'
 

@@ -3,9 +3,10 @@ import toast from 'react-hot-toast'
 import {
   getTransactions,
   createTransaction,
+  deleteTransaction,
   CreateTransactionInput,
   TransactionFilter,
-} from './pos.api'
+} from './transaction.api'
 
 export const useTransactions = (filter?: TransactionFilter) =>
   useQuery({
@@ -26,6 +27,23 @@ export const useCreateTransaction = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
+    },
+  })
+}
+
+export const useDeleteTransaction = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => deleteTransaction(id),
+    onError: (error: Error) => {
+      toast.error(error.message)
+    },
+    onSuccess: () => {
+      toast.success('Transaction deleted successfully!')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
   })
 }

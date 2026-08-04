@@ -1,5 +1,5 @@
 import axios from '../../lib/axios'
-import { Transaction, PaymentType } from './pos.types'
+import { Transaction, PaymentType } from './transaction.types'
 
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
@@ -43,6 +43,12 @@ const CREATE_TRANSACTION = `
   }
 `
 
+const DELETE_TRANSACTION = `
+  mutation DeleteTransaction($id: ID!) {
+    deleteTransaction(id: $id)
+  }
+`
+
 export async function getTransactions(filter?: TransactionFilter): Promise<Transaction[]> {
   const res = await axios.post(GRAPHQL_URL, {
     query: GET_TRANSACTIONS,
@@ -57,4 +63,12 @@ export async function createTransaction(input: CreateTransactionInput): Promise<
     variables: { input },
   })
   return res.data.data.createTransaction
+}
+
+export async function deleteTransaction(id: string): Promise<boolean> {
+  const res = await axios.post(GRAPHQL_URL, {
+    query: DELETE_TRANSACTION,
+    variables: { id },
+  })
+  return res.data.data.deleteTransaction
 }

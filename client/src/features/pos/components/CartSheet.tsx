@@ -1,4 +1,4 @@
-import { PaymentType, TransactionItem } from '../../../services/pos/pos.types'
+import { PaymentType, TransactionItem } from '../../../services/transaction/transaction.types'
 import { CurrentSale } from './CurrentSale'
 
 interface CartSheetProps {

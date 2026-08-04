@@ -1,16 +1,18 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { PageHeader } from '../../components/ui/page-header'
 import { Button } from '../../components'
-import { useReport, useDeleteReport } from '../../services/report/report.queries'
+import { useReport } from '../../services/report/report.queries'
 import { ReportDisplay } from './components/ReportDisplay'
+import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { UserRoutes } from '../../routes/paths'
 
 const ReportDetailPage = () => {
   const { reportId } = useParams<{ reportId: string }>()
   const navigate = useNavigate()
   const { data: report, isLoading } = useReport(reportId)
-  const { mutate: removeReport } = useDeleteReport()
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -41,14 +43,15 @@ const ReportDetailPage = () => {
           </p>
         </div>
       ) : (
-        <ReportDisplay
-          report={report}
-          onDelete={(id) => {
-            removeReport(id)
-            navigate(UserRoutes.Reports)
-          }}
-        />
+        <ReportDisplay report={report} onDelete={() => setDeleteOpen(true)} />
       )}
+
+      <DeleteConfirmModal
+        item={report ?? null}
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onDeleted={() => navigate(UserRoutes.Reports)}
+      />
     </div>
   )
 }

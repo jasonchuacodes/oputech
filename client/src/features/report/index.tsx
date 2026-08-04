@@ -1,16 +1,13 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
-import {
-  useCreateReport,
-  useDeleteReport,
-  useReports,
-} from '../../services/report/report.queries'
-import { useTransactions } from '../../services/pos/pos.queries'
-import { PaymentType } from '../../services/pos/pos.types'
+import { useCreateReport, useReports } from '../../services/report/report.queries'
+import { useTransactions } from '../../services/transaction/transaction.queries'
+import { PaymentType } from '../../services/transaction/transaction.types'
 import { ReportDisplay } from './components/ReportDisplay'
+import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { dayjsLocal } from '../../utils/date'
 import { formatCurrency } from '../../utils/number'
 import { Report } from '../../services/report/report.types'
@@ -29,7 +26,8 @@ const ReportPage = () => {
     processed: false,
   })
   const { mutate: generate, isPending } = useCreateReport()
-  const { mutate: removeReport } = useDeleteReport()
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   const todayReports = useMemo(
     () =>
@@ -38,6 +36,13 @@ const ReportPage = () => {
       ),
     [allReports]
   )
+
+  const openDelete = (id: string) => {
+    const report = todayReports.find((r) => r.id === id)
+    if (!report) return
+    setSelectedReport(report)
+    setDeleteOpen(true)
+  }
 
   const previewReport = useMemo(() => {
     if (!transactions?.length) return null
@@ -181,10 +186,19 @@ const ReportPage = () => {
             <ReportDisplay report={previewReport as Report} isPreview />
           )}
           {todayReports.map((report, i) => (
-            <ReportDisplay key={i} report={report} onDelete={removeReport} />
+            <ReportDisplay key={i} report={report} onDelete={openDelete} />
           ))}
         </div>
       )}
+
+      <DeleteConfirmModal
+        item={selectedReport}
+        open={deleteOpen}
+        onClose={() => {
+          setDeleteOpen(false)
+          setSelectedReport(null)
+        }}
+      />
     </div>
   )
 }
