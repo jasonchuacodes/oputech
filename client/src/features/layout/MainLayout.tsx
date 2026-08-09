@@ -1,10 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Outlet } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { Sidebar } from './components/Sidebar'
 import { Navbar } from './components/Navbar'
 import { StatusOverlay } from './components/StatusOverlay'
+import { PullToRefreshIndicator } from './components/PullToRefreshIndicator'
 import { useCurrentUserActivityStatus } from './hooks/useCurrentUserActivityStatus'
+import { usePullToRefresh } from './hooks/usePullToRefresh'
 import { UserStatus } from '../../services/users/users.types'
+
+const PULL_THRESHOLD = 56
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024)
@@ -21,8 +26,23 @@ function useIsMobile() {
 
 export function MainLayout() {
   const isMobile = useIsMobile()
+  const queryClient = useQueryClient()
+
+  const mainRef = useRef<HTMLElement>(null)
+
   const [open, setOpen] = useState(!isMobile)
   const { status, setActive } = useCurrentUserActivityStatus()
+
+  const handleRefresh = useCallback(
+    () => queryClient.invalidateQueries(),
+    [queryClient]
+  )
+
+  const { bind, pullDistance, isRefreshing, isTriggered } = usePullToRefresh(
+    mainRef,
+    handleRefresh,
+    { threshold: PULL_THRESHOLD }
+  )
 
   return (
     <>
@@ -34,7 +54,17 @@ export function MainLayout() {
         <Sidebar open={open} onOpenChange={setOpen} isMobile={isMobile} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Navbar onMenuClick={() => setOpen(true)} />
-          <main className="min-h-0 flex-1 overflow-auto">
+          <main
+            ref={mainRef}
+            {...bind()}
+            className="relative min-h-0 flex-1 touch-pan-x overflow-auto [overscroll-behavior-y:contain]"
+          >
+            <PullToRefreshIndicator
+              pullDistance={pullDistance}
+              isRefreshing={isRefreshing}
+              isTriggered={isTriggered}
+              threshold={PULL_THRESHOLD}
+            />
             <Outlet />
           </main>
         </div>
