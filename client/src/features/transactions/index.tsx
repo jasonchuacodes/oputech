@@ -29,6 +29,7 @@ const TransactionsPage = () => {
   }
 
   const columns: DataTableColumn<Transaction>[] = [
+    { id: 'index', heading: '#', cell: (_, index) => index + 1 },
     {
       id: 'createdAt',
       heading: 'Time',

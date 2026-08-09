@@ -9,7 +9,7 @@ type SortConfig = { key: string; direction: SortDirection } | null
 export interface DataTableColumn<T> {
   id: string
   heading: string
-  cell: (item: T) => React.ReactNode
+  cell: (item: T, index: number) => React.ReactNode
   orderable?: boolean
   width?: string | number
   align?: 'left' | 'center' | 'right'
@@ -182,7 +182,7 @@ function DataTableComponent<T>({
                           colIdx === 0 && !column.width && 'truncate'
                         )}
                       >
-                        {column.cell(item)}
+                        {column.cell(item, idx)}
                       </Tag>
                     )
                   })}
