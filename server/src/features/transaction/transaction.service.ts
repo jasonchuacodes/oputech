@@ -42,7 +42,7 @@ export class TransactionService {
 
     if (filter?.processed !== undefined) query.processed = filter.processed
 
-    return this.transaction.find(query).sort({ createdAt: 1 }).exec()
+    return this.transaction.find(query).sort({ createdAt: -1 }).exec()
   }
 
   async createTransaction(input: CreateTransactionInput): Promise<TransactionDocument> {
