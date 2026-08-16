@@ -6,6 +6,18 @@ interface UsePullToRefreshOptions {
 }
 
 const REFRESH_SETTLE_DELAY = 500
+const DIRECTION_LOCK_THRESHOLD = 10
+
+const startsInHorizontalScroller = (target: EventTarget | null, boundary: HTMLElement): boolean => {
+  let node = target instanceof Element ? target : null
+  while (node && node !== boundary) {
+    const style = getComputedStyle(node)
+    const scrollable = style.overflowX === 'auto' || style.overflowX === 'scroll'
+    if (scrollable && node.scrollWidth > node.clientWidth) return true
+    node = node.parentElement
+  }
+  return false
+}
 
 export const usePullToRefresh = (
   containerRef: React.RefObject<HTMLElement | null>,
@@ -15,7 +27,9 @@ export const usePullToRefresh = (
   const [pullDistance, setPullDistance] = useState(0)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const isRefreshingRef = useRef(false)
+  const startXRef = useRef<number | null>(null)
   const startYRef = useRef<number | null>(null)
+  const directionRef = useRef<'vertical' | 'horizontal' | null>(null)
 
   useEffect(() => {
     const el = containerRef.current
@@ -23,24 +37,38 @@ export const usePullToRefresh = (
 
     const handleTouchStart = (e: TouchEvent) => {
       if (isRefreshingRef.current || e.touches.length !== 1) return
+      if (startsInHorizontalScroller(e.target, el)) {
+        startYRef.current = null
+        return
+      }
+      directionRef.current = null
+      startXRef.current = e.touches[0].clientX
       startYRef.current = el.scrollTop === 0 ? e.touches[0].clientY : null
     }
 
     const handleTouchMove = (e: TouchEvent) => {
       if (isRefreshingRef.current || startYRef.current === null) return
 
+      const deltaX = e.touches[0].clientX - (startXRef.current ?? e.touches[0].clientX)
       const deltaY = e.touches[0].clientY - startYRef.current
 
-      // Not at the top anymore, or the drag reversed upward (normal scroll) —
-      // stop treating this gesture as a pull and let the browser scroll natively.
+      if (directionRef.current === null) {
+        if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < DIRECTION_LOCK_THRESHOLD) return
+        directionRef.current = Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical'
+      }
+
+      if (directionRef.current === 'horizontal') {
+        startYRef.current = null
+        setPullDistance(0)
+        return
+      }
+
       if (el.scrollTop > 0 || deltaY <= 0) {
         startYRef.current = null
         setPullDistance(0)
         return
       }
 
-      // Only reachable when at the top and dragging down: take over from the
-      // browser so it doesn't bounce/scroll while we show our own indicator.
       e.preventDefault()
       setPullDistance(Math.min(maxPull, deltaY))
     }
