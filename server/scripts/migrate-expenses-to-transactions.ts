@@ -1,12 +1,20 @@
 import 'dotenv/config'
-import mongoose from 'mongoose'
-import { ExpenseSchema } from '../src/features/expenses/schemas/expense.schema'
+import mongoose, { Schema } from 'mongoose'
 import { ReportSchema } from '../src/features/report/schemas/report.schema'
 import {
   TransactionSchema,
   TransactionType,
   PaymentType,
 } from '../src/features/transaction/schemas/transaction.schema'
+
+const ExpenseSchema = new Schema(
+  {
+    reportId: { type: String, required: true },
+    label: { type: String, required: true, trim: true },
+    amount: { type: Number, required: true },
+  },
+  { timestamps: true }
+)
 
 const dryRun = process.argv.includes('--dry-run')
 
@@ -23,6 +31,18 @@ const main = async () => {
 
   await mongoose.connect(uri)
   console.log(`Connected. Dry run: ${dryRun}`)
+
+  const missingTypeFilter = { type: { $exists: false } }
+  const staleTransactionCount = await TransactionModel.countDocuments(missingTypeFilter).exec()
+  console.log(
+    `${dryRun ? '[DRY RUN] Would backfill' : 'Backfilling'} type="${TransactionType.SALE}" on ` +
+      `${staleTransactionCount} pre-existing transaction(s) missing a type.`
+  )
+  if (!dryRun && staleTransactionCount > 0) {
+    await TransactionModel.updateMany(missingTypeFilter, {
+      $set: { type: TransactionType.SALE },
+    }).exec()
+  }
 
   const expenses = await ExpenseModel.find().exec()
   console.log(`Found ${expenses.length} expense(s) to migrate.`)

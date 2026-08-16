@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
-import { useCreateReport, useReports } from '../../services/report/report.queries'
+import { cn } from '../../utils/cn'
+import {
+  useCreateReport,
+  useReports,
+} from '../../services/report/report.queries'
 import { useTransactions } from '../../services/transaction/transaction.queries'
 import { PaymentType } from '../../services/transaction/transaction.types'
 import { ReportDisplay } from './components/ReportDisplay'
@@ -49,7 +53,12 @@ const ReportPage = () => {
 
     const productMap = new Map<
       string,
-      { name: string; pricePerUnit: number; printCount: number; quantitySold: number }
+      {
+        name: string
+        pricePerUnit: number
+        printCount: number
+        quantitySold: number
+      }
     >()
     let totalCash = 0
     let totalOnline = 0
@@ -126,6 +135,28 @@ const ReportPage = () => {
       id: 'totalExpenses',
       heading: 'Expenses',
       cell: (r) => formatCurrency(r.totalExpenses),
+    },
+    {
+      id: 'status',
+      heading: 'Status',
+      cell: (r) => (
+        <span
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium',
+            r.isRemitted
+              ? 'bg-success/10 text-green-800'
+              : 'bg-warning/10 text-yellow-800'
+          )}
+        >
+          <span
+            className={cn(
+              'h-2 w-2 shrink-0 rounded-full',
+              r.isRemitted ? 'bg-green-500' : 'bg-yellow-500'
+            )}
+          />
+          {r.isRemitted ? 'Remitted' : 'Pending'}
+        </span>
+      ),
     },
   ]
 
