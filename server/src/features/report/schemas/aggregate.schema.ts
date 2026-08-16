@@ -14,7 +14,6 @@ export class Aggregate {
   @Prop({ required: true, default: 0 })
   totalSales: number
 
-  // Kept in sync by ExpensesService via ReportService.adjustDailyExpenses.
   @Prop({ required: true, default: 0 })
   totalExpenses: number
 }

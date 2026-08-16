@@ -18,6 +18,8 @@ type Report {
   totalIncome: Float!
   totalExpenses: Float!
   totalPrintCount: Int!
+  expenses: [Transaction!]!
+  isRemitted: Boolean!
   createdAt: String!
   updatedAt: String!
 }
@@ -63,4 +65,5 @@ extend type Query {
 extend type Mutation {
   createReport(input: CreateReportInput!): Report!
   deleteReport(id: ID!): Boolean!
+  remit(id: ID!, isRemitted: Boolean!): Report!
 }

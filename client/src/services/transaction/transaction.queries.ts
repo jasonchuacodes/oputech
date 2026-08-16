@@ -27,6 +27,7 @@ export const useCreateTransaction = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
   })
 }

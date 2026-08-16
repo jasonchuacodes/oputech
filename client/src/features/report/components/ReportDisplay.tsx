@@ -1,12 +1,19 @@
-import { DataTable, DataTableColumn } from '../../../components/ui/data-table'
-import { formatCurrency } from '../../../utils/number'
+import { DataTable, DataTableColumn } from '../../../components/ui/data-table';
+import { Button } from '../../../components';
+import { cn } from '../../../utils/cn';
+import { formatCurrency } from '../../../utils/number';
+import { formatTime } from '../../../utils/date';
 import {
   ProductSale,
   Report,
+  ReportExpense,
   ReportUser,
-} from '../../../services/report/report.types'
-import { Trash } from 'lucide-react'
-import { ExpensesSection } from './ExpensesSection'
+} from '../../../services/report/report.types';
+import { PaymentType } from '../../../services/transaction/transaction.types';
+import { useRemit } from '../../../services/report/report.queries';
+import { Trash } from 'lucide-react';
+import { UserRole } from '../../../types';
+import { useAuthContext } from '../../../context/auth/useAuthContext';
 
 type PreviewReport = Pick<
   Report,
@@ -17,24 +24,26 @@ type PreviewReport = Pick<
   | 'totalExpenses'
   | 'totalPrintCount'
 > & {
-  id?: string
-  createdBy?: ReportUser
-  fromDate?: string
-  toDate?: string
-  createdAt?: string
-}
+  id?: string;
+  createdBy?: ReportUser;
+  fromDate?: string;
+  toDate?: string;
+  createdAt?: string;
+  expenses?: ReportExpense[];
+  isRemitted?: boolean;
+};
 
 interface Props {
-  report: PreviewReport
-  isPreview?: boolean
-  onDelete?: (id: string) => void
+  report: PreviewReport;
+  isPreview?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString('en-PH', {
     dateStyle: 'medium',
     timeStyle: 'short',
-  })
+  });
 
 const productColumns: DataTableColumn<ProductSale>[] = [
   {
@@ -58,9 +67,30 @@ const productColumns: DataTableColumn<ProductSale>[] = [
     heading: 'Total',
     cell: (p) => <span className="font-medium">{formatCurrency(p.total)}</span>,
   },
-]
+];
+
+const expenseColumns: DataTableColumn<ReportExpense>[] = [
+  {
+    id: 'label',
+    heading: 'Label',
+    cell: (e) => e.label,
+  },
+  {
+    id: 'paymentType',
+    heading: 'Payment',
+    cell: (e) => (e.paymentType === PaymentType.Cash ? 'Cash' : 'Online'),
+  },
+  {
+    id: 'total',
+    heading: 'Amount',
+    cell: (e) => <span className="font-medium">{formatCurrency(e.total)}</span>,
+  },
+];
 
 export const ReportDisplay = ({ report, isPreview, onDelete }: Props) => {
+  const remit = useRemit();
+  const { auth } = useAuthContext();
+
   return (
     <div className="flex flex-col gap-4">
       <div
@@ -91,16 +121,46 @@ export const ReportDisplay = ({ report, isPreview, onDelete }: Props) => {
                 </p>
               )}
             </div>
-            {onDelete && report.id && (
-              <button
-                type="button"
-                onClick={() => onDelete(report.id!)}
-                className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md p-1 transition-colors"
-                aria-label="Delete report"
-              >
-                <Trash size={16} />
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {report.id && (
+                <>
+                  <span className="flex items-center gap-1.5 rounded-sm border px-2 py-1 text-xs font-medium">
+                    <span
+                      className={cn(
+                        'h-2 w-2 shrink-0 rounded-full',
+                        report.isRemitted ? 'bg-green-500' : 'bg-gray-400',
+                      )}
+                    />
+                    {report.isRemitted ? 'Remitted' : 'Not Remitted'}
+                  </span>
+                  <Button
+                    hidden={auth?.role !== UserRole.ADMIN}
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    disabled={remit.isPending}
+                    onClick={() =>
+                      remit.mutate({
+                        id: report.id!,
+                        isRemitted: !report.isRemitted,
+                      })
+                    }
+                  >
+                    {report.isRemitted ? 'Undo Remit' : 'Mark as Remitted'}
+                  </Button>
+                </>
+              )}
+              {onDelete && report.id && (
+                <button
+                  type="button"
+                  onClick={() => onDelete(report.id!)}
+                  className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md p-1 transition-colors"
+                  aria-label="Delete report"
+                >
+                  <Trash size={16} />
+                </button>
+              )}
+            </div>
           </div>
         )}
 
@@ -155,13 +215,23 @@ export const ReportDisplay = ({ report, isPreview, onDelete }: Props) => {
             emptyMessage="No transactions found in this date range."
           />
         </div>
-      </div>
 
-      {!isPreview && report.id && (
-        <div className="rounded-md border bg-white p-6">
-          <ExpensesSection reportId={report.id} />
-        </div>
-      )}
+        {!isPreview && report.id && (
+          <div className="flex flex-col gap-3">
+            <h3 className="text-sm font-semibold text-slate-700">Expenses</h3>
+            <DataTable
+              collection={DataTable.collection({
+                items: report.expenses ?? [],
+                itemToValue: (e) => e.id,
+                itemToString: (e) => e.label ?? e.id,
+              })}
+              columns={expenseColumns}
+              emptyMessage="No expenses logged in this date range."
+            />
+          </div>
+        )}
+      </div>
     </div>
-  )
-}
+  );
+};
+

@@ -8,7 +8,8 @@
     "dev": "nest start --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "register-admin": "ts-node scripts/register-admin.ts"
+    "register-admin": "ts-node scripts/register-admin.ts",
+    "migrate-expenses": "ts-node scripts/migrate-expenses-to-transactions.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.13.0",

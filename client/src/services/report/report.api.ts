@@ -21,6 +21,14 @@ const REPORT_FIELDS = `
   totalIncome
   totalExpenses
   totalPrintCount
+  expenses {
+    id
+    label
+    total
+    paymentType
+    createdAt
+  }
+  isRemitted
   createdAt
 `
 
@@ -81,4 +89,20 @@ export async function deleteReport(id: string): Promise<boolean> {
     variables: { id },
   })
   return res.data.data.deleteReport
+}
+
+const REMIT = `
+  mutation Remit($id: ID!, $isRemitted: Boolean!) {
+    remit(id: $id, isRemitted: $isRemitted) {
+      ${REPORT_FIELDS}
+    }
+  }
+`
+
+export async function remit(id: string, isRemitted: boolean): Promise<Report> {
+  const res = await axios.post(GRAPHQL_URL, {
+    query: REMIT,
+    variables: { id, isRemitted },
+  })
+  return res.data.data.remit
 }

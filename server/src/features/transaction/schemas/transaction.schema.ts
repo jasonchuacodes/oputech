@@ -6,6 +6,11 @@ export enum PaymentType {
   ONLINE = 'ONLINE',
 }
 
+export enum TransactionType {
+  SALE = 'SALE',
+  EXPENSE = 'EXPENSE',
+}
+
 export type TransactionDocument = HydratedDocument<Transaction>
 
 @Schema({ _id: false })
@@ -30,8 +35,14 @@ const TransactionItemSchema = SchemaFactory.createForClass(TransactionItem)
 
 @Schema({ timestamps: true })
 export class Transaction {
-  @Prop({ type: [TransactionItemSchema], required: true })
+  @Prop({ required: true, enum: Object.values(TransactionType), default: TransactionType.SALE })
+  type: TransactionType
+
+  @Prop({ type: [TransactionItemSchema], required: true, default: [] })
   items: TransactionItem[]
+
+  @Prop({ trim: true })
+  label?: string
 
   @Prop({ required: true, enum: Object.values(PaymentType) })
   paymentType: PaymentType

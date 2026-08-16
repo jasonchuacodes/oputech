@@ -3,8 +3,12 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Report, ReportDocument } from './schemas/report.schema'
 import { Aggregate, AggregateDocument } from './schemas/aggregate.schema'
-import { Transaction, TransactionDocument, PaymentType } from '../transaction/schemas/transaction.schema'
-import { Expense, ExpenseDocument } from '../expenses/schemas/expense.schema'
+import {
+  Transaction,
+  TransactionDocument,
+  PaymentType,
+  TransactionType,
+} from '../transaction/schemas/transaction.schema'
 import { CreateReportInput } from './report.types'
 import { dayjsLocal } from '../../common/utils/date'
 
@@ -42,7 +46,6 @@ export class ReportService {
     @InjectModel(Report.name) private reportModel: Model<ReportDocument>,
     @InjectModel(Aggregate.name) private aggregateModel: Model<AggregateDocument>,
     @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
-    @InjectModel(Expense.name) private expenseModel: Model<ExpenseDocument>,
   ) {}
 
   async create(input: CreateReportInput, userId: string): Promise<ReportDocument> {
@@ -82,8 +85,13 @@ export class ReportService {
 
     await this.transactionModel.updateMany({ _id: { $in: ids } }, { processed: true }).exec()
 
-    const totalSales = transactions.reduce((sum, t) => sum + t.total, 0)
-    await this.aggregate(this.startOfDay(to), totalSales, 0)
+    const totalSales = transactions
+      .filter((t) => t.type === TransactionType.SALE)
+      .reduce((sum, t) => sum + t.total, 0)
+    const totalExpenses = transactions
+      .filter((t) => t.type === TransactionType.EXPENSE)
+      .reduce((sum, t) => sum + t.total, 0)
+    await this.aggregate(this.startOfDay(to), totalSales, totalExpenses)
 
     return this.reportModel.create({
       createdBy: userId,
@@ -101,33 +109,47 @@ export class ReportService {
     const transactions = await this.transactionModel
       .find({ _id: { $in: report.transactionIds } })
       .exec()
-    const totalSales = transactions.reduce((sum, t) => sum + t.total, 0)
-    const totalExpenses = await this.getTotalExpenses(reportId)
+    const totalSales = transactions
+      .filter((t) => t.type === TransactionType.SALE)
+      .reduce((sum, t) => sum + t.total, 0)
+    const totalExpenses = await this.getExpenseTotalFromTransactions(report.transactionIds)
 
     await this.deaggregate(this.startOfDay(report.toDate), totalSales, totalExpenses)
     await this.transactionModel
       .updateMany({ _id: { $in: report.transactionIds } }, { processed: false })
       .exec()
-    await this.expenseModel.deleteMany({ reportId }).exec()
     await report.deleteOne()
 
     return true
   }
 
+  async remit(reportId: string, isRemitted: boolean): Promise<ReportDocument> {
+    const report = await this.reportModel
+      .findByIdAndUpdate(reportId, { isRemitted }, { new: true })
+      .exec()
+    if (!report) throw new NotFoundException('Report not found')
+    return report
+  }
+
   async getTotalByPaymentType(transactionIds: string[], paymentType: PaymentType): Promise<number> {
     const transactions = await this.transactionModel
-      .find({ _id: { $in: transactionIds }, paymentType })
+      .find({ _id: { $in: transactionIds }, paymentType, type: TransactionType.SALE })
       .exec()
     return transactions.reduce((sum, t) => sum + t.total, 0)
   }
 
-  async getTotalExpenses(reportId: string): Promise<number> {
-    const expenses = await this.expenseModel.find({ reportId }).exec()
-    return expenses.reduce((sum, e) => sum + e.amount, 0)
+  async getExpenseTotalFromTransactions(transactionIds: string[]): Promise<number> {
+    const transactions = await this.transactionModel
+      .find({ _id: { $in: transactionIds }, type: TransactionType.EXPENSE })
+      .exec()
+    return transactions.reduce((sum, t) => sum + t.total, 0)
   }
 
-  async adjustDailyExpenses(date: Date, delta: number): Promise<void> {
-    await this.aggregate(this.startOfDay(date), 0, delta)
+  getExpenseTransactions(transactionIds: string[]): Promise<TransactionDocument[]> {
+    return this.transactionModel
+      .find({ _id: { $in: transactionIds }, type: TransactionType.EXPENSE })
+      .sort({ createdAt: 1 })
+      .exec()
   }
 
   findAll(): Promise<ReportDocument[]> {

@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 *.env
+
+# local Mongo dumps (may contain production data — never commit)
+server/tmp/

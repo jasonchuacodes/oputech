@@ -1,6 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { getReports, getReport, createReport, deleteReport } from './report.api'
+import {
+  getReports,
+  getReport,
+  createReport,
+  deleteReport,
+  remit,
+} from './report.api'
 import { CreateReportInput } from './report.types'
 
 export const useReports = () =>
@@ -41,6 +47,22 @@ export const useDeleteReport = () => {
       queryClient.invalidateQueries({ queryKey: ['reports'] })
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['analytics'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message)
+    },
+  })
+}
+
+export const useRemit = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, isRemitted }: { id: string; isRemitted: boolean }) =>
+      remit(id, isRemitted),
+    onSuccess: (data, variables) => {
+      toast.success(variables.isRemitted ? 'Marked as remitted' : 'Marked as not remitted')
+      queryClient.setQueryData(['report', variables.id], data)
+      queryClient.invalidateQueries({ queryKey: ['reports'] })
     },
     onError: (error: Error) => {
       toast.error(error.message)

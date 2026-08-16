@@ -3,6 +3,11 @@ enum PaymentType {
   ONLINE
 }
 
+enum TransactionType {
+  SALE
+  EXPENSE
+}
+
 type TransactionItem {
   productId: ID!
   name: String!
@@ -13,7 +18,9 @@ type TransactionItem {
 
 type Transaction {
   id: ID!
+  type: TransactionType!
   items: [TransactionItem!]!
+  label: String
   paymentType: PaymentType!
   total: Float!
   processed: Boolean!
@@ -26,7 +33,10 @@ input TransactionItemInput {
 }
 
 input CreateTransactionInput {
-  items: [TransactionItemInput!]!
+  type: TransactionType!
+  items: [TransactionItemInput!]
+  label: String
+  amount: Float
   paymentType: PaymentType!
 }
 

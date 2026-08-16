@@ -2,7 +2,11 @@ import { useState } from 'react'
 import { ShoppingCart } from 'lucide-react'
 import { Input, Spinner } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
-import { PaymentType, TransactionItem } from '../../services/transaction/transaction.types'
+import {
+  PaymentType,
+  TransactionItem,
+  TransactionType,
+} from '../../services/transaction/transaction.types'
 import { Product } from '../../services/product/product.types'
 import { useProducts } from '../../services/product/product.queries'
 import { useCreateTransaction } from '../../services/transaction/transaction.queries'
@@ -64,7 +68,7 @@ const POSPage = () => {
     }))
     handleClear()
     cart.onClose()
-    createTransaction({ items, paymentType })
+    createTransaction({ type: TransactionType.Sale, items, paymentType })
   }
 
   return (

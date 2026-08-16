@@ -1,3 +1,5 @@
+import { PaymentType } from '../transaction/transaction.types'
+
 export interface ProductSale {
   productId: string
   name: string
@@ -12,6 +14,14 @@ export interface ReportUser {
   username: string
 }
 
+export interface ReportExpense {
+  id: string
+  label?: string
+  total: number
+  paymentType: PaymentType
+  createdAt: string
+}
+
 export interface Report {
   id: string
   createdBy: ReportUser
@@ -23,6 +33,8 @@ export interface Report {
   totalIncome: number
   totalExpenses: number
   totalPrintCount: number
+  expenses: ReportExpense[]
+  isRemitted: boolean
   createdAt: string
 }
 

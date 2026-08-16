@@ -10,7 +10,6 @@ import { AuthModule } from './features/auth/auth.module'
 import { ProductModule } from './features/product/product.module'
 import { TransactionModule } from './features/transaction/transaction.module'
 import { ReportModule } from './features/report/report.module'
-import { ExpensesModule } from './features/expenses/expenses.module'
 
 @Module({
   imports: [
@@ -25,7 +24,6 @@ import { ExpensesModule } from './features/expenses/expenses.module'
     ProductModule,
     TransactionModule,
     ReportModule,
-    ExpensesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

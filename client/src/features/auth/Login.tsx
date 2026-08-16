@@ -63,7 +63,7 @@ export default function LoginPage() {
             <div className="rounded-sm bg-white p-8 shadow-sm">
               <div className="mb-6 flex justify-center">
                 <img
-                  src="/pwa-192x192.png"
+                  src="/assets/brand/icon-192.png"
                   alt="Spincam"
                   className="h-14 w-14"
                 />

@@ -19,13 +19,13 @@ export function LoginLayout({
         {...props}
       >
         <img
-          src="/pwa-512x512.png"
+          src="/assets/brand/icon-512.png"
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute -top-20 -left-20 hidden opacity-20 brightness-150 grayscale select-none sm:w-60 sm:block"
         />
         <img
-          src="/pwa-512x512.png"
+          src="/assets/brand/icon-512.png"
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute -top-20 -right-20 hidden -scale-x-100 opacity-20 brightness-150 grayscale select-none sm:w-60 sm:block"

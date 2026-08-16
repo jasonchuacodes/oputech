@@ -1,5 +1,5 @@
 import axios from '../../lib/axios'
-import { Transaction, PaymentType } from './transaction.types'
+import { Transaction, PaymentType, TransactionType } from './transaction.types'
 
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
@@ -9,7 +9,10 @@ export interface CreateTransactionItemInput {
 }
 
 export interface CreateTransactionInput {
-  items: CreateTransactionItemInput[]
+  type: TransactionType
+  items?: CreateTransactionItemInput[]
+  label?: string
+  amount?: number
   paymentType: PaymentType
 }
 
@@ -23,7 +26,9 @@ const GET_TRANSACTIONS = `
   query GetTransactions($filter: TransactionFilter) {
     transactions(filter: $filter) {
       id
+      type
       items { productId name price printCount quantity }
+      label
       paymentType
       total
       processed
@@ -36,7 +41,9 @@ const CREATE_TRANSACTION = `
   mutation CreateTransaction($input: CreateTransactionInput!) {
     createTransaction(input: $input) {
       id
+      type
       total
+      label
       paymentType
       createdAt
     }

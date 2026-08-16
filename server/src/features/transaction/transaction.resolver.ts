@@ -2,7 +2,7 @@ import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/g
 import { UseGuards } from '@nestjs/common'
 import { TransactionService } from './transaction.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
-import { TransactionDocument, PaymentType } from './schemas/transaction.schema'
+import { TransactionDocument, PaymentType, TransactionType } from './schemas/transaction.schema'
 import { TransactionFilter } from './transaction.types'
 
 interface TransactionItemInput {
@@ -11,7 +11,10 @@ interface TransactionItemInput {
 }
 
 interface CreateTransactionInput {
-  items: TransactionItemInput[]
+  type: TransactionType
+  items?: TransactionItemInput[]
+  label?: string
+  amount?: number
   paymentType: PaymentType
 }
 

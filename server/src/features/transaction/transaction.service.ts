@@ -1,7 +1,12 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { QueryFilter, Model } from 'mongoose'
-import { Transaction, TransactionDocument, PaymentType } from './schemas/transaction.schema'
+import {
+  Transaction,
+  TransactionDocument,
+  PaymentType,
+  TransactionType,
+} from './schemas/transaction.schema'
 import { Product, ProductDocument } from '../product/schemas/product.schema'
 import { TransactionFilter } from './transaction.types'
 
@@ -11,14 +16,17 @@ interface TransactionItemInput {
 }
 
 interface CreateTransactionInput {
-  items: TransactionItemInput[]
+  type: TransactionType
+  items?: TransactionItemInput[]
+  label?: string
+  amount?: number
   paymentType: PaymentType
 }
 
 @Injectable()
 export class TransactionService {
   constructor(
-    @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
+    @InjectModel(Transaction.name) private transaction: Model<TransactionDocument>,
     @InjectModel(Product.name) private product: Model<ProductDocument>,
   ) {}
 
@@ -34,19 +42,36 @@ export class TransactionService {
 
     if (filter?.processed !== undefined) query.processed = filter.processed
 
-    return this.transactionModel.find(query).sort({ createdAt: 1 }).exec()
+    return this.transaction.find(query).sort({ createdAt: 1 }).exec()
   }
 
   async createTransaction(input: CreateTransactionInput): Promise<TransactionDocument> {
-    const ids = input.items.map((i) => i.productId)
+    if (input.type === TransactionType.EXPENSE) {
+      if (!input.label?.trim()) throw new BadRequestException('Expense label is required')
+      if (!input.amount || input.amount <= 0) {
+        throw new BadRequestException('Expense amount must be greater than 0')
+      }
+
+      return this.transaction.create({
+        type: TransactionType.EXPENSE,
+        label: input.label,
+        items: [],
+        paymentType: input.paymentType,
+        total: input.amount,
+        processed: false,
+      })
+    }
+
+    const items = input.items ?? []
+    const ids = items.map((i) => i.productId)
     const products = await this.product.find({ _id: { $in: ids } }).exec()
 
-    for (const { productId } of input.items) {
+    for (const { productId } of items) {
       const item = products.find((p) => p._id.toString() === productId)
       if (!item) throw new BadRequestException(`Product ${productId} not found`)
     }
 
-    const transactionItems = input.items.map(({ productId, quantity }) => {
+    const transactionItems = items.map(({ productId, quantity }) => {
       const item = products.find((p) => p._id.toString() === productId)!
       return {
         productId,
@@ -59,7 +84,8 @@ export class TransactionService {
 
     const total = transactionItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
-    return this.transactionModel.create({
+    return this.transaction.create({
+      type: TransactionType.SALE,
       items: transactionItems,
       paymentType: input.paymentType,
       total,
@@ -68,7 +94,7 @@ export class TransactionService {
   }
 
   async remove(id: string): Promise<TransactionDocument | null> {
-    const transaction = await this.transactionModel.findById(id).exec()
+    const transaction = await this.transaction.findById(id).exec()
     if (!transaction) return null
 
     if (transaction.processed) {

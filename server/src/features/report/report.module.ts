@@ -4,7 +4,6 @@ import { Report, ReportSchema } from './schemas/report.schema'
 import { Aggregate, AggregateSchema } from './schemas/aggregate.schema'
 import { Transaction, TransactionSchema } from '../transaction/schemas/transaction.schema'
 import { Product, ProductSchema } from '../product/schemas/product.schema'
-import { Expense, ExpenseSchema } from '../expenses/schemas/expense.schema'
 import { UsersModule } from '../users/users.module'
 import { ReportService } from './report.service'
 import { ReportResolver, ProductSaleResolver } from './report.resolver'
@@ -16,7 +15,6 @@ import { ReportResolver, ProductSaleResolver } from './report.resolver'
       { name: Aggregate.name, schema: AggregateSchema },
       { name: Transaction.name, schema: TransactionSchema },
       { name: Product.name, schema: ProductSchema },
-      { name: Expense.name, schema: ExpenseSchema },
     ]),
     UsersModule,
   ],

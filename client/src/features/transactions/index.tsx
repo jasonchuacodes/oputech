@@ -1,22 +1,25 @@
 import { useState } from 'react'
-import { Trash2 } from 'lucide-react'
-import { PageHeader } from '../../components'
+import { Trash2, Receipt } from 'lucide-react'
+import { PageHeader, Button } from '../../components'
 import { DataTable, DataTableColumn } from '../../components/ui/data-table'
 import { DatePicker } from '../../components/ui/date-picker'
 import { useTransactions } from '../../services/transaction/transaction.queries'
 import {
   Transaction,
   PaymentType,
+  TransactionType,
 } from '../../services/transaction/transaction.types'
 import { dayjsLocal, formatDate, formatTime } from '../../utils/date'
 import { formatCurrency } from '../../utils/number'
 import { cn } from '../../utils/cn'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
+import { LogExpenseModal } from './components/LogExpenseModal'
 
 const TransactionsPage = () => {
   const [date, setDate] = useState(dayjsLocal().format('YYYY-MM-DD'))
   const [selectedItem, setSelectedItem] = useState<Transaction | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [expenseOpen, setExpenseOpen] = useState(false)
 
   const { data, isLoading } = useTransactions({
     from: dayjsLocal(date).startOf('day').toISOString(),
@@ -37,9 +40,29 @@ const TransactionsPage = () => {
       cell: (t) => formatTime(t.createdAt),
     },
     {
+      id: 'type',
+      heading: 'Type',
+      cell: (t) => (
+        <div className="flex items-center gap-2">
+          <span
+            className={cn(
+              'h-2 w-2 shrink-0 rounded-full',
+              t.type === TransactionType.Expense ? 'bg-red-500' : 'bg-blue-500'
+            )}
+          />
+          <span className="text-sm">
+            {t.type === TransactionType.Expense ? 'Expense' : 'Sale'}
+          </span>
+        </div>
+      ),
+    },
+    {
       id: 'items',
       heading: 'Items',
-      cell: (t) => t.items.map((i) => `${i.name} ×${i.quantity}`).join(', '),
+      cell: (t) =>
+        t.type === TransactionType.Expense
+          ? t.label
+          : t.items.map((i) => `${i.name} ×${i.quantity}`).join(', '),
     },
     {
       id: 'paymentType',
@@ -100,10 +123,20 @@ const TransactionsPage = () => {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <PageHeader
-        title="Transactions"
-        description={`Showing transactions for ${formatDate(date)}`}
-      />
+      <div className="flex items-center justify-between">
+        <PageHeader
+          title="Transactions"
+          description={`Showing transactions for ${formatDate(date)}`}
+        />
+        <Button
+          variant="outline"
+          className="gap-2"
+          onClick={() => setExpenseOpen(true)}
+        >
+          <Receipt size={16} />
+          Log Expense
+        </Button>
+      </div>
 
       <DatePicker
         label="Date Filter"
@@ -129,6 +162,11 @@ const TransactionsPage = () => {
           setDeleteOpen(false)
           setSelectedItem(null)
         }}
+      />
+
+      <LogExpenseModal
+        open={expenseOpen}
+        onClose={() => setExpenseOpen(false)}
       />
     </div>
   )

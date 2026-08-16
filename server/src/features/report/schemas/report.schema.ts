@@ -39,6 +39,9 @@ export class Report {
 
   @Prop({ type: [ProductSaleSchema], required: true })
   products: ProductSale[]
+
+  @Prop({ required: true, default: false })
+  isRemitted: boolean
 }
 
 export const ReportSchema = SchemaFactory.createForClass(Report)
