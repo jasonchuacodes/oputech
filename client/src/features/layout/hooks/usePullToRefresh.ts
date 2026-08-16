@@ -1,5 +1,4 @@
-import { useRef, useState } from 'react'
-import { useVerticalDrag } from '../../../hooks/useVerticalDrag'
+import { useEffect, useRef, useState } from 'react'
 
 interface UsePullToRefreshOptions {
   threshold?: number
@@ -16,18 +15,43 @@ export const usePullToRefresh = (
   const [pullDistance, setPullDistance] = useState(0)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const isRefreshingRef = useRef(false)
+  const startYRef = useRef<number | null>(null)
 
-  const bind = useVerticalDrag(
-    ({ movement: [, my], last, cancel, first }) => {
-      if (isRefreshingRef.current) return cancel()
-      if (first && (containerRef.current?.scrollTop ?? 0) !== 0) return cancel()
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
 
-      if (!last) {
-        setPullDistance(Math.max(0, Math.min(maxPull, my)))
+    const handleTouchStart = (e: TouchEvent) => {
+      if (isRefreshingRef.current || e.touches.length !== 1) return
+      startYRef.current = el.scrollTop === 0 ? e.touches[0].clientY : null
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isRefreshingRef.current || startYRef.current === null) return
+
+      const deltaY = e.touches[0].clientY - startYRef.current
+
+      // Not at the top anymore, or the drag reversed upward (normal scroll) —
+      // stop treating this gesture as a pull and let the browser scroll natively.
+      if (el.scrollTop > 0 || deltaY <= 0) {
+        startYRef.current = null
+        setPullDistance(0)
         return
       }
 
-      if (my >= threshold) {
+      // Only reachable when at the top and dragging down: take over from the
+      // browser so it doesn't bounce/scroll while we show our own indicator.
+      e.preventDefault()
+      setPullDistance(Math.min(maxPull, deltaY))
+    }
+
+    const handleTouchEnd = () => {
+      if (isRefreshingRef.current || startYRef.current === null) return
+      startYRef.current = null
+
+      setPullDistance((current) => {
+        if (current < threshold) return 0
+
         isRefreshingRef.current = true
         setIsRefreshing(true)
         setTimeout(() => {
@@ -39,12 +63,22 @@ export const usePullToRefresh = (
               setPullDistance(0)
             })
         }, REFRESH_SETTLE_DELAY)
-      } else {
-        setPullDistance(0)
-      }
-    },
-    { rubberband: true }
-  )
+        return current
+      })
+    }
 
-  return { bind, pullDistance, isRefreshing, isTriggered: pullDistance >= threshold }
+    el.addEventListener('touchstart', handleTouchStart, { passive: true })
+    el.addEventListener('touchmove', handleTouchMove, { passive: false })
+    el.addEventListener('touchend', handleTouchEnd)
+    el.addEventListener('touchcancel', handleTouchEnd)
+
+    return () => {
+      el.removeEventListener('touchstart', handleTouchStart)
+      el.removeEventListener('touchmove', handleTouchMove)
+      el.removeEventListener('touchend', handleTouchEnd)
+      el.removeEventListener('touchcancel', handleTouchEnd)
+    }
+  }, [containerRef, onRefresh, threshold, maxPull])
+
+  return { pullDistance, isRefreshing, isTriggered: pullDistance >= threshold }
 }

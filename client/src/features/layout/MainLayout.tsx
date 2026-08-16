@@ -38,7 +38,7 @@ export function MainLayout() {
     [queryClient]
   )
 
-  const { bind, pullDistance, isRefreshing, isTriggered } = usePullToRefresh(
+  const { pullDistance, isRefreshing, isTriggered } = usePullToRefresh(
     mainRef,
     handleRefresh,
     { threshold: PULL_THRESHOLD }
@@ -56,8 +56,7 @@ export function MainLayout() {
           <Navbar onMenuClick={() => setOpen(true)} />
           <main
             ref={mainRef}
-            {...bind()}
-            className="relative min-h-0 flex-1 touch-pan-x overflow-auto [overscroll-behavior-y:contain]"
+            className="relative min-h-0 flex-1 overflow-auto overscroll-y-contain"
           >
             <PullToRefreshIndicator
               pullDistance={pullDistance}
