@@ -123,20 +123,20 @@ const TransactionsPage = () => {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <PageHeader
-          title="Transactions"
-          description={`Showing transactions for ${formatDate(date)}`}
-        />
-        <Button
-          variant="outline"
-          className="gap-2"
-          onClick={() => setExpenseOpen(true)}
-        >
-          <Receipt size={16} />
-          Log Expense
-        </Button>
-      </div>
+      <PageHeader
+        action={
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => setExpenseOpen(true)}
+          >
+            <Receipt size={16} />
+            Log Expense
+          </Button>
+        }
+        title="Transactions"
+        description={`Showing transactions for ${formatDate(date)}`}
+      />
 
       <DatePicker
         label="Date Filter"
