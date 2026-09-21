@@ -4,6 +4,7 @@ const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
+  timeout: 15_000,
 })
 
 const NO_RETRY_PATHS = ['/auth/login', '/auth/refresh']

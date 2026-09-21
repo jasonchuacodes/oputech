@@ -1,7 +1,5 @@
-import axios from '../../lib/axios'
+import { requestGraphQL } from '../../lib/graphql'
 import { Product, CreateProductInput, UpdateProductInput } from './product.types'
-
-const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
 const PRODUCT_FIELDS = `
   id
@@ -21,11 +19,10 @@ const GET_PRODUCTS = `
 `
 
 export async function getProducts(search?: string): Promise<Product[]> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: GET_PRODUCTS,
-    variables: { search: search || undefined },
+  const data = await requestGraphQL<{ products: Product[] }>(GET_PRODUCTS, {
+    search: search || undefined,
   })
-  return res.data.data.products
+  return data.products
 }
 
 const CREATE_PRODUCT = `
@@ -37,11 +34,10 @@ const CREATE_PRODUCT = `
 `
 
 export async function createProduct(input: CreateProductInput): Promise<Product> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: CREATE_PRODUCT,
-    variables: { input },
+  const data = await requestGraphQL<{ createProduct: Product }>(CREATE_PRODUCT, {
+    input,
   })
-  return res.data.data.createProduct
+  return data.createProduct
 }
 
 const UPDATE_PRODUCT = `
@@ -53,11 +49,11 @@ const UPDATE_PRODUCT = `
 `
 
 export async function updateProduct(id: string, input: UpdateProductInput): Promise<Product> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: UPDATE_PRODUCT,
-    variables: { id, input },
+  const data = await requestGraphQL<{ updateProduct: Product }>(UPDATE_PRODUCT, {
+    id,
+    input,
   })
-  return res.data.data.updateProduct
+  return data.updateProduct
 }
 
 const DELETE_PRODUCT = `
@@ -67,9 +63,8 @@ const DELETE_PRODUCT = `
 `
 
 export async function deleteProduct(id: string): Promise<boolean> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: DELETE_PRODUCT,
-    variables: { id },
+  const data = await requestGraphQL<{ deleteProduct: boolean }>(DELETE_PRODUCT, {
+    id,
   })
-  return res.data.data.deleteProduct
+  return data.deleteProduct
 }

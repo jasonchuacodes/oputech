@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { Request } from 'express';
+import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private readonly users: UsersService) {
     super({
       jwtFromRequest: (req: Request) => req?.cookies?.access_token ?? null,
       ignoreExpiration: false,
@@ -13,7 +14,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: { sub: string; role: string }) {
-    return { userId: payload.sub, role: payload.role };
+  async validate(payload: { sub: string; role: string }) {
+    const user = await this.users.findById(payload.sub)
+    if (!user) throw new UnauthorizedException('User no longer exists')
+    return { userId: String(user._id), role: user.role };
   }
 }

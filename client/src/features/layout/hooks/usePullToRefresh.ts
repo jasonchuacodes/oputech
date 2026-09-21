@@ -8,11 +8,15 @@ interface UsePullToRefreshOptions {
 const REFRESH_SETTLE_DELAY = 500
 const DIRECTION_LOCK_THRESHOLD = 10
 
-const startsInHorizontalScroller = (target: EventTarget | null, boundary: HTMLElement): boolean => {
+const startsInHorizontalScroller = (
+  target: EventTarget | null,
+  boundary: HTMLElement
+): boolean => {
   let node = target instanceof Element ? target : null
   while (node && node !== boundary) {
     const style = getComputedStyle(node)
-    const scrollable = style.overflowX === 'auto' || style.overflowX === 'scroll'
+    const scrollable =
+      style.overflowX === 'auto' || style.overflowX === 'scroll'
     if (scrollable && node.scrollWidth > node.clientWidth) return true
     node = node.parentElement
   }
@@ -49,12 +53,18 @@ export const usePullToRefresh = (
     const handleTouchMove = (e: TouchEvent) => {
       if (isRefreshingRef.current || startYRef.current === null) return
 
-      const deltaX = e.touches[0].clientX - (startXRef.current ?? e.touches[0].clientX)
+      const deltaX =
+        e.touches[0].clientX - (startXRef.current ?? e.touches[0].clientX)
       const deltaY = e.touches[0].clientY - startYRef.current
 
       if (directionRef.current === null) {
-        if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < DIRECTION_LOCK_THRESHOLD) return
-        directionRef.current = Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical'
+        if (
+          Math.max(Math.abs(deltaX), Math.abs(deltaY)) <
+          DIRECTION_LOCK_THRESHOLD
+        )
+          return
+        directionRef.current =
+          Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical'
       }
 
       if (directionRef.current === 'horizontal') {

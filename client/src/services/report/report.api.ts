@@ -1,7 +1,5 @@
-import axios from '../../lib/axios'
+import { requestGraphQL } from '../../lib/graphql'
 import { Report, CreateReportInput } from './report.types'
-
-const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
 const REPORT_FIELDS = `
   id
@@ -57,24 +55,20 @@ const CREATE_REPORT = `
 `
 
 export async function getReports(): Promise<Report[]> {
-  const res = await axios.post(GRAPHQL_URL, { query: GET_REPORTS })
-  return res.data.data.reports
+  const data = await requestGraphQL<{ reports: Report[] }>(GET_REPORTS)
+  return data.reports
 }
 
 export async function getReport(id: string): Promise<Report> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: GET_REPORT,
-    variables: { id },
-  })
-  return res.data.data.report
+  const data = await requestGraphQL<{ report: Report }>(GET_REPORT, { id })
+  return data.report
 }
 
 export async function createReport(input: CreateReportInput): Promise<Report> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: CREATE_REPORT,
-    variables: { input },
+  const data = await requestGraphQL<{ createReport: Report }>(CREATE_REPORT, {
+    input,
   })
-  return res.data.data.createReport
+  return data.createReport
 }
 
 const DELETE_REPORT = `
@@ -84,11 +78,10 @@ const DELETE_REPORT = `
 `
 
 export async function deleteReport(id: string): Promise<boolean> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: DELETE_REPORT,
-    variables: { id },
+  const data = await requestGraphQL<{ deleteReport: boolean }>(DELETE_REPORT, {
+    id,
   })
-  return res.data.data.deleteReport
+  return data.deleteReport
 }
 
 const REMIT = `
@@ -100,9 +93,9 @@ const REMIT = `
 `
 
 export async function remit(id: string, isRemitted: boolean): Promise<Report> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: REMIT,
-    variables: { id, isRemitted },
+  const data = await requestGraphQL<{ remit: Report }>(REMIT, {
+    id,
+    isRemitted,
   })
-  return res.data.data.remit
+  return data.remit
 }

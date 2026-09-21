@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/auth/AuthContext'
 import { apolloClient } from './lib/apollo'
 import { PWAReloadPrompt } from './components/PWAReloadPrompt'
+import { SyncProvider } from './context/sync/SyncContext'
 
 const queryClient = new QueryClient()
 
@@ -18,10 +19,12 @@ export const App = () => {
     <ApolloProvider client={apolloClient}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <AppLayout />
-          <PWAReloadPrompt />
-          <Toaster position="top-right" />
-          <ReactQueryDevtools initialIsOpen={false} />
+          <SyncProvider>
+            <AppLayout />
+            <PWAReloadPrompt />
+            <Toaster position="top-right" />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </SyncProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ApolloProvider>

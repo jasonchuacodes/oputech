@@ -34,10 +34,10 @@ const TransactionsPage = () => {
   const columns: DataTableColumn<Transaction>[] = [
     { id: 'index', heading: '#', cell: (_, index) => index + 1 },
     {
-      id: 'createdAt',
+      id: 'occurredAt',
       heading: 'Time',
       orderable: true,
-      cell: (t) => formatTime(t.createdAt),
+      cell: (t) => formatTime(t.occurredAt),
     },
     {
       id: 'type',
@@ -78,19 +78,35 @@ const TransactionsPage = () => {
     {
       id: 'status',
       heading: 'Status',
-      cell: (t) => (
-        <div className="flex items-center gap-2">
-          <span
-            className={cn(
-              'h-2 w-2 shrink-0 rounded-full',
-              t.processed ? 'bg-green-500' : 'bg-amber-500'
-            )}
-          />
-          <span className="text-sm">
-            {t.processed ? 'Processed' : 'Pending'}
-          </span>
-        </div>
-      ),
+      cell: (t) => {
+        const label =
+          t.syncState === 'blocked'
+            ? 'Sync blocked'
+            : t.syncState === 'deleting'
+              ? 'Deleting'
+              : t.syncState === 'pending'
+                ? 'Unsynced'
+                : t.processed
+                  ? 'Processed'
+                  : 'Pending report'
+        return (
+          <div className="flex items-center gap-2">
+            <span
+              className={cn(
+                'h-2 w-2 shrink-0 rounded-full',
+                t.syncState === 'blocked'
+                  ? 'bg-red-500'
+                  : t.syncState === 'pending' || t.syncState === 'deleting'
+                    ? 'bg-blue-500'
+                    : t.processed
+                      ? 'bg-green-500'
+                      : 'bg-amber-500'
+              )}
+            />
+            <span className="text-sm">{label}</span>
+          </div>
+        )
+      },
     },
     {
       id: 'actions',

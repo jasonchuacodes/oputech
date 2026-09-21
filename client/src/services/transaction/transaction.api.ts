@@ -1,7 +1,5 @@
-import axios from '../../lib/axios'
+import { requestGraphQL } from '../../lib/graphql'
 import { Transaction, PaymentType, TransactionType } from './transaction.types'
-
-const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
 export interface CreateTransactionItemInput {
   productId: string
@@ -9,11 +7,13 @@ export interface CreateTransactionItemInput {
 }
 
 export interface CreateTransactionInput {
-  type: TransactionType
+  type?: TransactionType
   items?: CreateTransactionItemInput[]
   label?: string
   amount?: number
   paymentType: PaymentType
+  clientMutationId?: string
+  occurredAt?: string
 }
 
 export interface TransactionFilter {
@@ -26,12 +26,14 @@ const GET_TRANSACTIONS = `
   query GetTransactions($filter: TransactionFilter) {
     transactions(filter: $filter) {
       id
+      clientMutationId
       type
       items { productId name price printCount quantity }
       label
       paymentType
       total
       processed
+      occurredAt
       createdAt
     }
   }
@@ -41,10 +43,13 @@ const CREATE_TRANSACTION = `
   mutation CreateTransaction($input: CreateTransactionInput!) {
     createTransaction(input: $input) {
       id
+      clientMutationId
       type
       total
       label
       paymentType
+      processed
+      occurredAt
       createdAt
     }
   }
@@ -56,26 +61,30 @@ const DELETE_TRANSACTION = `
   }
 `
 
-export async function getTransactions(filter?: TransactionFilter): Promise<Transaction[]> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: GET_TRANSACTIONS,
-    variables: { filter },
-  })
-  return res.data.data.transactions
+export async function getTransactions(
+  filter?: TransactionFilter
+): Promise<Transaction[]> {
+  const data = await requestGraphQL<{ transactions: Transaction[] }>(
+    GET_TRANSACTIONS,
+    { filter }
+  )
+  return data.transactions
 }
 
-export async function createTransaction(input: CreateTransactionInput): Promise<Transaction> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: CREATE_TRANSACTION,
-    variables: { input },
-  })
-  return res.data.data.createTransaction
+export async function createTransaction(
+  input: CreateTransactionInput
+): Promise<Transaction> {
+  const data = await requestGraphQL<{ createTransaction: Transaction }>(
+    CREATE_TRANSACTION,
+    { input }
+  )
+  return data.createTransaction
 }
 
 export async function deleteTransaction(id: string): Promise<boolean> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: DELETE_TRANSACTION,
-    variables: { id },
-  })
-  return res.data.data.deleteTransaction
+  const data = await requestGraphQL<{ deleteTransaction: boolean }>(
+    DELETE_TRANSACTION,
+    { id }
+  )
+  return data.deleteTransaction
 }

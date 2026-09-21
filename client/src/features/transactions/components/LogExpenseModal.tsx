@@ -1,4 +1,5 @@
-import { useForm, Controller } from 'react-hook-form'
+import { useEffect, useRef } from 'react'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Receipt } from 'lucide-react'
 import {
@@ -17,7 +18,13 @@ import {
   PaymentType,
   TransactionType,
 } from '../../../services/transaction/transaction.types'
-import { LogExpenseSchema, LogExpenseInput } from '../schemas/log-expense.schema'
+import {
+  LogExpenseSchema,
+  LogExpenseInput,
+} from '../schemas/log-expense.schema'
+import { clearDraft, getDraft, saveDraft } from '../../../offline/database'
+
+const EXPENSE_DRAFT_KEY = 'expense-form'
 
 interface Props {
   open: boolean
@@ -37,10 +44,29 @@ export const LogExpenseModal = ({ open, onClose }: Props) => {
     defaultValues: { label: '', amount: 0, paymentType: PaymentType.Cash },
     resolver: zodResolver(LogExpenseSchema),
   })
+  const draftLoaded = useRef(false)
+  const draft = useWatch({ control })
+
+  useEffect(() => {
+    void getDraft<LogExpenseInput>(EXPENSE_DRAFT_KEY).then((draft) => {
+      if (draft) reset(draft)
+      draftLoaded.current = true
+    })
+  }, [reset])
+
+  useEffect(() => {
+    if (!draftLoaded.current) return
+    void saveDraft(EXPENSE_DRAFT_KEY, draft)
+  }, [draft])
 
   const handleClose = () => {
     onClose()
-    reset()
+  }
+
+  const handleSaved = () => {
+    reset({ label: '', amount: 0, paymentType: PaymentType.Cash })
+    void clearDraft(EXPENSE_DRAFT_KEY)
+    onClose()
   }
 
   const onSubmit = (data: LogExpenseInput) => {
@@ -52,7 +78,7 @@ export const LogExpenseModal = ({ open, onClose }: Props) => {
         paymentType: data.paymentType,
         items: [],
       },
-      { onSuccess: handleClose }
+      { onSuccess: handleSaved }
     )
   }
 
@@ -85,9 +111,7 @@ export const LogExpenseModal = ({ open, onClose }: Props) => {
           <Label htmlFor="amount">Amount *</Label>
           <NumberInput name="amount" control={control} step={0.01} min={0} />
           {errors.amount && (
-            <p className="text-destructive text-xs">
-              {errors.amount.message}
-            </p>
+            <p className="text-destructive text-xs">{errors.amount.message}</p>
           )}
         </div>
 

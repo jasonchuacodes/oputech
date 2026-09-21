@@ -1,7 +1,5 @@
-import axios from '../../lib/axios'
+import { requestGraphQL } from '../../lib/graphql'
 import { User, CreateUserInput, UpdateUserInput, UpdateActivityStatusInput } from './users.types'
-
-const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
 const GET_USERS = `
   query GetUsers {
@@ -20,8 +18,8 @@ const GET_USERS = `
 `
 
 export async function getUsers(): Promise<User[]> {
-  const res = await axios.post(GRAPHQL_URL, { query: GET_USERS })
-  return res.data.data.users
+  const data = await requestGraphQL<{ users: User[] }>(GET_USERS)
+  return data.users
 }
 
 const CREATE_USER = `
@@ -36,11 +34,8 @@ const CREATE_USER = `
   }
 `
 export async function createUser(input: CreateUserInput): Promise<User> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: CREATE_USER,
-    variables: { input },
-  })
-  return res.data.data.createUser
+  const data = await requestGraphQL<{ createUser: User }>(CREATE_USER, { input })
+  return data.createUser
 }
 
 const UPDATE_USER = `
@@ -56,11 +51,11 @@ const UPDATE_USER = `
 `
 
 export async function updateUser(id: string, input: UpdateUserInput): Promise<User> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: UPDATE_USER,
-    variables: { id, input },
+  const data = await requestGraphQL<{ updateUser: User }>(UPDATE_USER, {
+    id,
+    input,
   })
-  return res.data.data.updateUser
+  return data.updateUser
 }
 
 const DELETE_USER = `
@@ -70,11 +65,8 @@ const DELETE_USER = `
 `
 
 export async function deleteUser(id: string): Promise<boolean> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: DELETE_USER,
-    variables: { id },
-  })
-  return res.data.data.deleteUser
+  const data = await requestGraphQL<{ deleteUser: boolean }>(DELETE_USER, { id })
+  return data.deleteUser
 }
 
 const UPDATE_ACTIVITY_STATUS = `
@@ -90,11 +82,11 @@ const UPDATE_ACTIVITY_STATUS = `
 `
 
 export async function updateActivityStatus(id: string, input: UpdateActivityStatusInput): Promise<User> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: UPDATE_ACTIVITY_STATUS,
-    variables: { id, input },
-  })
-  return res.data.data.updateActivityStatus
+  const data = await requestGraphQL<{ updateActivityStatus: User }>(
+    UPDATE_ACTIVITY_STATUS,
+    { id, input }
+  )
+  return data.updateActivityStatus
 }
 
 const RESET_PASSWORD = `
@@ -106,9 +98,9 @@ const RESET_PASSWORD = `
 `
 
 export async function resetPassword(id: string, password: string): Promise<User> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: RESET_PASSWORD,
-    variables: { id, password },
+  const data = await requestGraphQL<{ resetPassword: User }>(RESET_PASSWORD, {
+    id,
+    password,
   })
-  return res.data.data.resetPassword
+  return data.resetPassword
 }

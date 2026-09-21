@@ -9,7 +9,10 @@ import {
   useReports,
 } from '../../services/report/report.queries'
 import { useTransactions } from '../../services/transaction/transaction.queries'
-import { PaymentType } from '../../services/transaction/transaction.types'
+import {
+  PaymentType,
+  TransactionType,
+} from '../../services/transaction/transaction.types'
 import { ReportDisplay } from './components/ReportDisplay'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { dayjsLocal } from '../../utils/date'
@@ -18,31 +21,37 @@ import { Report } from '../../services/report/report.types'
 import { reportDetailPath } from '../../routes/paths'
 import { useAuthContext } from '../../context/auth/useAuthContext'
 import { UserRole } from '../../types'
+import { DatePicker } from '../../components/ui/date-picker'
+import { useSyncContext } from '../../context/sync/useSyncContext'
 
 const ReportPage = () => {
   const navigate = useNavigate()
   const { auth } = useAuthContext()
   const isAdmin = auth?.role === UserRole.ADMIN
+  const { canUseOnlineFeatures } = useSyncContext()
+  const [reportDate, setReportDate] = useState(
+    dayjsLocal().format('YYYY-MM-DD')
+  )
   const { data: allReports, isLoading: reportsLoading } = useReports()
   const { data: transactions, isLoading: txLoading } = useTransactions({
-    from: dayjsLocal().startOf('day').toISOString(),
-    to: dayjsLocal().endOf('day').toISOString(),
+    from: dayjsLocal(reportDate).startOf('day').toISOString(),
+    to: dayjsLocal(reportDate).endOf('day').toISOString(),
     processed: false,
   })
   const { mutate: generate, isPending } = useCreateReport()
   const [selectedReport, setSelectedReport] = useState<Report | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  const todayReports = useMemo(
+  const selectedDateReports = useMemo(
     () =>
       (allReports ?? []).filter((r) =>
-        dayjsLocal(r.createdAt).isSame(dayjsLocal(), 'day')
+        dayjsLocal(r.toDate).isSame(dayjsLocal(reportDate), 'day')
       ),
-    [allReports]
+    [allReports, reportDate]
   )
 
   const openDelete = (id: string) => {
-    const report = todayReports.find((r) => r.id === id)
+    const report = selectedDateReports.find((r) => r.id === id)
     if (!report) return
     setSelectedReport(report)
     setDeleteOpen(true)
@@ -62,10 +71,16 @@ const ReportPage = () => {
     >()
     let totalCash = 0
     let totalOnline = 0
+    let totalExpenses = 0
 
     for (const tx of transactions) {
-      if (tx.paymentType === PaymentType.Cash) totalCash += tx.total
-      else totalOnline += tx.total
+      if (tx.type === TransactionType.Expense) {
+        totalExpenses += tx.total
+      } else if (tx.paymentType === PaymentType.Cash) {
+        totalCash += tx.total
+      } else {
+        totalOnline += tx.total
+      }
 
       for (const item of tx.items) {
         const existing = productMap.get(item.productId)
@@ -90,7 +105,7 @@ const ReportPage = () => {
       totalCash,
       totalOnline,
       totalIncome: totalCash + totalOnline,
-      totalExpenses: 0,
+      totalExpenses,
       totalPrintCount: Array.from(productMap.values()).reduce(
         (sum, p) => sum + p.printCount * p.quantitySold,
         0
@@ -100,12 +115,14 @@ const ReportPage = () => {
 
   const isLoading = isAdmin ? reportsLoading : reportsLoading || txLoading
   const hasTransactions = (transactions?.length ?? 0) > 0
-  const hasReports = todayReports.length > 0
+  const hasReports = selectedDateReports.length > 0
 
   const handleGenerate = () => {
     generate({
-      fromDate: dayjsLocal().startOf('day').toISOString(),
-      toDate: dayjsLocal().toISOString(),
+      fromDate: dayjsLocal(reportDate).startOf('day').toISOString(),
+      toDate: dayjsLocal(reportDate).isSame(dayjsLocal(), 'day')
+        ? dayjsLocal().toISOString()
+        : dayjsLocal(reportDate).endOf('day').toISOString(),
     })
   }
 
@@ -172,18 +189,44 @@ const ReportPage = () => {
         <PageHeader
           title="Reports"
           description={
-            isAdmin ? 'All generated reports' : "Today's sales report"
+            isAdmin
+              ? 'All generated reports'
+              : 'Sales report by transaction date'
           }
         />
         {!isAdmin && (
           <Button
             onClick={handleGenerate}
-            disabled={isPending || !hasTransactions}
+            disabled={isPending || !hasTransactions || !canUseOnlineFeatures}
+            title={
+              canUseOnlineFeatures
+                ? undefined
+                : 'Connect and sync pending transactions first'
+            }
           >
             {isPending ? 'Generating…' : 'Generate Report'}
           </Button>
         )}
       </div>
+
+      {!isAdmin && (
+        <DatePicker
+          label="Report Date"
+          value={dayjsLocal(reportDate).toDate()}
+          onChange={(next) =>
+            next && setReportDate(dayjsLocal(next).format('YYYY-MM-DD'))
+          }
+          disableFuture
+          className="w-48"
+        />
+      )}
+
+      {!canUseOnlineFeatures && (
+        <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          Reports are available after this device is online and all pending
+          transactions are synced.
+        </p>
+      )}
 
       {isAdmin ? (
         <DataTable
@@ -216,7 +259,7 @@ const ReportPage = () => {
           {previewReport && (
             <ReportDisplay report={previewReport as Report} isPreview />
           )}
-          {todayReports.map((report, i) => (
+          {selectedDateReports.map((report, i) => (
             <ReportDisplay key={i} report={report} onDelete={openDelete} />
           ))}
         </div>

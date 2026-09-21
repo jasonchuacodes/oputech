@@ -10,9 +10,11 @@ import { DeleteUserModal } from './components/DeleteUserModal'
 import { ResetPasswordModal } from './components/ResetPasswordModal'
 import { ActionsDropdown } from './components/ActionsDropdown'
 import { cn } from '../../utils/cn'
+import { useSyncContext } from '../../context/sync/useSyncContext'
 
 const UsersPage = () => {
   const { data, isLoading } = useUsers()
+  const { canUseOnlineFeatures } = useSyncContext()
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [editOpen, setEditOpen] = useState(false)
@@ -83,11 +85,13 @@ const UsersPage = () => {
       align: 'right',
       cell: (u) => (
         <div className="flex items-center justify-end gap-1">
-          <ActionsDropdown
-            onEdit={() => openEdit(u)}
-            onResetPassword={() => openResetPassword(u)}
-            onDelete={() => openDelete(u)}
-          />
+          {canUseOnlineFeatures && (
+            <ActionsDropdown
+              onEdit={() => openEdit(u)}
+              onResetPassword={() => openResetPassword(u)}
+              onDelete={() => openDelete(u)}
+            />
+          )}
         </div>
       ),
     },
@@ -105,12 +109,22 @@ const UsersPage = () => {
         title="Users"
         description="Manage system users and their roles"
         action={
-          <Button className="gap-2" onClick={() => setModalOpen(true)}>
+          <Button
+            className="gap-2"
+            disabled={!canUseOnlineFeatures}
+            onClick={() => setModalOpen(true)}
+          >
             <Plus size={16} />
             Add User
           </Button>
         }
       />
+
+      {!canUseOnlineFeatures && (
+        <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          User administration is available after this device is online and fully synced.
+        </p>
+      )}
 
       <DataTable
         collection={collection}

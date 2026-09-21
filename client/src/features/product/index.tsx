@@ -11,10 +11,12 @@ import { AddItemModal } from './components/AddItemModal'
 import { EditItemModal } from './components/EditItemModal'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { ActionsDropdown } from './components/ActionsDropdown'
+import { useSyncContext } from '../../context/sync/useSyncContext'
 
 const ProductPage = () => {
   const { auth } = useAuthContext()
   const isAdmin = auth?.role === UserRole.ADMIN
+  const { canUseOnlineFeatures } = useSyncContext()
 
   const [search, setSearch] = useState('')
   const [addOpen, setAddOpen] = useState(false)
@@ -71,18 +73,23 @@ const ProductPage = () => {
       align: 'right',
       cell: (item) => (
         <div className="flex items-center justify-end gap-1">
-          <button
-            type="button"
-            onClick={() => openEdit(item)}
-            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md p-1 transition-colors"
-            aria-label="Edit item"
-          >
-            <Pencil size={16} />
-          </button>
-          <ActionsDropdown
-            onEdit={() => openEdit(item)}
-            onDelete={() => openDelete(item)}
-          />
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => openEdit(item)}
+              disabled={!canUseOnlineFeatures}
+              className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md p-1 transition-colors"
+              aria-label="Edit item"
+            >
+              <Pencil size={16} />
+            </button>
+          )}
+          {isAdmin && canUseOnlineFeatures && (
+            <ActionsDropdown
+              onEdit={() => openEdit(item)}
+              onDelete={() => openDelete(item)}
+            />
+          )}
         </div>
       ),
     },
@@ -112,13 +119,28 @@ const ProductPage = () => {
         description="Track and manage your product stock"
         action={
           isAdmin && (
-            <Button className="gap-2" onClick={() => setAddOpen(true)}>
+            <Button
+              className="gap-2"
+              disabled={!canUseOnlineFeatures}
+              title={
+                canUseOnlineFeatures
+                  ? undefined
+                  : 'Connect and sync pending transactions first'
+              }
+              onClick={() => setAddOpen(true)}
+            >
               <Plus size={16} />
               Add Item
             </Button>
           )
         }
       />
+
+      {!canUseOnlineFeatures && isAdmin && (
+        <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          Inventory changes are available after this device is online and fully synced.
+        </p>
+      )}
 
       <Input
         placeholder="Search by name…"

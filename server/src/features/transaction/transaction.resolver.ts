@@ -1,22 +1,20 @@
-import { Query, Mutation, ResolveField, Resolver, Parent, Args } from '@nestjs/graphql'
+import {
+  Query,
+  Mutation,
+  ResolveField,
+  Resolver,
+  Parent,
+  Args,
+} from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
 import { TransactionService } from './transaction.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
-import { TransactionDocument, PaymentType, TransactionType } from './schemas/transaction.schema'
-import { TransactionFilter } from './transaction.types'
-
-interface TransactionItemInput {
-  productId: string
-  quantity: number
-}
-
-interface CreateTransactionInput {
-  type: TransactionType
-  items?: TransactionItemInput[]
-  label?: string
-  amount?: number
-  paymentType: PaymentType
-}
+import {
+  TransactionDocument,
+  TransactionType,
+} from './schemas/transaction.schema'
+import { CreateTransactionInput, TransactionFilter } from './transaction.types'
+import { dayjsLocal } from '../../common/utils/date'
 
 @UseGuards(JwtAuthGuard)
 @Resolver('Transaction')
@@ -24,8 +22,19 @@ export class TransactionResolver {
   constructor(private readonly transaction: TransactionService) {}
 
   @Query()
-  transactions(@Args('filter') filter?: TransactionFilter) {
-    return this.transaction.getTransactions(filter)
+  transactions(
+    @Args('filter') filter?: TransactionFilter,
+    @Args('date') legacyDate?: string
+  ) {
+    const effectiveFilter =
+      filter ??
+      (legacyDate
+        ? {
+            from: dayjsLocal(legacyDate).startOf('day').toISOString(),
+            to: dayjsLocal(legacyDate).endOf('day').toISOString(),
+          }
+        : undefined)
+    return this.transaction.getTransactions(effectiveFilter)
   }
 
   @Mutation()
@@ -41,6 +50,16 @@ export class TransactionResolver {
 
   @ResolveField('createdAt')
   createdAt(@Parent() transaction: TransactionDocument): string {
-    return (transaction as any).createdAt.toISOString()
+    return transaction.createdAt.toISOString()
+  }
+
+  @ResolveField('occurredAt')
+  occurredAt(@Parent() transaction: TransactionDocument): string {
+    return (transaction.occurredAt ?? transaction.createdAt).toISOString()
+  }
+
+  @ResolveField('type')
+  type(@Parent() transaction: TransactionDocument): TransactionType {
+    return transaction.type ?? TransactionType.SALE
   }
 }

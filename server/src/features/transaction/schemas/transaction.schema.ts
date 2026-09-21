@@ -35,7 +35,21 @@ const TransactionItemSchema = SchemaFactory.createForClass(TransactionItem)
 
 @Schema({ timestamps: true })
 export class Transaction {
-  @Prop({ required: true, enum: Object.values(TransactionType), default: TransactionType.SALE })
+  createdAt: Date
+
+  updatedAt: Date
+
+  @Prop({ unique: true, sparse: true, index: true })
+  clientMutationId?: string
+
+  @Prop({ required: true, default: Date.now, index: true })
+  occurredAt: Date
+
+  @Prop({
+    required: true,
+    enum: Object.values(TransactionType),
+    default: TransactionType.SALE,
+  })
   type: TransactionType
 
   @Prop({ type: [TransactionItemSchema], required: true, default: [] })

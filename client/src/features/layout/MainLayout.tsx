@@ -8,6 +8,8 @@ import { PullToRefreshIndicator } from './components/PullToRefreshIndicator'
 import { useCurrentUserActivityStatus } from './hooks/useCurrentUserActivityStatus'
 import { usePullToRefresh } from './hooks/usePullToRefresh'
 import { UserStatus } from '../../services/users/users.types'
+import { SyncStatus } from './components/SyncStatus'
+import { useSyncContext } from '../../context/sync/useSyncContext'
 
 const PULL_THRESHOLD = 56
 
@@ -32,11 +34,12 @@ export function MainLayout() {
 
   const [open, setOpen] = useState(!isMobile)
   const { status, setActive } = useCurrentUserActivityStatus()
+  const { status: connectivityStatus, syncNow } = useSyncContext()
 
-  const handleRefresh = useCallback(
-    () => queryClient.invalidateQueries(),
-    [queryClient]
-  )
+  const handleRefresh = useCallback(async () => {
+    await syncNow()
+    await queryClient.invalidateQueries()
+  }, [queryClient, syncNow])
 
   const { pullDistance, isRefreshing, isTriggered } = usePullToRefresh(
     mainRef,
@@ -47,7 +50,7 @@ export function MainLayout() {
   return (
     <>
       <StatusOverlay
-        open={status === UserStatus.Inactive}
+        open={status === UserStatus.Inactive && connectivityStatus === 'online'}
         onActive={setActive}
       />
       <div className="flex h-dvh">
@@ -68,6 +71,7 @@ export function MainLayout() {
           </main>
         </div>
       </div>
+      <SyncStatus />
     </>
   )
 }

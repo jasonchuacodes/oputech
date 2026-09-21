@@ -25,6 +25,6 @@ export async function refresh(): Promise<void> {
 }
 
 export async function getMe(): Promise<AuthUser> {
-  const res = await axios.get<AuthUser>('/auth/me')
+  const res = await axios.get<AuthUser>('/auth/me', { timeout: 5_000 })
   return res.data
 }

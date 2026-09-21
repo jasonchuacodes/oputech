@@ -18,12 +18,14 @@ type TransactionItem {
 
 type Transaction {
   id: ID!
+  clientMutationId: ID
   type: TransactionType!
   items: [TransactionItem!]!
   label: String
   paymentType: PaymentType!
   total: Float!
   processed: Boolean!
+  occurredAt: String!
   createdAt: String!
 }
 
@@ -33,11 +35,13 @@ input TransactionItemInput {
 }
 
 input CreateTransactionInput {
-  type: TransactionType!
+  type: TransactionType! = SALE
   items: [TransactionItemInput!]
   label: String
   amount: Float
   paymentType: PaymentType!
+  clientMutationId: ID
+  occurredAt: String
 }
 
 input TransactionFilter {
@@ -47,7 +51,7 @@ input TransactionFilter {
 }
 
 extend type Query {
-  transactions(filter: TransactionFilter): [Transaction!]!
+  transactions(filter: TransactionFilter, date: String): [Transaction!]!
 }
 
 extend type Mutation {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ShoppingCart } from 'lucide-react'
 import { Input, Spinner } from '../../components'
 import { PageHeader } from '../../components/ui/page-header'
@@ -14,6 +14,15 @@ import { useDisclosure } from '../../hooks/useDisclosure'
 import { ProductCard } from './components/ProductCard'
 import { CurrentSale } from './components/CurrentSale'
 import { CartSheet } from './components/CartSheet'
+import { getDraft, saveDraft, clearDraft } from '../../offline/database'
+import { useSyncContext } from '../../context/sync/useSyncContext'
+
+const POS_DRAFT_KEY = 'pos-cart'
+
+interface PosDraft {
+  items: TransactionItem[]
+  paymentType: PaymentType
+}
 
 const POSPage = () => {
   const [transactionItems, setTransactionItems] = useState<TransactionItem[]>(
@@ -21,10 +30,30 @@ const POSPage = () => {
   )
   const [paymentType, setPaymentType] = useState<PaymentType>(PaymentType.Cash)
   const [search, setSearch] = useState('')
+  const draftLoaded = useRef(false)
   const cart = useDisclosure()
 
   const { data: products = [], isLoading } = useProducts(search)
   const { mutate: createTransaction } = useCreateTransaction()
+  const { status } = useSyncContext()
+
+  useEffect(() => {
+    void getDraft<PosDraft>(POS_DRAFT_KEY).then((draft) => {
+      if (draft) {
+        setTransactionItems(draft.items)
+        setPaymentType(draft.paymentType)
+      }
+      draftLoaded.current = true
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!draftLoaded.current) return
+    void saveDraft<PosDraft>(POS_DRAFT_KEY, {
+      items: transactionItems,
+      paymentType,
+    })
+  }, [paymentType, transactionItems])
 
   const mainProducts = products.filter((p) => p.category === 'main')
   const addOnProducts = products.filter((p) => p.category === 'add-on')
@@ -66,9 +95,16 @@ const POSPage = () => {
       productId: i.productId,
       quantity: i.quantity,
     }))
-    handleClear()
-    cart.onClose()
-    createTransaction({ type: TransactionType.Sale, items, paymentType })
+    createTransaction(
+      { type: TransactionType.Sale, items, paymentType },
+      {
+        onSuccess: () => {
+          handleClear()
+          cart.onClose()
+          void clearDraft(POS_DRAFT_KEY)
+        },
+      }
+    )
   }
 
   return (
@@ -95,7 +131,9 @@ const POSPage = () => {
             )}
             {!isLoading && products.length === 0 && (
               <p className="py-12 text-center text-sm text-slate-400">
-                No products found.
+                {status === 'offline' && !search
+                  ? 'Connect once to prepare this device for offline sales.'
+                  : 'No products found.'}
               </p>
             )}
             {!isLoading && mainProducts.length > 0 && (

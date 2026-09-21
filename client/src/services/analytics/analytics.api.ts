@@ -1,7 +1,5 @@
-import axios from '../../lib/axios'
+import { requestGraphQL } from '../../lib/graphql'
 import { Analytics, AnalyticsRange } from './analytics.types'
-
-const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
 
 const GET_ANALYTICS = `
   query GetAnalytics($range: AnalyticsRange!) {
@@ -23,9 +21,8 @@ const GET_ANALYTICS = `
 `
 
 export async function getAnalytics(range: AnalyticsRange): Promise<Analytics> {
-  const res = await axios.post(GRAPHQL_URL, {
-    query: GET_ANALYTICS,
-    variables: { range },
+  const data = await requestGraphQL<{ analytics: Analytics }>(GET_ANALYTICS, {
+    range,
   })
-  return res.data.data.analytics
+  return data.analytics
 }

@@ -1,29 +1,37 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
+import { CreateTransactionInput, TransactionFilter } from './transaction.api'
 import {
-  getTransactions,
-  createTransaction,
-  deleteTransaction,
-  CreateTransactionInput,
-  TransactionFilter,
-} from './transaction.api'
+  listLocalTransactions,
+  queueLocalTransaction,
+  queueLocalTransactionDelete,
+} from '../../offline/repository'
+import { useAuthContext } from '../../context/auth/useAuthContext'
+import { notifyOutboxChanged } from '../../context/sync/sync-context'
 
 export const useTransactions = (filter?: TransactionFilter) =>
   useQuery({
     queryKey: ['transactions', filter],
-    queryFn: () => getTransactions(filter),
+    queryFn: () => listLocalTransactions(filter),
+    networkMode: 'always',
   })
 
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient()
+  const { auth } = useAuthContext()
 
   return useMutation({
-    mutationFn: (input: CreateTransactionInput) => createTransaction(input),
+    networkMode: 'always',
+    mutationFn: (input: CreateTransactionInput) => {
+      if (!auth?.id) throw new Error('Sign in before creating a transaction')
+      return queueLocalTransaction(input, auth.id)
+    },
     onError: (error: Error) => {
       toast.error(error.message)
     },
     onSuccess: () => {
-      toast.success('Transaction completed successfully!')
+      toast.success('Transaction saved on this device')
+      notifyOutboxChanged()
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
@@ -34,14 +42,20 @@ export const useCreateTransaction = () => {
 
 export const useDeleteTransaction = () => {
   const queryClient = useQueryClient()
+  const { auth } = useAuthContext()
 
   return useMutation({
-    mutationFn: (id: string) => deleteTransaction(id),
+    networkMode: 'always',
+    mutationFn: (id: string) => {
+      if (!auth?.id) throw new Error('Sign in before deleting a transaction')
+      return queueLocalTransactionDelete(id, auth.id)
+    },
     onError: (error: Error) => {
       toast.error(error.message)
     },
     onSuccess: () => {
-      toast.success('Transaction deleted successfully!')
+      toast.success('Transaction deletion saved')
+      notifyOutboxChanged()
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] })

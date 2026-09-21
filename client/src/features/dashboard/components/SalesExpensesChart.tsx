@@ -28,7 +28,7 @@ const options: ChartOptions<'line'> = {
     tooltip: {
       callbacks: {
         label: ({ dataset, parsed }) =>
-          `${dataset.label}: ${formatCurrency(parsed.y)}`,
+          `${dataset.label}: ${formatCurrency(parsed.y ?? 0)}`,
       },
     },
   },
