@@ -189,15 +189,15 @@ const ReportPage = () => {
         <PageHeader
           title="Reports"
           description={
-            isAdmin
-              ? 'All generated reports'
-              : 'Sales report by transaction date'
+            isAdmin ? 'All generated reports' : 'Sales report by transaction date'
           }
         />
         {!isAdmin && (
           <Button
             onClick={handleGenerate}
-            disabled={isPending || !hasTransactions || !canUseOnlineFeatures}
+            disabled={
+              isPending || !hasTransactions || !canUseOnlineFeatures
+            }
             title={
               canUseOnlineFeatures
                 ? undefined
@@ -223,8 +223,7 @@ const ReportPage = () => {
 
       {!canUseOnlineFeatures && (
         <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-          Reports are available after this device is online and all pending
-          transactions are synced.
+          Reports are available after this device is online and all pending transactions are synced.
         </p>
       )}
 

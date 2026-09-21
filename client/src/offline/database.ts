@@ -130,11 +130,7 @@ export const getDraft = async <T>(key: string): Promise<T | undefined> =>
   (await offlineDb.drafts.get(key))?.value as T | undefined
 
 export const saveDraft = async <T>(key: string, value: T): Promise<void> => {
-  await offlineDb.drafts.put({
-    key,
-    value,
-    updatedAt: new Date().toISOString(),
-  })
+  await offlineDb.drafts.put({ key, value, updatedAt: new Date().toISOString() })
 }
 
 export const clearDraft = async (key: string): Promise<void> => {

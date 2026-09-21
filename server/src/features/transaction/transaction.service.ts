@@ -13,14 +13,11 @@ import { CreateTransactionInput, TransactionFilter } from './transaction.types'
 @Injectable()
 export class TransactionService {
   constructor(
-    @InjectModel(Transaction.name)
-    private transaction: Model<TransactionDocument>,
-    @InjectModel(Product.name) private product: Model<ProductDocument>
+    @InjectModel(Transaction.name) private transaction: Model<TransactionDocument>,
+    @InjectModel(Product.name) private product: Model<ProductDocument>,
   ) {}
 
-  async getTransactions(
-    filter?: TransactionFilter
-  ): Promise<TransactionDocument[]> {
+  async getTransactions(filter?: TransactionFilter): Promise<TransactionDocument[]> {
     const query: QueryFilter<TransactionDocument> = {}
 
     if (filter?.from || filter?.to) {
@@ -36,36 +33,24 @@ export class TransactionService {
 
     if (filter?.processed !== undefined) query.processed = filter.processed
 
-    return this.transaction
-      .find(query)
-      .sort({ occurredAt: -1, createdAt: -1 })
-      .exec()
+    return this.transaction.find(query).sort({ createdAt: -1 }).exec()
   }
 
-  async createTransaction(
-    input: CreateTransactionInput
-  ): Promise<TransactionDocument> {
+  async createTransaction(input: CreateTransactionInput): Promise<TransactionDocument> {
     if (input.clientMutationId) {
-      const existing = await this.transaction
-        .findOne({
-          clientMutationId: input.clientMutationId,
-        })
-        .exec()
+      const existing = await this.transaction.findOne({
+        clientMutationId: input.clientMutationId,
+      }).exec()
       if (existing) return existing
     }
 
-    const occurredAt = input.occurredAt
-      ? new Date(input.occurredAt)
-      : new Date()
+    const occurredAt = input.occurredAt ? new Date(input.occurredAt) : new Date()
     if (Number.isNaN(occurredAt.getTime())) {
       throw new BadRequestException('Invalid transaction occurrence date')
     }
 
-    const type = input.type ?? TransactionType.SALE
-
-    if (type === TransactionType.EXPENSE) {
-      if (!input.label?.trim())
-        throw new BadRequestException('Expense label is required')
+    if (input.type === TransactionType.EXPENSE) {
+      if (!input.label?.trim()) throw new BadRequestException('Expense label is required')
       if (!input.amount || input.amount <= 0) {
         throw new BadRequestException('Expense amount must be greater than 0')
       }
@@ -88,9 +73,7 @@ export class TransactionService {
     }
     for (const item of items) {
       if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
-        throw new BadRequestException(
-          'Transaction quantities must be positive integers'
-        )
+        throw new BadRequestException('Transaction quantities must be positive integers')
       }
     }
 
@@ -113,10 +96,7 @@ export class TransactionService {
       }
     })
 
-    const total = transactionItems.reduce(
-      (sum, i) => sum + i.price * i.quantity,
-      0
-    )
+    const total = transactionItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
     return this.createIdempotently(input.clientMutationId, {
       clientMutationId: input.clientMutationId,
@@ -131,15 +111,13 @@ export class TransactionService {
 
   private async createIdempotently(
     clientMutationId: string | undefined,
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
   ): Promise<TransactionDocument> {
     try {
       return await this.transaction.create(data)
     } catch (error: any) {
       if (error?.code === 11000 && clientMutationId) {
-        const existing = await this.transaction
-          .findOne({ clientMutationId })
-          .exec()
+        const existing = await this.transaction.findOne({ clientMutationId }).exec()
         if (existing) return existing
       }
       throw error
@@ -151,9 +129,7 @@ export class TransactionService {
     if (!transaction) return null
 
     if (transaction.processed) {
-      throw new BadRequestException(
-        'Cannot delete a transaction already included in a report'
-      )
+      throw new BadRequestException('Cannot delete a transaction already included in a report')
     }
 
     await transaction.deleteOne()

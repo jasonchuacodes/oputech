@@ -44,16 +44,11 @@ export interface TopProduct {
 export class ReportService {
   constructor(
     @InjectModel(Report.name) private reportModel: Model<ReportDocument>,
-    @InjectModel(Aggregate.name)
-    private aggregateModel: Model<AggregateDocument>,
-    @InjectModel(Transaction.name)
-    private transactionModel: Model<TransactionDocument>
+    @InjectModel(Aggregate.name) private aggregateModel: Model<AggregateDocument>,
+    @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
   ) {}
 
-  async create(
-    input: CreateReportInput,
-    userId: string
-  ): Promise<ReportDocument> {
+  async create(input: CreateReportInput, userId: string): Promise<ReportDocument> {
     const from = new Date(input.fromDate)
     const to = new Date(input.toDate)
 
@@ -74,12 +69,7 @@ export class ReportService {
 
     const productMap = new Map<
       string,
-      {
-        name: string
-        pricePerUnit: number
-        printCount: number
-        quantitySold: number
-      }
+      { name: string; pricePerUnit: number; printCount: number; quantitySold: number }
     >()
     for (const tx of transactions) {
       for (const item of tx.items) {
@@ -102,12 +92,10 @@ export class ReportService {
       ...v,
     }))
 
-    await this.transactionModel
-      .updateMany({ _id: { $in: ids } }, { processed: true })
-      .exec()
+    await this.transactionModel.updateMany({ _id: { $in: ids } }, { processed: true }).exec()
 
     const totalSales = transactions
-      .filter((t) => t.type !== TransactionType.EXPENSE)
+      .filter((t) => t.type === TransactionType.SALE)
       .reduce((sum, t) => sum + t.total, 0)
     const totalExpenses = transactions
       .filter((t) => t.type === TransactionType.EXPENSE)
@@ -131,17 +119,11 @@ export class ReportService {
       .find({ _id: { $in: report.transactionIds } })
       .exec()
     const totalSales = transactions
-      .filter((t) => t.type !== TransactionType.EXPENSE)
+      .filter((t) => t.type === TransactionType.SALE)
       .reduce((sum, t) => sum + t.total, 0)
-    const totalExpenses = await this.getExpenseTotalFromTransactions(
-      report.transactionIds
-    )
+    const totalExpenses = await this.getExpenseTotalFromTransactions(report.transactionIds)
 
-    await this.deaggregate(
-      this.startOfDay(report.toDate),
-      totalSales,
-      totalExpenses
-    )
+    await this.deaggregate(this.startOfDay(report.toDate), totalSales, totalExpenses)
     await this.transactionModel
       .updateMany({ _id: { $in: report.transactionIds } }, { processed: false })
       .exec()
@@ -158,35 +140,24 @@ export class ReportService {
     return report
   }
 
-  async getTotalByPaymentType(
-    transactionIds: string[],
-    paymentType: PaymentType
-  ): Promise<number> {
+  async getTotalByPaymentType(transactionIds: string[], paymentType: PaymentType): Promise<number> {
     const transactions = await this.transactionModel
-      .find({
-        _id: { $in: transactionIds },
-        paymentType,
-        $or: [{ type: TransactionType.SALE }, { type: { $exists: false } }],
-      })
+      .find({ _id: { $in: transactionIds }, paymentType, type: TransactionType.SALE })
       .exec()
     return transactions.reduce((sum, t) => sum + t.total, 0)
   }
 
-  async getExpenseTotalFromTransactions(
-    transactionIds: string[]
-  ): Promise<number> {
+  async getExpenseTotalFromTransactions(transactionIds: string[]): Promise<number> {
     const transactions = await this.transactionModel
       .find({ _id: { $in: transactionIds }, type: TransactionType.EXPENSE })
       .exec()
     return transactions.reduce((sum, t) => sum + t.total, 0)
   }
 
-  getExpenseTransactions(
-    transactionIds: string[]
-  ): Promise<TransactionDocument[]> {
+  getExpenseTransactions(transactionIds: string[]): Promise<TransactionDocument[]> {
     return this.transactionModel
       .find({ _id: { $in: transactionIds }, type: TransactionType.EXPENSE })
-      .sort({ occurredAt: 1, createdAt: 1 })
+      .sort({ createdAt: 1 })
       .exec()
   }
 
@@ -245,11 +216,7 @@ export class ReportService {
       { $sort: { quantitySold: -1 } },
       { $limit: 10 },
     ])
-    return rows.map((r) => ({
-      productId: r._id,
-      name: r.name,
-      quantitySold: r.quantitySold,
-    }))
+    return rows.map((r) => ({ productId: r._id, name: r.name, quantitySold: r.quantitySold }))
   }
 
   private bucketWeekly(aggregates: AggregateDocument[]): AnalyticsPoint[] {
@@ -272,28 +239,17 @@ export class ReportService {
     return Array.from(buckets.values())
   }
 
-  private async aggregate(
-    date: Date,
-    sales: number,
-    expenses: number
-  ): Promise<void> {
+  private async aggregate(date: Date, sales: number, expenses: number): Promise<void> {
     await this.aggregateModel
       .updateOne(
         { date },
-        {
-          $inc: { totalSales: sales, totalExpenses: expenses },
-          $setOnInsert: { date },
-        },
-        { upsert: true }
+        { $inc: { totalSales: sales, totalExpenses: expenses }, $setOnInsert: { date } },
+        { upsert: true },
       )
       .exec()
   }
 
-  private async deaggregate(
-    date: Date,
-    sales: number,
-    expenses: number
-  ): Promise<void> {
+  private async deaggregate(date: Date, sales: number, expenses: number): Promise<void> {
     await this.aggregate(date, -sales, -expenses)
   }
 

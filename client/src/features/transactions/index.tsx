@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import { Trash2, Receipt } from 'lucide-react'
-import { PageHeader, Button } from '../../components'
-import { DataTable, DataTableColumn } from '../../components/ui/data-table'
-import { DatePicker } from '../../components/ui/date-picker'
-import { useTransactions } from '../../services/transaction/transaction.queries'
+import { useState } from 'react';
+import { Trash2, Receipt } from 'lucide-react';
+import { PageHeader, Button } from '../../components';
+import { DataTable, DataTableColumn } from '../../components/ui/data-table';
+import { DatePicker } from '../../components/ui/date-picker';
+import { useTransactions } from '../../services/transaction/transaction.queries';
 import {
   Transaction,
   PaymentType,
   TransactionType,
-} from '../../services/transaction/transaction.types'
-import { dayjsLocal, formatDate, formatTime } from '../../utils/date'
-import { formatCurrency } from '../../utils/number'
-import { cn } from '../../utils/cn'
-import { DeleteConfirmModal } from './components/DeleteConfirmModal'
-import { LogExpenseModal } from './components/LogExpenseModal'
+} from '../../services/transaction/transaction.types';
+import { dayjsLocal, formatDate, formatTime } from '../../utils/date';
+import { formatCurrency } from '../../utils/number';
+import { cn } from '../../utils/cn';
+import { DeleteConfirmModal } from './components/DeleteConfirmModal';
+import { LogExpenseModal } from './components/LogExpenseModal';
 
 const TransactionsPage = () => {
-  const [date, setDate] = useState(dayjsLocal().format('YYYY-MM-DD'))
-  const [selectedItem, setSelectedItem] = useState<Transaction | null>(null)
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [expenseOpen, setExpenseOpen] = useState(false)
+  const [date, setDate] = useState(dayjsLocal().format('YYYY-MM-DD'));
+  const [selectedItem, setSelectedItem] = useState<Transaction | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [expenseOpen, setExpenseOpen] = useState(false);
 
   const { data, isLoading } = useTransactions({
     from: dayjsLocal(date).startOf('day').toISOString(),
     to: dayjsLocal(date).endOf('day').toISOString(),
-  })
+  });
 
   const openDelete = (item: Transaction) => {
-    setSelectedItem(item)
-    setDeleteOpen(true)
-  }
+    setSelectedItem(item);
+    setDeleteOpen(true);
+  };
 
   const columns: DataTableColumn<Transaction>[] = [
     { id: 'index', heading: '#', cell: (_, index) => index + 1 },
@@ -47,7 +47,7 @@ const TransactionsPage = () => {
           <span
             className={cn(
               'h-2 w-2 shrink-0 rounded-full',
-              t.type === TransactionType.Expense ? 'bg-red-500' : 'bg-blue-500'
+              t.type === TransactionType.Expense ? 'bg-red-500' : 'bg-blue-500',
             )}
           />
           <span className="text-sm">
@@ -100,7 +100,7 @@ const TransactionsPage = () => {
                     ? 'bg-blue-500'
                     : t.processed
                       ? 'bg-green-500'
-                      : 'bg-amber-500'
+                      : 'bg-amber-500',
               )}
             />
             <span className="text-sm">{label}</span>
@@ -129,13 +129,13 @@ const TransactionsPage = () => {
         </button>
       ),
     },
-  ]
+  ];
 
   const collection = DataTable.collection({
     items: data ?? [],
     itemToValue: (t) => t.id,
     itemToString: (t) => t.id,
-  })
+  });
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -175,8 +175,8 @@ const TransactionsPage = () => {
         item={selectedItem}
         open={deleteOpen}
         onClose={() => {
-          setDeleteOpen(false)
-          setSelectedItem(null)
+          setDeleteOpen(false);
+          setSelectedItem(null);
         }}
       />
 
@@ -185,7 +185,7 @@ const TransactionsPage = () => {
         onClose={() => setExpenseOpen(false)}
       />
     </div>
-  )
-}
+  );
+};
 
-export default TransactionsPage
+export default TransactionsPage;

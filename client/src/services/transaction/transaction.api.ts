@@ -1,5 +1,9 @@
 import { requestGraphQL } from '../../lib/graphql'
-import { Transaction, PaymentType, TransactionType } from './transaction.types'
+import {
+  ServerTransaction,
+  PaymentType,
+  TransactionType,
+} from './transaction.types'
 
 export interface CreateTransactionItemInput {
   productId: string
@@ -7,7 +11,7 @@ export interface CreateTransactionItemInput {
 }
 
 export interface CreateTransactionInput {
-  type?: TransactionType
+  type: TransactionType
   items?: CreateTransactionItemInput[]
   label?: string
   amount?: number
@@ -26,13 +30,13 @@ const GET_TRANSACTIONS = `
   query GetTransactions($filter: TransactionFilter) {
     transactions(filter: $filter) {
       id
-      clientMutationId
       type
       items { productId name price printCount quantity }
       label
       paymentType
       total
       processed
+      clientMutationId
       occurredAt
       createdAt
     }
@@ -43,12 +47,13 @@ const CREATE_TRANSACTION = `
   mutation CreateTransaction($input: CreateTransactionInput!) {
     createTransaction(input: $input) {
       id
-      clientMutationId
       type
+      items { productId name price printCount quantity }
       total
       label
       paymentType
       processed
+      clientMutationId
       occurredAt
       createdAt
     }
@@ -61,20 +66,16 @@ const DELETE_TRANSACTION = `
   }
 `
 
-export async function getTransactions(
-  filter?: TransactionFilter
-): Promise<Transaction[]> {
-  const data = await requestGraphQL<{ transactions: Transaction[] }>(
+export async function getTransactions(filter?: TransactionFilter): Promise<ServerTransaction[]> {
+  const data = await requestGraphQL<{ transactions: ServerTransaction[] }>(
     GET_TRANSACTIONS,
     { filter }
   )
   return data.transactions
 }
 
-export async function createTransaction(
-  input: CreateTransactionInput
-): Promise<Transaction> {
-  const data = await requestGraphQL<{ createTransaction: Transaction }>(
+export async function createTransaction(input: CreateTransactionInput): Promise<ServerTransaction> {
+  const data = await requestGraphQL<{ createTransaction: ServerTransaction }>(
     CREATE_TRANSACTION,
     { input }
   )

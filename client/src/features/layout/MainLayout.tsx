@@ -50,7 +50,9 @@ export function MainLayout() {
   return (
     <>
       <StatusOverlay
-        open={status === UserStatus.Inactive && connectivityStatus === 'online'}
+        open={
+          status === UserStatus.Inactive && connectivityStatus === 'online'
+        }
         onActive={setActive}
       />
       <div className="flex h-dvh">

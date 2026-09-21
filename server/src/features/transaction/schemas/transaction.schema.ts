@@ -45,11 +45,7 @@ export class Transaction {
   @Prop({ required: true, default: Date.now, index: true })
   occurredAt: Date
 
-  @Prop({
-    required: true,
-    enum: Object.values(TransactionType),
-    default: TransactionType.SALE,
-  })
+  @Prop({ required: true, enum: Object.values(TransactionType), default: TransactionType.SALE })
   type: TransactionType
 
   @Prop({ type: [TransactionItemSchema], required: true, default: [] })

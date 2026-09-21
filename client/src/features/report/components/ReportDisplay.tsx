@@ -1,18 +1,18 @@
-import { DataTable, DataTableColumn } from '../../../components/ui/data-table'
-import { Button } from '../../../components'
-import { cn } from '../../../utils/cn'
-import { formatCurrency } from '../../../utils/number'
+import { DataTable, DataTableColumn } from '../../../components/ui/data-table';
+import { Button } from '../../../components';
+import { cn } from '../../../utils/cn';
+import { formatCurrency } from '../../../utils/number';
 import {
   ProductSale,
   Report,
   ReportExpense,
   ReportUser,
-} from '../../../services/report/report.types'
-import { PaymentType } from '../../../services/transaction/transaction.types'
-import { useRemit } from '../../../services/report/report.queries'
-import { Trash } from 'lucide-react'
-import { UserRole } from '../../../types'
-import { useAuthContext } from '../../../context/auth/useAuthContext'
+} from '../../../services/report/report.types';
+import { PaymentType } from '../../../services/transaction/transaction.types';
+import { useRemit } from '../../../services/report/report.queries';
+import { Trash } from 'lucide-react';
+import { UserRole } from '../../../types';
+import { useAuthContext } from '../../../context/auth/useAuthContext';
 
 type PreviewReport = Pick<
   Report,
@@ -23,26 +23,26 @@ type PreviewReport = Pick<
   | 'totalExpenses'
   | 'totalPrintCount'
 > & {
-  id?: string
-  createdBy?: ReportUser
-  fromDate?: string
-  toDate?: string
-  createdAt?: string
-  expenses?: ReportExpense[]
-  isRemitted?: boolean
-}
+  id?: string;
+  createdBy?: ReportUser;
+  fromDate?: string;
+  toDate?: string;
+  createdAt?: string;
+  expenses?: ReportExpense[];
+  isRemitted?: boolean;
+};
 
 interface Props {
-  report: PreviewReport
-  isPreview?: boolean
-  onDelete?: (id: string) => void
+  report: PreviewReport;
+  isPreview?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString('en-PH', {
     dateStyle: 'medium',
     timeStyle: 'short',
-  })
+  });
 
 const productColumns: DataTableColumn<ProductSale>[] = [
   {
@@ -66,7 +66,7 @@ const productColumns: DataTableColumn<ProductSale>[] = [
     heading: 'Total',
     cell: (p) => <span className="font-medium">{formatCurrency(p.total)}</span>,
   },
-]
+];
 
 const expenseColumns: DataTableColumn<ReportExpense>[] = [
   {
@@ -84,11 +84,11 @@ const expenseColumns: DataTableColumn<ReportExpense>[] = [
     heading: 'Amount',
     cell: (e) => <span className="font-medium">{formatCurrency(e.total)}</span>,
   },
-]
+];
 
 export const ReportDisplay = ({ report, isPreview, onDelete }: Props) => {
-  const remit = useRemit()
-  const { auth } = useAuthContext()
+  const remit = useRemit();
+  const { auth } = useAuthContext();
 
   return (
     <div className="flex flex-col gap-4">
@@ -127,7 +127,7 @@ export const ReportDisplay = ({ report, isPreview, onDelete }: Props) => {
                     <span
                       className={cn(
                         'h-2 w-2 shrink-0 rounded-full',
-                        report.isRemitted ? 'bg-green-500' : 'bg-gray-400'
+                        report.isRemitted ? 'bg-green-500' : 'bg-gray-400',
                       )}
                     />
                     {report.isRemitted ? 'Remitted' : 'Not Remitted'}
@@ -231,5 +231,5 @@ export const ReportDisplay = ({ report, isPreview, onDelete }: Props) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};

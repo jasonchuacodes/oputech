@@ -33,9 +33,7 @@ export const useCreateReport = () => {
   const { canUseOnlineFeatures, syncNow } = useSyncContext()
   return useMutation({
     mutationFn: (input: CreateReportInput) => {
-      if (!canUseOnlineFeatures) {
-        throw new Error('Sync all transactions before generating a report')
-      }
+      if (!canUseOnlineFeatures) throw new Error('Sync all transactions before generating a report')
       return createReport(input)
     },
     onSuccess: () => {
@@ -56,9 +54,7 @@ export const useDeleteReport = () => {
   const { canUseOnlineFeatures } = useSyncContext()
   return useMutation({
     mutationFn: (id: string) => {
-      if (!canUseOnlineFeatures) {
-        throw new Error('Reports can only be changed while online and synced')
-      }
+      if (!canUseOnlineFeatures) throw new Error('Reports can only be changed while online and synced')
       return deleteReport(id)
     },
     onSuccess: () => {
@@ -78,15 +74,11 @@ export const useRemit = () => {
   const { canUseOnlineFeatures } = useSyncContext()
   return useMutation({
     mutationFn: ({ id, isRemitted }: { id: string; isRemitted: boolean }) => {
-      if (!canUseOnlineFeatures) {
-        throw new Error('Reports can only be changed while online and synced')
-      }
+      if (!canUseOnlineFeatures) throw new Error('Reports can only be changed while online and synced')
       return remit(id, isRemitted)
     },
     onSuccess: (data, variables) => {
-      toast.success(
-        variables.isRemitted ? 'Marked as remitted' : 'Marked as not remitted'
-      )
+      toast.success(variables.isRemitted ? 'Marked as remitted' : 'Marked as not remitted')
       queryClient.setQueryData(['report', variables.id], data)
       queryClient.invalidateQueries({ queryKey: ['reports'] })
     },

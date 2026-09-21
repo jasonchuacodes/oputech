@@ -13,9 +13,7 @@ import {
 
 const uuid = () => crypto.randomUUID()
 
-export const listLocalProducts = async (
-  search?: string
-): Promise<Product[]> => {
+export const listLocalProducts = async (search?: string): Promise<Product[]> => {
   const products = await offlineDb.products.toArray()
   const term = search?.trim().toLocaleLowerCase()
   if (!term) return products
@@ -29,12 +27,7 @@ export const listLocalTransactions = async (
 ): Promise<Transaction[]> => {
   const transactions = await offlineDb.transactions
     .where('occurredAt')
-    .between(
-      filter?.from ?? DexieMinDate,
-      filter?.to ?? DexieMaxDate,
-      true,
-      true
-    )
+    .between(filter?.from ?? DexieMinDate, filter?.to ?? DexieMaxDate, true, true)
     .reverse()
     .sortBy('occurredAt')
 
@@ -61,8 +54,7 @@ const makeTransactionItems = async (
 
   return items.map((item, index) => {
     const product = products[index]
-    if (!product)
-      throw new Error(`Product ${item.productId} is not available offline`)
+    if (!product) throw new Error(`Product ${item.productId} is not available offline`)
     return {
       productId: product.id,
       name: product.name,
@@ -79,22 +71,21 @@ export const queueLocalTransaction = async (
 ): Promise<Transaction> => {
   const clientMutationId = input.clientMutationId ?? uuid()
   const occurredAt = input.occurredAt ?? new Date().toISOString()
-  const type = input.type ?? TransactionType.Sale
   const id = `local:${clientMutationId}`
   const items = await makeTransactionItems(input)
   const total =
-    type === TransactionType.Expense
+    input.type === TransactionType.Expense
       ? (input.amount ?? 0)
       : items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
-  if (type === TransactionType.Expense && total <= 0) {
+  if (input.type === TransactionType.Expense && total <= 0) {
     throw new Error('Expense amount must be greater than 0')
   }
 
   const transaction: LocalTransaction = {
     id,
     clientMutationId,
-    type,
+    type: input.type,
     items,
     label: input.label,
     paymentType: input.paymentType ?? PaymentType.Cash,
@@ -114,7 +105,7 @@ export const queueLocalTransaction = async (
         operationId: uuid(),
         kind: 'CREATE_TRANSACTION',
         entityId: id,
-        payload: { ...input, type, clientMutationId, occurredAt },
+        payload: { ...input, clientMutationId, occurredAt },
         ownerUserId,
         state: 'pending',
         attempts: 0,

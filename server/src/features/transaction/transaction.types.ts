@@ -12,7 +12,7 @@ export interface TransactionItemInput {
 }
 
 export interface CreateTransactionInput {
-  type?: TransactionType
+  type: TransactionType
   items?: TransactionItemInput[]
   label?: string
   amount?: number

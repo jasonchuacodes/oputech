@@ -35,7 +35,7 @@ input TransactionItemInput {
 }
 
 input CreateTransactionInput {
-  type: TransactionType! = SALE
+  type: TransactionType!
   items: [TransactionItemInput!]
   label: String
   amount: Float
@@ -51,7 +51,7 @@ input TransactionFilter {
 }
 
 extend type Query {
-  transactions(filter: TransactionFilter, date: String): [Transaction!]!
+  transactions(filter: TransactionFilter): [Transaction!]!
 }
 
 extend type Mutation {

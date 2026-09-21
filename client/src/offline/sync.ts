@@ -78,10 +78,7 @@ const classifyError = (error: unknown): SyncFailure => {
       return new SyncFailure('auth', 'Sign in again to sync pending records')
     }
     if (!status || status >= 500) {
-      return new SyncFailure(
-        'network',
-        error.message || 'The API is unavailable'
-      )
+      return new SyncFailure('network', error.message || 'The API is unavailable')
     }
     const message =
       (error.response?.data as { message?: string } | undefined)?.message ??
@@ -114,7 +111,10 @@ const retryAt = (attempts: number) => {
   return new Date(Date.now() + base + jitter).toISOString()
 }
 
-const markFailed = async (operation: OutboxOperation, failure: SyncFailure) => {
+const markFailed = async (
+  operation: OutboxOperation,
+  failure: SyncFailure
+) => {
   const attempts = operation.attempts + 1
   const blocked = failure.kind === 'blocked'
 
@@ -132,9 +132,7 @@ const markFailed = async (operation: OutboxOperation, failure: SyncFailure) => {
       if (blocked) {
         await offlineDb.transactions.update(operation.entityId, {
           syncState: 'blocked',
-          ...(operation.kind === 'DELETE_TRANSACTION'
-            ? { deleted: false }
-            : {}),
+          ...(operation.kind === 'DELETE_TRANSACTION' ? { deleted: false } : {}),
         })
       }
     }
@@ -174,10 +172,7 @@ const processDelete = async (operation: OutboxOperation) => {
     return
   }
   if (!local.serverId) {
-    throw new SyncFailure(
-      'network',
-      'Waiting for the transaction create to sync'
-    )
+    throw new SyncFailure('network', 'Waiting for the transaction create to sync')
   }
 
   await deleteTransaction(local.serverId)
@@ -211,9 +206,7 @@ export const refreshLocalSnapshot = async (): Promise<void> => {
         products.map((product) => ({ ...product, cachedAt }))
       )
 
-      const serverIds = new Set(
-        transactions.map((transaction) => transaction.id)
-      )
+      const serverIds = new Set(transactions.map((transaction) => transaction.id))
       for (const remote of transactions) {
         const existing = remote.clientMutationId
           ? await offlineDb.transactions
@@ -267,10 +260,7 @@ export const flushOutbox = async ({
       const operation = await offlineDb.outbox.orderBy('createdAt').first()
       if (!operation) break
       if (operation.state === 'blocked') {
-        throw new SyncFailure(
-          'blocked',
-          operation.lastError ?? 'Sync is blocked'
-        )
+        throw new SyncFailure('blocked', operation.lastError ?? 'Sync is blocked')
       }
       if (
         !force &&
@@ -309,11 +299,7 @@ export const retryBlockedOperations = async () => {
   await offlineDb.outbox
     .where('state')
     .equals('blocked')
-    .modify({
-      state: 'pending',
-      nextAttemptAt: undefined,
-      lastError: undefined,
-    })
+    .modify({ state: 'pending', nextAttemptAt: undefined, lastError: undefined })
   await offlineDb.transactions
     .where('syncState')
     .equals('blocked')

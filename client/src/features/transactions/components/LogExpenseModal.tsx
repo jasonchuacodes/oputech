@@ -18,10 +18,7 @@ import {
   PaymentType,
   TransactionType,
 } from '../../../services/transaction/transaction.types'
-import {
-  LogExpenseSchema,
-  LogExpenseInput,
-} from '../schemas/log-expense.schema'
+import { LogExpenseSchema, LogExpenseInput } from '../schemas/log-expense.schema'
 import { clearDraft, getDraft, saveDraft } from '../../../offline/database'
 
 const EXPENSE_DRAFT_KEY = 'expense-form'
@@ -111,7 +108,9 @@ export const LogExpenseModal = ({ open, onClose }: Props) => {
           <Label htmlFor="amount">Amount *</Label>
           <NumberInput name="amount" control={control} step={0.01} min={0} />
           {errors.amount && (
-            <p className="text-destructive text-xs">{errors.amount.message}</p>
+            <p className="text-destructive text-xs">
+              {errors.amount.message}
+            </p>
           )}
         </div>
 
